@@ -1,0 +1,128 @@
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
+@layer base {
+    html {
+        font-family: "Roboto", system-ui, sans-serif;
+    }
+
+    input[type="color"] {
+        -webkit-appearance: none;
+        appearance: none;
+        @apply w-6 h-6 border-0 cursor-pointer p-0 bg-transparent;
+    }
+    input[type="color"]::-webkit-color-swatch-wrapper {
+        @apply p-0;
+    }
+    input[type="color"]::-webkit-color-swatch {
+        @apply border-0 rounded-full;
+    }
+}
+
+
+/* The blockly input field should have the correct size but due to aliasing it needs to be just a nudge smaller to not cover up parts of the border */
+.renderer-renderer.light-theme.blocklyWidgetDiv:has(.blocklyHtmlInput) {
+    transform: scale(0.98) translateX(0.5px) translateY(-0.5px);
+}
+
+.blocklyMenuFilter {
+    border-radius: 4px;
+    padding: 2px 4px;
+    font-size: 10pt;
+    color: white;
+    outline: none;
+    width: 100%;
+}
+
+.blocklyDropDownContent:has(.blocklyMenu) {
+    max-width: 500px;
+}
+
+.blocklyDropDownContent:has(.blocklyMenu) .blocklyMenu {
+    /** not really nice, the scrollbar is all the way at the bottom... */
+    overflow-x: auto;
+}
+
+.blocklyMenuFilter::placeholder {
+    color: rgba(255, 255, 255, 0.5)
+}
+
+.blocklyAutocompleteMenu {
+    min-width: 100px;
+    font: normal 13px "Helvetica Neue", Helvetica, sans-serif;
+}
+
+.blocklyAutocompleteMenu > div {
+    padding: 6px 15px;
+    color: white;
+    cursor: pointer;
+}
+
+.blocklyAutocompleteMenu > div:hover, .blocklyAutocompleteMenu > div.selected {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.blocklyHierarchyMenu, .blocklyDateMenu {
+    font: normal 13px "Helvetica Neue", Helvetica, sans-serif;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.blocklyHierarchyMenu > div {
+    display: flex;
+    gap: 4px;
+}
+
+.blocklyDateMenu > div {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+    width: 100%;
+}
+
+.blocklyDateMenu > div > select {
+    min-width: 70px;
+}
+
+.blocklyDateMenu > div > label {
+    min-width: 60px;
+}
+
+.markdown-body ol {
+    list-style: decimal;
+    padding-left: 2em;
+}
+
+.markdown-body ol ol {
+    list-style: lower-alpha;
+    padding-left: 2em;
+}
+
+.markdown-body ol ol ol {
+    list-style: lower-roman;
+    padding-left: 2em;
+}
+
+.markdown-body ul {
+    list-style: disc;
+    padding-left: 2em;
+}
+
+.markdown-body .block-preview .blocklyMainBackground {
+    fill: transparent !important;
+    stroke: transparent !important;
+}
+
+.markdown-body .block-preview .blocklySvg {
+    background: transparent !important;
+}
+
+.markdown-body table tr {
+    background-color: transparent !important;
+}
+
+.markdown-body table tr:nth-child(2n) {
+    background-color: rgba(0, 0, 0, 0.05) !important;
+}

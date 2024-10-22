@@ -1,0 +1,1132 @@
+{
+    "user": {
+        "browser": {
+            "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+            "isBrave": false,
+            "prefersDarkMode": false,
+            "screenMetrics": {
+                "width": 2525,
+                "height": 1268
+            }
+        },
+        "code": "A-96751",
+        "consentGiven": true
+    },
+    "results": {
+        "demographics": {
+            "Age": {
+                "answer": "36-45"
+            },
+            "Gender": {
+                "answer": "divers"
+            },
+            "HighestEducationalQualification": {
+                "answer": "Fachabitur"
+            },
+            "FieldOfStudy": {
+                "answer": "Data Science"
+            }
+        },
+        "computer-experience": {
+            "ComputerExperience": {
+                "answer": "Experte"
+            },
+            "VisualLanguageExperience": {
+                "answer": [
+                    "Mit keiner"
+                ]
+            },
+            "ProgrammingExperience": {
+                "answer": [
+                    "C#",
+                    "JavaScript",
+                    "Mit keiner"
+                ]
+            }
+        }
+    },
+    "tasks": {
+        "learning": {
+            "0": {
+                "isPractice": true,
+                "recall": 0.6666666666666666,
+                "precision": 0.1111111111111111,
+                "time": 26321,
+                "chosenEntities": {
+                    "Target": [
+                        0,
+                        1,
+                        2,
+                        7,
+                        8,
+                        10,
+                        13,
+                        18,
+                        22,
+                        25,
+                        26,
+                        27,
+                        29,
+                        31,
+                        33,
+                        34,
+                        35,
+                        36
+                    ]
+                },
+                "events": [
+                    {
+                        "name": "createBlockInToolbox",
+                        "time": 9155,
+                        "payload": {
+                            "blockType": "comparison_greater"
+                        }
+                    },
+                    {
+                        "name": "workspaceChanged",
+                        "time": 9197,
+                        "payload": {
+                            "workspaceState": {
+                                "workspaceState": {
+                                    "blocks": {
+                                        "languageVersion": 0,
+                                        "blocks": [
+                                            {
+                                                "type": "comparison_greater",
+                                                "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                "x": -364,
+                                                "y": 876,
+                                                "extraState": {
+                                                    "inputTypes": {},
+                                                    "originalTypes": {
+                                                        "A": "Union<Number | Timestamp>?",
+                                                        "B": "Union<Number | Timestamp>?"
+                                                    }
+                                                },
+                                                "inputs": {
+                                                    "A": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": ",L},YeOoSrQL:s2b_:,:",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    },
+                                                    "B": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": "HZ+xfMza}TWCf^2^la+H",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "variables": [
+                                        {
+                                            "name": "Stadt",
+                                            "id": "r.*f#iVPX!ya=k14?clT",
+                                            "type": "Enum<StadtName>"
+                                        },
+                                        {
+                                            "name": "Schl\u00fcsselnummer",
+                                            "id": "^iJo41~?E,s@pl4%02Cn",
+                                            "type": "Hierarchy<AGS>"
+                                        },
+                                        {
+                                            "name": "IstLandeshauptstadt",
+                                            "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                            "type": "Boolean"
+                                        },
+                                        {
+                                            "name": "Fl\u00e4che in km\u00b2",
+                                            "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (m\u00e4nnl.)",
+                                            "id": "py;4K)btSlT#?-g4fj16",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (weibl.)",
+                                            "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "H\u00f6he \u00fcber NN",
+                                            "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Wetterstation",
+                                            "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                            "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                                        },
+                                        {
+                                            "name": "Wetterdaten",
+                                            "id": "XH8g9Io(U{Tyr;@K4-12",
+                                            "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                                        }
+                                    ],
+                                    "edges": [],
+                                    "local_variables": []
+                                },
+                                "panPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "toolboxScrollPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "workspaceChanged",
+                        "time": 10342,
+                        "payload": {
+                            "workspaceState": {
+                                "workspaceState": {
+                                    "blocks": {
+                                        "languageVersion": 0,
+                                        "blocks": [
+                                            {
+                                                "type": "comparison_greater",
+                                                "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                "x": 300,
+                                                "y": 340,
+                                                "extraState": {
+                                                    "inputTypes": {},
+                                                    "originalTypes": {
+                                                        "A": "Union<Number | Timestamp>?",
+                                                        "B": "Union<Number | Timestamp>?"
+                                                    }
+                                                },
+                                                "inputs": {
+                                                    "A": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": ",L},YeOoSrQL:s2b_:,:",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    },
+                                                    "B": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": "HZ+xfMza}TWCf^2^la+H",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "variables": [
+                                        {
+                                            "name": "Stadt",
+                                            "id": "r.*f#iVPX!ya=k14?clT",
+                                            "type": "Enum<StadtName>"
+                                        },
+                                        {
+                                            "name": "Schl\u00fcsselnummer",
+                                            "id": "^iJo41~?E,s@pl4%02Cn",
+                                            "type": "Hierarchy<AGS>"
+                                        },
+                                        {
+                                            "name": "IstLandeshauptstadt",
+                                            "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                            "type": "Boolean"
+                                        },
+                                        {
+                                            "name": "Fl\u00e4che in km\u00b2",
+                                            "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (m\u00e4nnl.)",
+                                            "id": "py;4K)btSlT#?-g4fj16",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (weibl.)",
+                                            "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "H\u00f6he \u00fcber NN",
+                                            "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Wetterstation",
+                                            "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                            "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                                        },
+                                        {
+                                            "name": "Wetterdaten",
+                                            "id": "XH8g9Io(U{Tyr;@K4-12",
+                                            "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                                        }
+                                    ],
+                                    "edges": [],
+                                    "local_variables": []
+                                },
+                                "panPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "toolboxScrollPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "createBlockInToolbox",
+                        "time": 13271,
+                        "payload": {
+                            "blockType": "variable_get"
+                        }
+                    },
+                    {
+                        "name": "workspaceChanged",
+                        "time": 13309,
+                        "payload": {
+                            "workspaceState": {
+                                "workspaceState": {
+                                    "blocks": {
+                                        "languageVersion": 0,
+                                        "blocks": [
+                                            {
+                                                "type": "comparison_greater",
+                                                "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                "x": 300,
+                                                "y": 340,
+                                                "extraState": {
+                                                    "inputTypes": {},
+                                                    "originalTypes": {
+                                                        "A": "Union<Number | Timestamp>?",
+                                                        "B": "Union<Number | Timestamp>?"
+                                                    }
+                                                },
+                                                "inputs": {
+                                                    "A": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": ",L},YeOoSrQL:s2b_:,:",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    },
+                                                    "B": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": "HZ+xfMza}TWCf^2^la+H",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "variable_get",
+                                                "id": "6Y{4Xpnn;vY[?)ZPE,N+",
+                                                "x": -372,
+                                                "y": 219,
+                                                "extraState": {
+                                                    "variable": "Number"
+                                                },
+                                                "fields": {
+                                                    "VAR": {
+                                                        "id": ",eWfUX5-f_Lu]K=@3h?d"
+                                                    },
+                                                    "TYPE": {
+                                                        "type": "Number"
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "variables": [
+                                        {
+                                            "name": "Stadt",
+                                            "id": "r.*f#iVPX!ya=k14?clT",
+                                            "type": "Enum<StadtName>"
+                                        },
+                                        {
+                                            "name": "Schl\u00fcsselnummer",
+                                            "id": "^iJo41~?E,s@pl4%02Cn",
+                                            "type": "Hierarchy<AGS>"
+                                        },
+                                        {
+                                            "name": "IstLandeshauptstadt",
+                                            "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                            "type": "Boolean"
+                                        },
+                                        {
+                                            "name": "Fl\u00e4che in km\u00b2",
+                                            "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (m\u00e4nnl.)",
+                                            "id": "py;4K)btSlT#?-g4fj16",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (weibl.)",
+                                            "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "H\u00f6he \u00fcber NN",
+                                            "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Wetterstation",
+                                            "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                            "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                                        },
+                                        {
+                                            "name": "Wetterdaten",
+                                            "id": "XH8g9Io(U{Tyr;@K4-12",
+                                            "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                                        }
+                                    ],
+                                    "edges": [],
+                                    "local_variables": []
+                                },
+                                "panPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "toolboxScrollPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "workspaceChanged",
+                        "time": 14653,
+                        "payload": {
+                            "workspaceState": {
+                                "workspaceState": {
+                                    "blocks": {
+                                        "languageVersion": 0,
+                                        "blocks": [
+                                            {
+                                                "type": "comparison_greater",
+                                                "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                "x": 300,
+                                                "y": 340,
+                                                "extraState": {
+                                                    "inputTypes": {},
+                                                    "originalTypes": {
+                                                        "A": "Union<Number | Timestamp>?",
+                                                        "B": "Union<Number | Timestamp>?"
+                                                    }
+                                                },
+                                                "inputs": {
+                                                    "A": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": ",L},YeOoSrQL:s2b_:,:",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        },
+                                                        "block": {
+                                                            "type": "variable_get",
+                                                            "id": "6Y{4Xpnn;vY[?)ZPE,N+",
+                                                            "extraState": {
+                                                                "variable": "Number"
+                                                            },
+                                                            "fields": {
+                                                                "VAR": {
+                                                                    "id": ",eWfUX5-f_Lu]K=@3h?d"
+                                                                },
+                                                                "TYPE": {
+                                                                    "type": "Number"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "B": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": "HZ+xfMza}TWCf^2^la+H",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "variables": [
+                                        {
+                                            "name": "Stadt",
+                                            "id": "r.*f#iVPX!ya=k14?clT",
+                                            "type": "Enum<StadtName>"
+                                        },
+                                        {
+                                            "name": "Schl\u00fcsselnummer",
+                                            "id": "^iJo41~?E,s@pl4%02Cn",
+                                            "type": "Hierarchy<AGS>"
+                                        },
+                                        {
+                                            "name": "IstLandeshauptstadt",
+                                            "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                            "type": "Boolean"
+                                        },
+                                        {
+                                            "name": "Fl\u00e4che in km\u00b2",
+                                            "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (m\u00e4nnl.)",
+                                            "id": "py;4K)btSlT#?-g4fj16",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (weibl.)",
+                                            "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "H\u00f6he \u00fcber NN",
+                                            "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Wetterstation",
+                                            "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                            "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                                        },
+                                        {
+                                            "name": "Wetterdaten",
+                                            "id": "XH8g9Io(U{Tyr;@K4-12",
+                                            "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                                        }
+                                    ],
+                                    "edges": [],
+                                    "local_variables": []
+                                },
+                                "panPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "toolboxScrollPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "workspaceChanged",
+                        "time": 14685,
+                        "payload": {
+                            "workspaceState": {
+                                "workspaceState": {
+                                    "blocks": {
+                                        "languageVersion": 0,
+                                        "blocks": [
+                                            {
+                                                "type": "comparison_greater",
+                                                "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                "x": 300,
+                                                "y": 340,
+                                                "extraState": {
+                                                    "inputTypes": {
+                                                        "A": "Number?",
+                                                        "B": "Number?"
+                                                    },
+                                                    "originalTypes": {
+                                                        "A": "Union<Number | Timestamp>?",
+                                                        "B": "Union<Number | Timestamp>?"
+                                                    }
+                                                },
+                                                "inputs": {
+                                                    "A": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": ",L},YeOoSrQL:s2b_:,:",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        },
+                                                        "block": {
+                                                            "type": "variable_get",
+                                                            "id": "6Y{4Xpnn;vY[?)ZPE,N+",
+                                                            "extraState": {
+                                                                "variable": "Number"
+                                                            },
+                                                            "fields": {
+                                                                "VAR": {
+                                                                    "id": ",eWfUX5-f_Lu]K=@3h?d"
+                                                                },
+                                                                "TYPE": {
+                                                                    "type": "Number"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "B": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": "HZ+xfMza}TWCf^2^la+H",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "variables": [
+                                        {
+                                            "name": "Stadt",
+                                            "id": "r.*f#iVPX!ya=k14?clT",
+                                            "type": "Enum<StadtName>"
+                                        },
+                                        {
+                                            "name": "Schl\u00fcsselnummer",
+                                            "id": "^iJo41~?E,s@pl4%02Cn",
+                                            "type": "Hierarchy<AGS>"
+                                        },
+                                        {
+                                            "name": "IstLandeshauptstadt",
+                                            "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                            "type": "Boolean"
+                                        },
+                                        {
+                                            "name": "Fl\u00e4che in km\u00b2",
+                                            "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (m\u00e4nnl.)",
+                                            "id": "py;4K)btSlT#?-g4fj16",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (weibl.)",
+                                            "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "H\u00f6he \u00fcber NN",
+                                            "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Wetterstation",
+                                            "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                            "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                                        },
+                                        {
+                                            "name": "Wetterdaten",
+                                            "id": "XH8g9Io(U{Tyr;@K4-12",
+                                            "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                                        }
+                                    ],
+                                    "edges": [],
+                                    "local_variables": []
+                                },
+                                "panPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "toolboxScrollPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "useMagicWand",
+                        "time": 23775,
+                        "payload": {
+                            "workspaceState": {
+                                "workspaceState": {
+                                    "blocks": {
+                                        "languageVersion": 0,
+                                        "blocks": [
+                                            {
+                                                "type": "comparison_greater",
+                                                "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                "x": 300,
+                                                "y": 340,
+                                                "extraState": {
+                                                    "inputTypes": {
+                                                        "A": "Number?",
+                                                        "B": "Number?"
+                                                    },
+                                                    "originalTypes": {
+                                                        "A": "Union<Number | Timestamp>?",
+                                                        "B": "Union<Number | Timestamp>?"
+                                                    }
+                                                },
+                                                "inputs": {
+                                                    "A": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": ",L},YeOoSrQL:s2b_:,:",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        },
+                                                        "block": {
+                                                            "type": "variable_get",
+                                                            "id": "6Y{4Xpnn;vY[?)ZPE,N+",
+                                                            "extraState": {
+                                                                "variable": "Number"
+                                                            },
+                                                            "fields": {
+                                                                "VAR": {
+                                                                    "id": ",eWfUX5-f_Lu]K=@3h?d"
+                                                                },
+                                                                "TYPE": {
+                                                                    "type": "Number"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "B": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": "HZ+xfMza}TWCf^2^la+H",
+                                                            "fields": {
+                                                                "NUM": "200"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "variables": [
+                                        {
+                                            "name": "Stadt",
+                                            "id": "r.*f#iVPX!ya=k14?clT",
+                                            "type": "Enum<StadtName>"
+                                        },
+                                        {
+                                            "name": "Schl\u00fcsselnummer",
+                                            "id": "^iJo41~?E,s@pl4%02Cn",
+                                            "type": "Hierarchy<AGS>"
+                                        },
+                                        {
+                                            "name": "IstLandeshauptstadt",
+                                            "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                            "type": "Boolean"
+                                        },
+                                        {
+                                            "name": "Fl\u00e4che in km\u00b2",
+                                            "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (m\u00e4nnl.)",
+                                            "id": "py;4K)btSlT#?-g4fj16",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (weibl.)",
+                                            "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "H\u00f6he \u00fcber NN",
+                                            "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Wetterstation",
+                                            "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                            "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                                        },
+                                        {
+                                            "name": "Wetterdaten",
+                                            "id": "XH8g9Io(U{Tyr;@K4-12",
+                                            "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                                        }
+                                    ],
+                                    "edges": [],
+                                    "local_variables": []
+                                },
+                                "panPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                },
+                                "toolboxScrollPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    },
+                    {
+                        "name": "workspaceChanged",
+                        "time": 23828,
+                        "payload": {
+                            "workspaceState": {
+                                "workspaceState": {
+                                    "blocks": {
+                                        "languageVersion": 0,
+                                        "blocks": [
+                                            {
+                                                "type": "source_node",
+                                                "id": "-W_Q,bH`ZZvNl8TZuxC6",
+                                                "x": 0,
+                                                "y": 0,
+                                                "fields": {
+                                                    "OUTPUT": "Quelle"
+                                                }
+                                            },
+                                            {
+                                                "type": "subset_node",
+                                                "id": "WQWD6in%B8@|0;x$+91i",
+                                                "x": 320,
+                                                "y": 116,
+                                                "fields": {
+                                                    "NAME": "Demo",
+                                                    "INPUT": "Eingabe",
+                                                    "POSITIVE": "Positiv",
+                                                    "NEGATIVE": "Negativ"
+                                                },
+                                                "inputs": {
+                                                    "FILTERS": {
+                                                        "block": {
+                                                            "type": "comparison_greater",
+                                                            "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                            "extraState": {
+                                                                "inputTypes": {
+                                                                    "A": "Number?",
+                                                                    "B": "Number?"
+                                                                },
+                                                                "originalTypes": {
+                                                                    "A": "Union<Number | Timestamp>?",
+                                                                    "B": "Union<Number | Timestamp>?"
+                                                                }
+                                                            },
+                                                            "inputs": {
+                                                                "A": {
+                                                                    "shadow": {
+                                                                        "type": "math_number",
+                                                                        "id": ",L},YeOoSrQL:s2b_:,:",
+                                                                        "fields": {
+                                                                            "NUM": ""
+                                                                        }
+                                                                    },
+                                                                    "block": {
+                                                                        "type": "variable_get",
+                                                                        "id": "6Y{4Xpnn;vY[?)ZPE,N+",
+                                                                        "extraState": {
+                                                                            "variable": "Number"
+                                                                        },
+                                                                        "fields": {
+                                                                            "VAR": {
+                                                                                "id": ",eWfUX5-f_Lu]K=@3h?d"
+                                                                            },
+                                                                            "TYPE": {
+                                                                                "type": "Number"
+                                                                            }
+                                                                        }
+                                                                    }
+                                                                },
+                                                                "B": {
+                                                                    "shadow": {
+                                                                        "type": "math_number",
+                                                                        "id": "HZ+xfMza}TWCf^2^la+H",
+                                                                        "fields": {
+                                                                            "NUM": "200"
+                                                                        }
+                                                                    }
+                                                                }
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            },
+                                            {
+                                                "type": "target_node",
+                                                "id": "7a@]!Q.GYW_KU%#vBu`J",
+                                                "x": 640,
+                                                "y": 365,
+                                                "fields": {
+                                                    "LABEL": {
+                                                        "id": "target0",
+                                                        "name": "Target"
+                                                    },
+                                                    "INPUT": "Ziel"
+                                                }
+                                            }
+                                        ]
+                                    },
+                                    "variables": [
+                                        {
+                                            "name": "Stadt",
+                                            "id": "r.*f#iVPX!ya=k14?clT",
+                                            "type": "Enum<StadtName>"
+                                        },
+                                        {
+                                            "name": "Schl\u00fcsselnummer",
+                                            "id": "^iJo41~?E,s@pl4%02Cn",
+                                            "type": "Hierarchy<AGS>"
+                                        },
+                                        {
+                                            "name": "IstLandeshauptstadt",
+                                            "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                            "type": "Boolean"
+                                        },
+                                        {
+                                            "name": "Fl\u00e4che in km\u00b2",
+                                            "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (m\u00e4nnl.)",
+                                            "id": "py;4K)btSlT#?-g4fj16",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Einwohner (weibl.)",
+                                            "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "H\u00f6he \u00fcber NN",
+                                            "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                            "type": "Number"
+                                        },
+                                        {
+                                            "name": "Wetterstation",
+                                            "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                            "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                                        },
+                                        {
+                                            "name": "Wetterdaten",
+                                            "id": "XH8g9Io(U{Tyr;@K4-12",
+                                            "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                                        }
+                                    ],
+                                    "edges": [
+                                        {
+                                            "sourceBlockId": "-W_Q,bH`ZZvNl8TZuxC6",
+                                            "targetBlockId": "WQWD6in%B8@|0;x$+91i",
+                                            "sourceField": "OUTPUT",
+                                            "targetField": "INPUT"
+                                        },
+                                        {
+                                            "sourceBlockId": "WQWD6in%B8@|0;x$+91i",
+                                            "targetBlockId": "7a@]!Q.GYW_KU%#vBu`J",
+                                            "sourceField": "POSITIVE",
+                                            "targetField": "INPUT"
+                                        }
+                                    ],
+                                    "local_variables": []
+                                },
+                                "panPosition": {
+                                    "x": 418.15367736816404,
+                                    "y": 382.1
+                                },
+                                "toolboxScrollPosition": {
+                                    "x": 0,
+                                    "y": 0
+                                }
+                            }
+                        }
+                    }
+                ],
+                "resultWorkspace": {
+                    "workspaceState": {
+                        "blocks": {
+                            "languageVersion": 0,
+                            "blocks": [
+                                {
+                                    "type": "source_node",
+                                    "id": "-W_Q,bH`ZZvNl8TZuxC6",
+                                    "x": 0,
+                                    "y": 0,
+                                    "fields": {
+                                        "OUTPUT": "Quelle"
+                                    }
+                                },
+                                {
+                                    "type": "subset_node",
+                                    "id": "WQWD6in%B8@|0;x$+91i",
+                                    "x": 320,
+                                    "y": 116,
+                                    "fields": {
+                                        "NAME": "Demo",
+                                        "INPUT": "Eingabe",
+                                        "POSITIVE": "Positiv",
+                                        "NEGATIVE": "Negativ"
+                                    },
+                                    "inputs": {
+                                        "FILTERS": {
+                                            "block": {
+                                                "type": "comparison_greater",
+                                                "id": "X?h4;L$9e-?z*8/:.L(}",
+                                                "extraState": {
+                                                    "inputTypes": {
+                                                        "A": "Number?",
+                                                        "B": "Number?"
+                                                    },
+                                                    "originalTypes": {
+                                                        "A": "Union<Number | Timestamp>?",
+                                                        "B": "Union<Number | Timestamp>?"
+                                                    }
+                                                },
+                                                "inputs": {
+                                                    "A": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": ",L},YeOoSrQL:s2b_:,:",
+                                                            "fields": {
+                                                                "NUM": ""
+                                                            }
+                                                        },
+                                                        "block": {
+                                                            "type": "variable_get",
+                                                            "id": "6Y{4Xpnn;vY[?)ZPE,N+",
+                                                            "extraState": {
+                                                                "variable": "Number"
+                                                            },
+                                                            "fields": {
+                                                                "VAR": {
+                                                                    "id": ",eWfUX5-f_Lu]K=@3h?d"
+                                                                },
+                                                                "TYPE": {
+                                                                    "type": "Number"
+                                                                }
+                                                            }
+                                                        }
+                                                    },
+                                                    "B": {
+                                                        "shadow": {
+                                                            "type": "math_number",
+                                                            "id": "HZ+xfMza}TWCf^2^la+H",
+                                                            "fields": {
+                                                                "NUM": "200"
+                                                            }
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                },
+                                {
+                                    "type": "target_node",
+                                    "id": "7a@]!Q.GYW_KU%#vBu`J",
+                                    "x": 640,
+                                    "y": 365,
+                                    "fields": {
+                                        "LABEL": {
+                                            "id": "target0",
+                                            "name": "Target"
+                                        },
+                                        "INPUT": "Ziel"
+                                    }
+                                }
+                            ]
+                        },
+                        "variables": [
+                            {
+                                "name": "Stadt",
+                                "id": "r.*f#iVPX!ya=k14?clT",
+                                "type": "Enum<StadtName>"
+                            },
+                            {
+                                "name": "Schl\u00fcsselnummer",
+                                "id": "^iJo41~?E,s@pl4%02Cn",
+                                "type": "Hierarchy<AGS>"
+                            },
+                            {
+                                "name": "IstLandeshauptstadt",
+                                "id": "ei5U@?Mn*lUP6S:dMmRw",
+                                "type": "Boolean"
+                            },
+                            {
+                                "name": "Fl\u00e4che in km\u00b2",
+                                "id": "Rkeiy=Lf.Q[hvo+0d@t^",
+                                "type": "Number"
+                            },
+                            {
+                                "name": "Einwohner (m\u00e4nnl.)",
+                                "id": "py;4K)btSlT#?-g4fj16",
+                                "type": "Number"
+                            },
+                            {
+                                "name": "Einwohner (weibl.)",
+                                "id": "}BT=u}rf+Qf%B[eGaLYs",
+                                "type": "Number"
+                            },
+                            {
+                                "name": "H\u00f6he \u00fcber NN",
+                                "id": ",eWfUX5-f_Lu]K=@3h?d",
+                                "type": "Number"
+                            },
+                            {
+                                "name": "Wetterstation",
+                                "id": "YQ*ZPd|uqz9kJ;*$Ln4_",
+                                "type": "{Name: Enum<StationsName>, Inbetriebnahme: Timestamp}"
+                            },
+                            {
+                                "name": "Wetterdaten",
+                                "id": "XH8g9Io(U{Tyr;@K4-12",
+                                "type": "Timeline<{timestamp: Timestamp, type: Enum<WetterEventType>, Windgeschwindigkeit: Number, Sonnenstunden: Number, Temperatur: Number, Niederschlag: Boolean, Niederschlagsarten: List<Enum<Niederschlagsform>>}>"
+                            }
+                        ],
+                        "edges": [
+                            {
+                                "sourceBlockId": "-W_Q,bH`ZZvNl8TZuxC6",
+                                "targetBlockId": "WQWD6in%B8@|0;x$+91i",
+                                "sourceField": "OUTPUT",
+                                "targetField": "INPUT"
+                            },
+                            {
+                                "sourceBlockId": "WQWD6in%B8@|0;x$+91i",
+                                "targetBlockId": "7a@]!Q.GYW_KU%#vBu`J",
+                                "sourceField": "POSITIVE",
+                                "targetField": "INPUT"
+                            }
+                        ],
+                        "local_variables": []
+                    },
+                    "panPosition": {
+                        "x": 418.15367736816404,
+                        "y": 382.1
+                    },
+                    "toolboxScrollPosition": {
+                        "x": 0,
+                        "y": 0
+                    }
+                }
+            }
+        }
+    }
+}

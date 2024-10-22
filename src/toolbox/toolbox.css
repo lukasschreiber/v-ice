@@ -1,0 +1,32 @@
+.categoryBubble {
+  @apply mt-0 mx-auto mb-0.5 rounded-full w-5 h-5 border border-solid border-black/10;
+}
+
+.blocklyTreeRow {
+  @apply py-1 px-0 mb-0 cursor-pointer h-[initial];
+}
+
+.blocklyTreeRow.blocklyTreeSelected .blocklyTreeLabel {
+  @apply text-[unset]
+}
+
+.blocklyTreeRow:hover .blocklyTreeLabel {
+  @apply text-secondary;
+}
+
+.blocklyTreeRowContentContainer {
+  @apply flex flex-col;
+}
+
+.blocklyTreeLabel {
+  @apply text-2xs m-auto;
+}
+
+.blocklyToolboxDiv {
+  @apply min-w-[65px] border-r-[1px] border-slate-200 border-solid border-0 p-0;
+  /* This magic number works well with the length of "Comparisons" the sidebar should not get too big and should not change if the language is switched */
+}
+
+.blocklyFlyoutLabelText {
+  @apply !font-bold;
+}

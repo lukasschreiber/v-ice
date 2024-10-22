@@ -1,0 +1,45 @@
+import { GenericBlockDefinition } from "@/blocks/toolbox/toolbox_definition";
+import { useRef, useState } from "react";
+import { BlockPreview } from "./BlockPreview";
+import { createPortal } from "react-dom";
+
+export function BlockInlinePreview(props: { block: GenericBlockDefinition; text: string }) {
+    const [isHovered, setIsHovered] = useState(false);
+    const inlineElementRef = useRef<HTMLSpanElement>(null);
+
+    return (
+        <span
+            className="relative inline-block"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            <span
+                className="underline underline-offset-4 decoration-dotted hover:bg-black/5"
+                ref={inlineElementRef}
+            >
+                {props.text}
+            </span>
+            {isHovered &&
+                createPortal(
+                    <div className="markdown-body">
+                        <div
+                            className={`absolute z-[100004] w-fit py-1 top-0 left-0`}
+                            style={{
+                                transform: `translate(
+                                    ${inlineElementRef.current!.getBoundingClientRect().left}px, 
+                                    ${
+                                        inlineElementRef.current!.getBoundingClientRect().top +
+                                        inlineElementRef.current!.getBoundingClientRect().height
+                                    }px)`,
+                            }}
+                        >
+                            <div className={`p-4 bg-white border border-gray-200 shadow-lg rounded-md`}>
+                                <BlockPreview block={props.block} />
+                            </div>
+                        </div>
+                    </div>,
+                    document.body
+                )}
+        </span>
+    );
+}

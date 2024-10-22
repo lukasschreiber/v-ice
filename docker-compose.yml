@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  backend:
+    build:
+      context: ./../../
+      dockerfile: ./projects/filters/Dockerfile
+      target: production-stage
+      args:
+        - VITE_API_BASE_URL=https://backend.eva.lukasschreiber.de
+    ports:
+      - "5000:5000"
+    volumes:
+      - db-data:/usr/src/app/projects/filters/demos/evaluation/data
+
+  nginx:
+    build:
+      context: ./../../
+      dockerfile: ./projects/filters/Dockerfile
+      target: nginx-stage
+      args:
+        - VITE_API_BASE_URL=https://backend.eva.lukasschreiber.de
+    ports:
+      - "5001:80"
+    depends_on:
+      - backend
+volumes:
+  db-data:

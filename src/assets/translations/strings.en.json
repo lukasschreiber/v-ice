@@ -1,0 +1,144 @@
+{
+    "blockly": {
+        "Variables": "Variables",
+        "Comparisons": "Comparisons",
+        "Nodes": "Nodes",
+        "Arithmetic": "Math",
+        "Timeline": "Time",
+        "lists": "Lists",
+        "Logic": "Logic",
+
+        "column": "Column",
+
+        "within": "within",
+        "matches": "matches",
+
+        "source": "Source",
+        "target": "Target",
+        "subset": "Subset",
+
+        "even": "even",
+        "odd": "odd",
+        "positive": "positive",
+        "negative": "negative",
+        "prime": "prime",
+        "divisible_by": "divisible by",
+        "whole": "whole",
+        "fraction": "decimal",
+        "constrain": "constrain %1 to %2 and %3",
+
+        "my_subset": "Demo",
+
+        "input": "Input",
+        "output": "Result",
+        "left": "Left",
+        "right": "Right",
+        "positive_edge": "Positive",
+        "negative_edge": "Negative",
+
+        "sin": "sin",
+        "cos": "cos",
+        "tan": "tan",
+        "asin": "asin",
+        "acos": "acos",
+        "atan": "atan",
+        "sqrt": "sqrt",
+        "abs": "abs",
+        "ln": "ln",
+        "exp": "e ^",
+        "round": "round",
+        "ceil": "ceil",
+        "floor": "floor",
+
+        "sum": "sum",
+        "average": "average",
+        "min": "minimum",
+        "max": "maximum",
+        "count": "count",
+        "median": "median",
+        "mode": "mode",
+        "std_dev": "standard deviation",
+        "variance": "variance",
+        "Q1": "Q1",
+        "Q3": "Q3",
+        "IQR": "IQR",
+        "range": "range",
+
+        "length": "length",
+        "contains": "contains",
+        "any": "any",
+        "all": "all",
+        "value": "value",
+
+        "flatten": "flatten",
+
+        "equals": "equals",
+        "contains_sequence": "contains sequence",
+        "starts_with": "starts with",
+        "ends_with": "ends with",
+        "contains_all_items_of": "contains all items of",
+
+        "attribute": "attribute",
+
+        "either": "either",
+        "not": "not",
+
+        "timeline_matches": "timeline %1 matches",
+        "event": "event",
+        "interval": "interval",
+        "start_of_interval": "start of interval",
+        "end_of_interval": "end of interval",
+        "occurs": "occurs",
+        "does_not_occur": "does not occur",
+        "does_not_occur_for": "does not occur for",
+        "occurs_for_the_first_time": "occurs for the first time",
+        "occurs_for_the_last_time": "occurs for the last time",
+
+        "start": "start",
+        "end": "end",
+        "after": "after",
+        "exactly": "exactly",
+        "at_least": "at least",
+        "at_most": "at most",
+
+        "seconds": "seconds",
+        "minutes": "minutes",
+        "hours": "hours",
+        "days": "days",
+        "weeks": "weeks",
+        "months": "months",
+        "years": "years",
+
+        "the_date_is": "the date is %1",
+        "repeat_until": "repeat until %1 occurs",
+        "repeat_for": "repeat %1 times",
+        "to": "to",
+        "is": "is",
+        "for": "for",
+        "true": "true",
+        "false": "false",
+        "between": "between",
+        "and": "and",
+        "or": "or",
+        "of": "of",
+        "is_null": "is null",
+
+        "notification_self_connect": "Ein Knoten kann nicht mit sich selbst verbunden werden!",
+        "notification_input_to_input": "Ein Input kann nicht mit einem anderen Input verbunden werden!",
+        "notification_output_to_output": "Ein Output kann nicht mit einem anderen Output verbunden werden!",
+        "notification_no_cycle": "A cycle in the graph is not permitted!",
+        "notification_variable_out_of_scope": "Die Variable \"Wert\" darf nur innerhalb ihres Elternblocks verwendet werden!"
+    },
+    "help": {
+        "title": "Handbuch",
+        "note": "Hinweis",
+        "warning": "Warning",
+        "tip": "Tip",
+        "zoom": "Adjust the zoom of the workspace"
+    },
+    "formats": {
+        "date": {
+            "short": "dd.MM.yyyy"
+        }
+    }
+}

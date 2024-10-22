@@ -1,0 +1,144 @@
+{
+    "blockly": {
+        "Variables": "Variablen",
+        "Comparisons": "Vergleiche",
+        "Nodes": "Knoten",
+        "Arithmetic": "Mathe",
+        "Timeline": "Zeit",
+        "lists": "Listen",
+        "Logic": "Logik",
+
+        "column": "Spalte",
+
+        "within": "innerhalb von",
+        "matches": "entspricht",
+
+        "source": "Quelle",
+        "target": "Ziel",
+        "subset": "Teilmenge",
+
+        "even": "gerade",
+        "odd": "ungerade",
+        "positive": "positiv",
+        "negative": "negativ",
+        "prime": "eine Primzahl",
+        "divisible_by": "teilbar durch",
+        "whole": "eine Ganzzahl",
+        "fraction": "eine Dezimalzahl",
+        "constrain": "beschränke %1 auf %2 bis %3",
+
+        "my_subset": "Demo",
+
+        "input": "Eingabe",
+        "output": "Ergebnis",
+        "left": "Links",
+        "right": "Rechts",
+        "positive_edge": "Positiv",
+        "negative_edge": "Negativ",
+        
+        "sin": "sin",
+        "cos": "cos",
+        "tan": "tan",
+        "asin": "asin",
+        "acos": "acos",
+        "atan": "atan",
+        "sqrt": "sqrt",
+        "abs": "Betrag",
+        "ln": "ln",
+        "exp": "e ^",
+        "round": "Runde",
+        "ceil": "Runde auf",
+        "floor": "Runde ab",
+
+        "sum": "Summe",
+        "average": "Durchschnitt",
+        "min": "Minimum",
+        "max": "Maximum",
+        "count": "Anzahl",
+        "median": "Median",
+        "mode": "Modus",
+        "std_dev": "Standardabweichung",
+        "variance": "Varianz",
+        "Q1": "Q1",
+        "Q3": "Q3",
+        "IQR": "IQR",
+        "range": "Spannweite",
+
+        "length": "Länge",
+        "contains": "enthält",
+        "any": "irgendeinen",
+        "all": "jeden",
+        "value": "Wert",
+
+        "flatten": "vereinige Listen",
+
+        "equals": "ist gleich",
+        "contains_sequence": "enthält die Folge",
+        "starts_with": "beginnt mit Folge",
+        "ends_with": "endet mit Folge",
+        "contains_all_items_of": "behinhaltet alle Elemente von",
+
+        "attribute": "Attribut",
+
+        "either": "entweder",
+        "not": "nicht",
+
+        "timeline_matches": "Zeitleiste %1 entspricht",
+        "event": "Ereignis",
+        "interval": "Intervall",
+        "start_of_interval": "Anfang von Intervall",
+        "end_of_interval": "Ende von Intervall",
+        "occurs": "tritt auf",
+        "does_not_occur": "tritt nicht auf",
+        "does_not_occur_for": "tritt nicht auf für",
+        "occurs_for_the_first_time": "tritt das erste Mal auf",
+        "occurs_for_the_last_time": "tritt das letzte Mal auf",
+
+        "start": "Anfang",
+        "end": "Ende",
+        "after": "nach",
+        "exactly": "genau",
+        "at_least": "mindestens",
+        "at_most": "höchstens",
+
+        "seconds": "Sekunden",
+        "minutes": "Minuten",
+        "hours": "Stunden",
+        "days": "Tagen",
+        "weeks": "Wochen",
+        "months": "Monaten",
+        "years": "Jahren",
+
+        "the_date_is": "das Datum ist %1",
+        "repeat_until": "wiederhole bis %1 auftritt",
+        "repeat_for": "wiederhole %1 Mal",
+        "to": "bis",
+        "is": "ist",
+        "for": "für",
+        "true": "wahr",
+        "false": "falsch",
+        "between": "zwischen",
+        "and": "und",
+        "or": "oder",
+        "of": "von",
+        "is_null": "ist ungültig",
+
+        "notification_self_connect": "Ein Knoten kann nicht mit sich selbst verbunden werden!",
+        "notification_input_to_input": "Ein Input kann nicht mit einem anderen Input verbunden werden!",
+        "notification_output_to_output": "Ein Output kann nicht mit einem anderen Output verbunden werden!",
+        "notification_no_cycle": "Ein Kreis im Diagramm ist nicht erlaubt!",
+        "notification_variable_out_of_scope": "Die Variable \"Wert\" darf nur innerhalb ihres Elternblocks verwendet werden!"
+    },
+    "help": {
+        "title": "Handbuch",
+        "note": "Hinweis",
+        "warning": "Warnung",
+        "tip": "Tipp",
+        "zoom": "Passe den Zoom des Workspace an"
+    },
+    "formats": {
+        "date": {
+            "short": "dd.MM.yyyy"
+        }
+    }
+}

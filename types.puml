@@ -1,0 +1,54 @@
+@startuml
+!theme reddress-lightred
+interface IListType<T extends IType> extends IType {
+    +elementType: T
+    +primitive: false
+}
+interface IPrimitiveType extends IType {
+    +primitive: true
+}
+interface IEnumType extends IType {
+    +primitive: false
+    +enumName: string
+    +wildcard: boolean
+}
+interface IStructType<T extends StructFields> extends IType {
+    +fields: T
+    +wildcard: boolean
+    +primitive: false
+}
+interface ITimelineEntryType<T extends StructFields> extends IStructType
+interface IEventType<T extends StructFields> extends ITimelineEntryType
+interface IIntervalType<T extends StructFields> extends ITimelineEntryType
+interface INumberType extends IPrimitiveType {
+    +name: "Number"
+}
+interface IStringType extends IPrimitiveType {
+    +name: "String"
+}
+interface IBooleanType extends IPrimitiveType {
+    +name: "Boolean"
+}
+interface ITimestampType extends IPrimitiveType {
+    +name: "Timestamp"
+}
+interface INullType extends IPrimitiveType {
+    +name: "Null"
+    +nullable: true
+}
+interface INullableType<T extends IType> extends IType {
+    +name: `${T["name"]}?`
+    +nullable: true
+}
+interface IWildcardType extends IType {
+    +name: "*"
+}
+interface IUnionType<T extends [IType, ...IType[]]> extends IType {
+    +types: T
+}
+interface IHierarchyType extends IType {
+    +primitive: false
+    +hierarchy: string
+    +wildcard: boolean
+}
+@enduml

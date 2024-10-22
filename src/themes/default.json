@@ -1,0 +1,31 @@
+{
+    "colors": {
+        "background": "#F9F9F9",
+        "secondary": "#4C97FF",
+        "primary": {
+            "50": "#E9FCF7",
+            "100": "#CAF7ED",
+            "200": "#83EDD4",
+            "300": "#21DEB2",
+            "400": "#1CBF99",
+            "500": "#179C7D",
+            "600": "#148A6E",
+            "700": "#127C64",
+            "800": "#0F6652",
+            "900": "#0A4739",
+            "950": "#08352B"
+        },
+        "menu": {
+            "background": "#FFFFFF",
+            "selected": "#E9EEF2"
+        },
+        "categories": {
+            "comparisons": "#4C97FF",
+            "test": "#FF8C1A",
+            "nodes": "#fafafa",
+            "logic": "#ffab19",
+            "logic_dark": "#cc8813",
+            "history": "#cf63cf"
+        }
+    }
+}
