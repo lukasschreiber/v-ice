@@ -1,5 +1,5 @@
 import { StructFields } from "@/data/types";
-import { SkipOp, Timeline, TimelineTemplate, TimelineTemplateEventMeta, TimelineTemplateEventMetaType } from "./timeline_templates";
+import { SkipOp, Timeline, TimelineTemplate, TimelineTemplateEventMeta, TimelineTemplateEventMetaType } from "./generation/timeline_templates";
 
 export type State = number;
 export type Transition = { [key: string]: State };

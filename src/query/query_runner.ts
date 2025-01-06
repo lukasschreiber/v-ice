@@ -1,7 +1,7 @@
 import { DataRow, DataTable } from "@/data/table";
 import { FunctionDeclaration, Parser, Program } from "acorn"
-import * as ambient from "@/generation/ambient_functions"
-import * as timeline_matcher from "@/generation/timeline_matcher"
+import * as ambient from "@/query/ambient_functions"
+import * as timeline_matcher from "@/query/timeline_matcher"
 import { typeRegistry } from "@/data/type_registry";
 
 export type QueryFnReturnType<T> = {targets: Record<string, T>, edgeCounts: Record<string, number>}

@@ -21,8 +21,8 @@ import { ISerializedWorkspace, clearWorkspace, deserializeWorkspace, serializeWo
 import { defineToolbox, defineBlock, defineCategory, blockDefinitionToBlock, blockToBlockDefinition } from "./blocks/toolbox/toolbox_definition"
 import emitter, { EvaluationAction } from "./evaluation_emitter"
 import { HelpPage as HelpPageElement } from "./components/HelpPage"
-import { queryGenerator } from "./generation"
-import { runQuery } from "./generation/query_runner"
+import { queryGenerator } from "./query"
+import { runQuery } from "./query/query_runner"
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `BlocklyProvider`.

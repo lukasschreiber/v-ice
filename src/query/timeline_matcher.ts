@@ -1,5 +1,5 @@
 
-import { MatchableEvent, Timeline, TimelineEntry, TimelineTemplate, TimelineTemplateDate, TimelineTemplateEvent, TimelineTemplateInterval, TimelineTemplateSkip, TimelineTemplateSkipBase, TimelineTemplateSkipInterval } from "./timeline_templates";
+import { MatchableEvent, Timeline, TimelineEntry, TimelineTemplate, TimelineTemplateDate, TimelineTemplateEvent, TimelineTemplateInterval, TimelineTemplateSkip, TimelineTemplateSkipBase, TimelineTemplateSkipInterval } from "./generation/timeline_templates";
 import { IStructType, StructFields, ValueOf } from "@/data/types";
 import { DateTimeGranularityType } from "@/utils/datetime";
 import { type DateTime } from "luxon";

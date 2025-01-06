@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks"
-import { Order, queryGenerator } from "./query_generator"
+import { Order, queryGenerator } from "../query_generator"
 import * as Blockly from "blockly/core"
 import { EventOp } from "./timeline_templates"
 import { parseDate } from "@/utils/datetime"

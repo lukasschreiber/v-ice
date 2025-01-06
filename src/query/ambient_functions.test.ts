@@ -1,6 +1,6 @@
 import { expect, test } from "vitest"
 import ambientRaw from "@/generation/ambient_functions?raw"
-import * as ambient from "@/generation/ambient_functions"
+import * as ambient from "@/query/ambient_functions"
 import ts from "typescript"
 import "@/window"
 

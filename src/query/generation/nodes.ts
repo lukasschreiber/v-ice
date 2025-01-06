@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks"
-import { QueryGenerator, queryGenerator } from "./query_generator"
+import { QueryGenerator, queryGenerator } from "../query_generator"
 import { FieldLabelTargetNode } from "@/blocks/fields/field_label_target_node"
 import { NodeBlock } from "@/blocks/extensions/node"
 import { FieldSetSelection } from "@/blocks/fields/field_set_selection"

@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks"
-import { Order, queryGenerator } from "./query_generator"
+import { Order, queryGenerator } from "../query_generator"
 import { ListSelectBlock } from "@/blocks/mutators/list_select"
 
 queryGenerator.registerBlock(Blocks.Names.LIST.MATH, (block, generator) => {

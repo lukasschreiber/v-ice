@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks"
-import { Order, queryGenerator } from "./query_generator"
+import { Order, queryGenerator } from "../query_generator"
 import * as Blockly from "blockly/core"
 
 queryGenerator.registerBlock(Blocks.Names.LOGIC.BOOLEAN, (block) => {

@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks"
-import { Order, QueryGenerator, queryGenerator } from "./query_generator"
+import { Order, QueryGenerator, queryGenerator } from "../query_generator"
 import * as Blockly from "blockly/core"
 
 function binaryMathImpl(block: Blockly.Block, generator: QueryGenerator, impl: (a: string, b: string) => string, aName: string = "A", bName: string = "B"): [string, number] {

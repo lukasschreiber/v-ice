@@ -2,7 +2,7 @@ import { ConnectionType, registerBlocksFromJsonArray } from "../block_definition
 import types from "@/data/types";
 import { Colors } from "@/themes/colors";
 import { Blocks } from "@/blocks";
-import { EventOp, SkipOp, TimeUnit } from "@/generation/timeline_templates";
+import { EventOp, SkipOp, TimeUnit } from "@/query/generation/timeline_templates";
 
 export default registerBlocksFromJsonArray([
     {

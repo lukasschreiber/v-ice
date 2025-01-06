@@ -1,7 +1,7 @@
 import types from "@/data/types";
 import * as Blockly from "blockly/core"
 import { ShadowFactory } from "../shadow_factory";
-import { TimeUnit } from "@/generation/timeline_templates";
+import { TimeUnit } from "@/query/generation/timeline_templates";
 
 type EventDoesNotOccurForBlock = Blockly.Block & EventDoesNotOccurForMixin;
 interface EventDoesNotOccurForMixin extends EventDoesNotOccurForMixinType { }

@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks"
-import { Order, queryGenerator } from "./query_generator"
+import { Order, queryGenerator } from "../query_generator"
 import types from "@/data/types"
 
 queryGenerator.registerBlock(Blocks.Names.ENUM.SELECT, (block) => {

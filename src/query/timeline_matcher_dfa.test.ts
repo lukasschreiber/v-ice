@@ -1,7 +1,7 @@
-import * as ambient from "@/generation/timeline_matcher_dfa"
+import * as ambient from "@/query/timeline_matcher_dfa"
 import "@/window"
 import { test } from "vitest"
-import { EventOp, Timeline } from "./timeline_templates"
+import { EventOp, Timeline } from "./generation/timeline_templates"
 import { StructFields } from "@/data/types"
 
 

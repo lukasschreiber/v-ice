@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks";
-import { Order, queryGenerator } from "./query_generator";
+import { Order, queryGenerator } from "../query_generator";
 
 queryGenerator.registerBlock(Blocks.Names.VARIABLE.GET, (block) => {
     const varModels = block.getVarModels()

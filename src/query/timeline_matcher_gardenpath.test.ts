@@ -1,8 +1,8 @@
-import * as ambient from "@/generation/timeline_matcher"
+import * as ambient from "@/query/timeline_matcher"
 import "@/window"
 import { beforeAll, expect, test } from "vitest"
 import weather from "@/assets/data/weather.json"
-import { EventOp, SkipOp, TimeUnit, Timeline, TimelineTemplate } from "./timeline_templates"
+import { EventOp, SkipOp, TimeUnit, Timeline, TimelineTemplate } from "./generation/timeline_templates"
 import { DataTable, TableSaveFile } from "@/main"
 import { StructFields } from "@/data/types"
 
