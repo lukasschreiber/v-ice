@@ -1,4 +1,4 @@
-import { Canvas, useGeneratedCode } from "@nephro-react/filters";
+import { Canvas, useGeneratedCode } from "v-ice";
 import { useEffect, useRef, useState } from "react";
 import { Tabs, Tab } from "./components/tabs/Tabs";
 import { Code } from "./components/Code";

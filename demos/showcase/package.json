@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nephro-react/filters": "file:../../",
-    "@nephro-react/filters-commons": "file:../../commons",
+    "v-ice": "file:../../",
+    "v-ice-commons": "file:../../commons",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

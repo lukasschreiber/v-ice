@@ -1,7 +1,7 @@
-import { Canvas, DataTable, ISerializedWorkspace, useQuery, useWorkspace } from "@nephro-react/filters";
-import { IEvaluation, IEvaluationTaskResult } from "@nephro-react/filters/demos/evaluation/web/store/EvaluationContext";
+import { Canvas, DataTable, ISerializedWorkspace, useQuery, useWorkspace } from "v-ice";
+import { IEvaluation, IEvaluationTaskResult } from "v-ice/demos/evaluation/web/store/EvaluationContext";
 import { IEvaluationInteractiveStage, IEvaluationTask, getEvaluation } from "./assets/data/evaluations";
-import { EvaluationAction, EvaluationActionPayloads } from "@nephro-react/filters/dist/evaluation_emitter";
+import { EvaluationAction, EvaluationActionPayloads } from "v-ice/dist/evaluation_emitter";
 import { useEffect, useRef, useState } from "react";
 import { Timeline } from "./Timeline";
 import { InfoTable } from "./InfoTable";
@@ -256,7 +256,7 @@ function App() {
                                 <Canvas
                                     width={width}
                                     height={height - (timelineRef?.current?.offsetHeight ?? 100)}
-                                    language={"en"}
+                                    language={"de"}
                                 />
                             </div>
                             <div className="w-full overflow-auto mt-auto" ref={timelineRef}>

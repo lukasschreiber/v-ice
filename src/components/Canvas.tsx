@@ -243,7 +243,7 @@ export function Canvas(props: CanvasProps) {
                     id={"canvas"}
                 ></div>
                 <ButtonStack className="absolute bottom-8 right-8 z-[1000]">
-                    <Tooltip text="Auto-Vervollständigung" position="left">
+                    <Tooltip text="Autocomplete" position="left">
                         <RoundButton
                             disabled={!workspaceRef.current || !QueryMagicWand.canAutoComplete(workspaceRef.current)}
                             onClick={() => {

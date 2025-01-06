@@ -1,5 +1,5 @@
 {
-    "name": "@nephro-react/filters-commons",
+    "name": "v-ice-commons",
     "private": true,
     "version": "0.0.0",
     "type": "module",
@@ -23,10 +23,10 @@
         "build": "tsc --p ./tsconfig.build.json && vite build"
     },
     "dependencies": {
-        "@nephro-react/filters": "file:../",
         "luxon": "^3.4.4",
         "react": "^18.2.0",
-        "react-dom": "^18.2.0"
+        "react-dom": "^18.2.0",
+        "v-ice": "file:../"
     },
     "devDependencies": {
         "@types/node": "^20.14.2",
@@ -40,6 +40,6 @@
         "eslint-plugin-react-refresh": "^0.4.6",
         "typescript": "^5.2.2",
         "vite": "^5.2.0",
-        "vite-plugin-dts": "^3.9.1"
+        "vite-plugin-dts": "^4.3.0"
     }
 }

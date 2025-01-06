@@ -4,7 +4,7 @@ This is a library for interactively creating cohorts with a visual programming l
 Components that can be imported directly from the root:
 
 ```typescript
-import {Demo} from "@nephro-react/filters"
+import {Demo} from "v-ice"
 ```
 
 ## Requirement

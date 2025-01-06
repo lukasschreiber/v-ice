@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { IEvaluation } from "../../evaluation/web/store/EvaluationContext";
-import { EvaluationAction, EvaluationActionPayloads } from "@nephro-react/filters/dist/evaluation_emitter";
+import { EvaluationAction, EvaluationActionPayloads } from "v-ice/dist/evaluation_emitter";
 import { OverviewRow } from "./OverviewRow";
 
 export function TaskOverview(

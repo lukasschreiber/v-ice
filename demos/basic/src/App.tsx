@@ -1,4 +1,4 @@
-import { Canvas, DataColumn, DataTable, Types, useQuery } from "@nephro-react/filters";
+import { Canvas, DataColumn, DataTable, Types, useQuery } from "v-ice";
 import { useEffect, useState } from "react";
 
 function App() {

@@ -1,7 +1,7 @@
 import laypersonEvaluation from "./laypersons.json" assert { type: "json" };
 import ibdEvaluation from "./ibd.json" assert { type: "json" };
 import ckdEvaluation from "./ckd.json" assert { type: "json" };
-import { TableSaveFile } from "@nephro-react/filters";
+import { TableSaveFile } from "v-ice";
 
 export interface IEvaluationData {
     sources: Record<string, TableSaveFile>;

@@ -4,7 +4,8 @@ export enum NotificationType {
     NodeLinkConnectionFailure = "NodeLinkConnectionFailure",
     NodeLinkConnectionFailureSelf = "NodeLinkConnectionFailureSelf",
     LocalVariableOutOfScope = "LocalVariableOutOfScope",
-    LocalVariableDisposed = "LocalVariableDisposed"
+    LocalVariableDisposed = "LocalVariableDisposed",
+    KeyPressed = "KeyPressed"
 }
 
 export type NotificationLocalStorageEntry = Record<NotificationType, number | null>;
@@ -43,5 +44,8 @@ export const notificationConfig: Record<NotificationType, Record<number, number 
         0: 5000,
         1: 2500,
         10: 1500,
+    },
+    [NotificationType.KeyPressed]: {
+        0: 1000
     }
 };

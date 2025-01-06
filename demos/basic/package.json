@@ -10,7 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nephro-react/filters": "file:../../",
+    "v-ice": "file:../../",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

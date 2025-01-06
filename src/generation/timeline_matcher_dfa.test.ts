@@ -1,17 +1,9 @@
 import * as ambient from "@/generation/timeline_matcher_dfa"
 import "@/window"
-import { beforeAll, expect, test } from "vitest"
-import weather from "@/assets/data/weather.json"
-import { DataTable, TableSaveFile } from "@/main"
-import { EventOp, Timeline, TimelineTemplateEventMeta } from "./timeline_templates"
+import { test } from "vitest"
+import { EventOp, Timeline } from "./timeline_templates"
 import { StructFields } from "@/data/types"
-import { M } from "vite/dist/node/types.d-aGj9QkWt"
 
-let weatherTable: DataTable
-
-beforeAll(() => {
-    weatherTable = DataTable.fromJSON(weather as TableSaveFile)
-})
 
 test("test", () => {
     const states = new Set<ambient.State>([0, 1, 2]);

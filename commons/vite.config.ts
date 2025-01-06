@@ -9,7 +9,7 @@ export default mergeConfig(baseConfig, {
   build: {
     lib: {
       entry: 'src/main.ts',
-      name: '@nephro-react/filters-common',
+      name: 'v-ice-common',
       formats: ['es'],
     },
     rollupOptions: {

@@ -11,8 +11,8 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
-    "@nephro-react/filters": "file:../../",
-    "@nephro-react/filters-commons": "file:../../commons",
+    "v-ice": "file:../../",
+    "v-ice-commons": "file:../../commons",
     "prismjs": "^1.29.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"

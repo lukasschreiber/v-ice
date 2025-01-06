@@ -10,8 +10,8 @@ import * as de from "blockly/msg/de"
 import * as en from "blockly/msg/en"
 
 const blocklyResources: {[key: string]: Record<string, string>} = {
-    de,
-    en
+    "de": de as unknown as Record<string, string>,
+    "en": en as unknown as Record<string, string>
 }
 
 interface Translations {

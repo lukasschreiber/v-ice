@@ -13,8 +13,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@nephro-react/filters": "file:../../",
-    "@nephro-react/filters-commons": "file:../../commons",
+    "v-ice": "file:../../",
+    "v-ice-commons": "file:../../commons",
     "@types/multer": "^1.4.11",
     "body-parser": "^1.20.2",
     "cors": "^2.8.5",

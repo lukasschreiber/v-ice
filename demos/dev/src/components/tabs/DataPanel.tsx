@@ -1,5 +1,5 @@
-import { DataRow, DataTable, IndexedDataRow } from "@nephro-react/filters";
-import { Table } from "@nephro-react/filters-commons";
+import { DataRow, DataTable, IndexedDataRow } from "v-ice";
+import { Table } from "v-ice-commons";
 import { Button } from "../Button";
 import { useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { DataContext, DataTableDefinition } from "../DataContext";

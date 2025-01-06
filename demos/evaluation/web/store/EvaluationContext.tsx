@@ -1,6 +1,6 @@
 import { createContext } from "react";
 import useLocalStorage from "./useLocalStorage";
-import { EvaluationAction, EvaluationActionPayloads } from "@nephro-react/filters/dist/evaluation_emitter";
+import { EvaluationAction, EvaluationActionPayloads } from "v-ice/dist/evaluation_emitter";
 import { ISerializedWorkspace } from "../../../../dist/serializer";
 
 export interface IEvaluation {

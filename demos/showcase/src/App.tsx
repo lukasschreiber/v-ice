@@ -1,8 +1,10 @@
-import { Canvas, DataTable, useQuery, useWorkspace, ISerializedWorkspace, TableSaveFile } from "@nephro-react/filters";
+import { Canvas, DataTable, useQuery, useWorkspace, ISerializedWorkspace, TableSaveFile } from "v-ice";
 import { useEffect, useRef, useState } from "react";
-import { Table } from "@nephro-react/filters-commons";
-import evaluationJson from "../assets/data/presentation.json";
+import { Table } from "v-ice-commons";
+import evaluationJson from "../assets/data/presentation_rheuma.json";
 import { Button } from "./Button";
+import { showNotification } from "@/store/notifications/notification_emitter";
+import { NotificationType } from "@/store/notifications/notification_config";
 
 interface IEvaluation {
     sources: Record<string, TableSaveFile>;
@@ -107,6 +109,21 @@ function App() {
     }, [currentSource, currentTab, currentTargets, currentTask, queryResults, querySource]);
 
     useEffect(() => {
+        const globalKeydown = (event: KeyboardEvent) => {
+            // if Ctrl + V or Ctrl + C is pressed the keystroke should be logged
+            if (event.ctrlKey && event.key.length === 1) {
+                showNotification(`Ctrl + ${event.key.toUpperCase()}`, NotificationType.KeyPressed);
+            }
+        }
+
+        window.addEventListener("keydown", globalKeydown);
+
+        return () => {
+            window.removeEventListener("keydown", globalKeydown);
+        }
+    }, []);
+
+    useEffect(() => {
         const newStats: Record<string, {precision: number, recall: number}> = {};
         for (const target of data.tasks[currentTask].targets) {
             const targetId = Object.keys(currentTargets).find((key) => currentTargets[key] === target.name);
@@ -156,7 +173,7 @@ function App() {
                     </div>
                 </div>
                 <div className="flex flex-row">
-                    <Canvas width={width} height={height} language={"de"} />
+                    <Canvas width={width} height={height} language={"en"} />
                 </div>
                 <div ref={footerRef} className="bg-white w-full p-2 border-0 border-r border-t border-gray-200 h-20">
                     <div className="text-gray-900">
@@ -189,7 +206,8 @@ function App() {
                     </div>
                 </div>
                 <div className="border-0 border-t border-gray-200 overflow-auto" style={{height: height}}>
-                    <Table showIndex={true} dataTable={displayedTable} page={0} rowsPerPage={100000} highlightedRows={highlighedRows} />
+                    <Table showIndex={true} dataTable={displayedTable} page={0} rowsPerPage={100000}  /> 
+                    {/* highlightedRows={highlighedRows} */}
                 </div>
                 <div
                     ref={footerRef}

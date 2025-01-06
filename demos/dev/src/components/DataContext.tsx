@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
-import { DataColumn, DataRow, DataTable, useQuery, Types } from "@nephro-react/filters";
+import { DataColumn, DataRow, DataTable, useQuery, Types } from "v-ice";
 import { faker } from "@faker-js/faker";
 
 Types.registry.registerEnum("Name", {columns: ["Name"]})

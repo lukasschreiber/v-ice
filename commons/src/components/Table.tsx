@@ -1,4 +1,4 @@
-import { DataTable, IType, Types, ValueOf } from "@nephro-react/filters";
+import { DataTable, IType, Types, ValueOf } from "v-ice";
 import React from "react";
 import { DateTime } from "luxon";
 

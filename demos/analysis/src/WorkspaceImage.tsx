@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 import * as Blockly from "blockly/core";
 import light_theme from "@/themes/light_theme";
 import { Renderer } from "@/renderer/renderer";
-import { ISerializedWorkspace } from "@nephro-react/filters";
+import { ISerializedWorkspace } from "v-ice";
 import { deserializeWorkspace } from "@/serializer";
 import { ContinuousMetrics } from "@/toolbox/metrics";
 import { ContinuousToolbox } from "@/toolbox/toolbox";

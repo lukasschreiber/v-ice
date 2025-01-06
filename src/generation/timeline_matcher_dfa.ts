@@ -167,6 +167,6 @@ export function buildDfa(template: TimelineTemplate) {
     return new SimpleEventDFA(states, transitions, startState, acceptStates);
 }
 
-export function matchTimeline(template_: TimelineTemplate, timeline: Timeline<StructFields>) {
+// export function matchTimeline(template_: TimelineTemplate, timeline: Timeline<StructFields>) {
 
-}
+// }

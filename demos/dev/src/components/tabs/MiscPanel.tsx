@@ -1,4 +1,4 @@
-import { DataColumn, DataTable, IType, QueryBackend, ValueOf, useQuery, useSettings } from "@nephro-react/filters";
+import { DataColumn, DataTable, IType, QueryBackend, ValueOf, useQuery, useSettings } from "v-ice";
 import { useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";

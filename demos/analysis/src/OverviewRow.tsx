@@ -3,7 +3,7 @@ import { IEvaluation, IEvaluationTaskResult } from "../../evaluation/web/store/E
 import { WorkspaceImage } from "./WorkspaceImage";
 import { InfoTable } from "./InfoTable";
 import { Timeline } from "./Timeline";
-import { EvaluationAction, EvaluationActionPayloads } from "@nephro-react/filters/dist/evaluation_emitter";
+import { EvaluationAction, EvaluationActionPayloads } from "v-ice/dist/evaluation_emitter";
 
 export function OverviewRow(
     props: React.HTMLProps<HTMLDivElement> & {

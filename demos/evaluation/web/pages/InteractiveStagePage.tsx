@@ -1,6 +1,6 @@
-import { Canvas, DataTable, Evaluation, useQuery, useWorkspace } from "@nephro-react/filters";
+import { Canvas, DataTable, Evaluation, useQuery, useWorkspace } from "v-ice";
 import { useEffect, useRef, useState } from "react";
-import { Table } from "@nephro-react/filters-commons";
+import { Table } from "v-ice-commons";
 import { IEvaluationData, IEvaluationInteractiveStage } from "../../assets/data/evaluations";
 import { Button } from "../common/Button";
 import { useEvaluationState } from "../store/useEvaluationHook";
@@ -8,7 +8,7 @@ import {
     EvaluationAction,
     EvaluationActionEvent,
     EvaluationActionPayloads,
-} from "@nephro-react/filters/dist/evaluation_emitter";
+} from "v-ice/dist/evaluation_emitter";
 
 export function InteractiveStagePage(props: {
     stageDefinition: IEvaluationInteractiveStage;

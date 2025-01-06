@@ -118,14 +118,14 @@ export const DefaultToolbox = defineToolbox([
                 shadow: mathNumberNull
             }
         }),
-        // defineBlock(Blocks.Names.MATH.BINARY).withInputs({
-        //     A: {
-        //         shadow: mathNumberNull
-        //     },
-        //     B: {
-        //         shadow: mathNumberNull
-        //     }
-        // }),
+        defineBlock(Blocks.Names.MATH.BINARY).withInputs({
+            A: {
+                shadow: mathNumberNull
+            },
+            B: {
+                shadow: mathNumberNull
+            }
+        }),
         defineBlock(Blocks.Names.MATH.UNARY).withInputs({
             NUM: {
                 shadow: mathNumberNull

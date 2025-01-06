@@ -1,8 +1,8 @@
 import { Button } from "./Button";
 import { useContext, useEffect, useState } from "react";
 import { DataContext } from "./DataContext";
-import { DataTable, CsvOptions, Types, ColumnType } from "@nephro-react/filters";
-import { Table, TableHeader } from "@nephro-react/filters-commons";
+import { DataTable, CsvOptions, Types, ColumnType } from "v-ice";
+import { Table, TableHeader } from "v-ice-commons";
 import { Modal, ModalBody, ModalHeader, ModalProps } from "../Modal";
 
 const delimiters = [",", ";"];

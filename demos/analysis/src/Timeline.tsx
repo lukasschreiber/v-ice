@@ -1,4 +1,4 @@
-import { EvaluationAction, EvaluationActionPayloads } from "@nephro-react/filters/dist/evaluation_emitter";
+import { EvaluationAction, EvaluationActionPayloads } from "v-ice/dist/evaluation_emitter";
 import { msToTime } from "./utils";
 import { ISerializedWorkspace } from "../../../dist/serializer";
 import { useRef } from "react";
