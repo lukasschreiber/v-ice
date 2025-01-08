@@ -8,7 +8,7 @@ import { MiscPanel } from "./components/tabs/MiscPanel";
 function App() {
     const toolPanelRef = useRef<HTMLDivElement>(null);
     const [language] = useState(localStorage.getItem("language") ?? "en");
-    const { code, json, xml } = useGeneratedCode();
+    const { code, json, xml, queryJson } = useGeneratedCode();
     const [width, setWidth] = useState(document.documentElement.clientWidth - 500); // TODO: this is a hack
     const [height, setHeight] = useState(document.documentElement.clientHeight);
 
@@ -39,6 +39,9 @@ function App() {
                         </Tab>
                         <Tab label="Code">
                             <Code language="typescript" code={code === "" ? "// no code" : code.split("\n\n\n")[1]} />
+                        </Tab>
+                        <Tab label="QueryJSON">
+                            <Code language="json" code={queryJson} />
                         </Tab>
                         <Tab label="JSON">
                             <Code language="json" code={json} />

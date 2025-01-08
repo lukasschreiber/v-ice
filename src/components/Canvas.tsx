@@ -13,7 +13,7 @@ import { SettingsModal } from "@/components/SettingsModal";
 import { setBlocklyLocale } from "@/i18n";
 import { queryGenerator } from "@/query";
 import { runQuery } from "@/query/query_runner";
-import { setJson, setXml, setCode } from "@/store/code/generated_code_slice";
+import { setJson, setXml, setCode, setQueryJson } from "@/store/code/generated_code_slice";
 import { setQueryResults } from "@/store/data/data_slice";
 import { useDispatch, useSelector } from "@/store/hooks";
 import { DataTable, SerializedTable } from "@/data/table";
@@ -37,6 +37,7 @@ import { ToolboxButton, ToolboxButtonStack } from "./ToolboxButton";
 import { showHelp } from "@/store/help/help_emitter";
 import { useHelp } from "@/store/help/help_hooks";
 import { Tooltip } from "./common/Tooltip";
+import { languageAgnosticQueryGenerator } from "@/query/builder/query_generator";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -205,6 +206,7 @@ export function Canvas(props: CanvasProps) {
             const query = queryGenerator.workspaceToCode(workspace!);
             if (code !== query) {
                 dispatch(setCode(query));
+                dispatch(setQueryJson(JSON.stringify(languageAgnosticQueryGenerator.generateQuery(workspace!), null, 2)));
             }
         }
 

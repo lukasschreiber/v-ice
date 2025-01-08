@@ -1,29 +1,30 @@
-import { DataRow, DataTable } from "@/data/table";
+import { DataTable } from "@/data/table";
 import { FunctionDeclaration, Parser, Program } from "acorn"
 import * as ambient from "@/query/ambient_functions"
 import * as timeline_matcher from "@/query/timeline_matcher"
-import { typeRegistry } from "@/data/type_registry";
 
 export type QueryFnReturnType<T> = {targets: Record<string, T>, edgeCounts: Record<string, number>}
 export function runQuery(query: string, source: DataTable): QueryFnReturnType<DataTable> {
-    if(source.getColumns().length === 0 || query === "" || !verifyCode(query)) return {targets: {}, edgeCounts: {}}
-    const rows = source.getRows()
+    // if(source.getColumns().length === 0 || query === "" || !verifyCode(query)) return {targets: {}, edgeCounts: {}}
+    // const rows = source.getRows()
 
-    if(!window.Blockly.typeRegistry) window.Blockly.typeRegistry = typeRegistry
+    // if(!window.Blockly.typeRegistry) window.Blockly.typeRegistry = typeRegistry
 
-    try {
-        const queryFunction = new Function("init", `${query};return query(init);`)
-        const result: QueryFnReturnType<DataRow[]> = queryFunction(rows)
-        const tables: Record<string, DataTable> = {}
-        for(const [id, rows] of Object.entries(result.targets)) {
-            tables[id] = DataTable.fromRows(rows, source.getColumnTypes(), source.getColumnNames())
-        }
+    // try {
+    //     const queryFunction = new Function("init", `${query};return query(init);`)
+    //     const result: QueryFnReturnType<DataRow[]> = queryFunction(rows)
+    //     const tables: Record<string, DataTable> = {}
+    //     for(const [id, rows] of Object.entries(result.targets)) {
+    //         tables[id] = DataTable.fromRows(rows, source.getColumnTypes(), source.getColumnNames())
+    //     }
 
-        return {targets: tables, edgeCounts: result.edgeCounts}
-    }catch(e){
-        console.warn(e)
-        return {targets: {}, edgeCounts: {}}
-    }
+    //     return {targets: tables, edgeCounts: result.edgeCounts}
+    // }catch(e){
+    //     console.warn(e)
+    //     return {targets: {}, edgeCounts: {}}
+    // }
+
+    return {targets: {}, edgeCounts: {}}
 }
 
 function verifyCode(code: string): boolean {

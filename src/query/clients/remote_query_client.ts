@@ -1,36 +1,8 @@
-
-export interface QueryClientParams {
-    mode: "remote" | "local";
-}
-
-export interface LocalQueryClientParams extends QueryClientParams {
-    mode: "local";
-}
+import { QueryClient, QueryClientParams } from "@/query/clients/query_client";
 
 export interface RemoteQueryClientParams extends QueryClientParams {
     mode: "remote";
     endpoint: string;
-}
-
-export abstract class QueryClient {
-    mode: "remote" | "local";
-
-    constructor(params: RemoteQueryClientParams | LocalQueryClientParams) {
-        this.mode = params.mode;
-    }
-
-    public abstract query(query: string): Promise<any>
-}
-
-export class LocalQueryClient extends QueryClient {
-    constructor(params: LocalQueryClientParams) {
-        super(params);
-    }
-
-    public async query(query: string): Promise<any> {
-        console.log("Local query client querying: ", query);
-        return "Local query result";
-    }
 }
 
 export class RemoteQueryClient extends QueryClient {
