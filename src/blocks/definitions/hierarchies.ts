@@ -1,9 +1,10 @@
 import { Blocks } from "@/blocks";
-import { registerBlocksFromJsonArray } from "@/blocks/block_definitions";
+import { registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
+import { ParentColorExtension } from "../extensions/parent_color";
 
-export default registerBlocksFromJsonArray([
+export default registerBlocks([
     {
         id: Blocks.Names.HIERARCHY.SELECT,
         message0: "%1",
@@ -14,8 +15,8 @@ export default registerBlocksFromJsonArray([
             },
         ],
         output: t.hierarchy(t.wildcard),
-        colour: Colors.categories.comparisons,
-        extensions: ["parent_color"],
+        color: Colors.categories.comparisons,
+        extensions: [ParentColorExtension],
         mutator: "hierarchy_select_mutator"
     }
 ] as const)

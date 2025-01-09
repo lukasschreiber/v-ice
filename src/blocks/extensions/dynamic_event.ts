@@ -4,10 +4,14 @@ import { TypeChecker } from "@/data/type_checker"
 import { Blocks } from "@/blocks"
 import { FieldVariable } from "../fields/field_variable"
 import { ShadowFactory } from "../shadow_factory"
+import { BlockExtension } from "../block_extensions"
 
-Blockly.Extensions.register(
-    "dynamic_event",
-    function (this: Blockly.Block) {
+export class DynamicEventExtension extends BlockExtension<Blockly.Block> {
+    constructor() {
+        super("dynamic_event")
+    }
+
+    extension(this: Blockly.Block) {
         this.setOnChange((event) => {
             if (event.type !== Blockly.Events.MOVE || event.getEventWorkspace_().isFlyout) return
             const payload = event.toJson() as Blockly.Events.BlockMoveJson
@@ -54,4 +58,4 @@ Blockly.Extensions.register(
             }
         })
     }
-)
+}

@@ -1,21 +1,29 @@
 import * as Blockly from 'blockly/core';
+import { BlockExtension, mixin } from '../block_extensions';
 
-export type ScopedExtension = Partial<Blockly.BlockSvg> & {
+export interface ScopedBlockExtension{
     isScoped_: boolean
     scope: string
     setScope: (scope: string) => void
 }
 
-export type ScopedBlock = ScopedExtension & Blockly.Block
+export type ScopedBlock = Blockly.BlockSvg & ScopedBlockExtension
 
-const scopedMixin: ScopedExtension = {
-    isScoped_: true,
-    scope: "",
-    setScope: function (scope) {
+export class ScopedExtension extends BlockExtension<Blockly.Block> implements ScopedBlockExtension {
+    constructor() {
+        super("scoped")
+    }
+
+    @mixin
+    isScoped_: boolean = true
+
+    @mixin
+    scope: string = ""
+
+    @mixin
+    setScope(scope: string) {
         this.scope = scope
     }
-}
 
-Blockly.Extensions.register('scoped', function (this: ScopedBlock) {
-    this.mixin(scopedMixin);
-});
+    extension(this: Blockly.Block) {}
+}

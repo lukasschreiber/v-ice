@@ -1,8 +1,9 @@
 import { Blocks } from "@/blocks";
-import { registerBlocksFromJsonArray } from "@/blocks/block_definitions";
+import { registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
+import { ScopedExtension } from "../extensions/scoped";
 
-export default registerBlocksFromJsonArray([
+export default registerBlocks([
     {
         id: Blocks.Names.VARIABLE.GET_COLUMN,
         message0: "%{BKY_COLUMN} %1 %2",
@@ -62,7 +63,7 @@ export default registerBlocksFromJsonArray([
         ],
         output: t.wildcard,
         style: "variable_blocks",
-        extensions: ["scoped"],
+        extensions: [ScopedExtension],
         mutator: "local_variable_mutator"
     }
 ] as const)

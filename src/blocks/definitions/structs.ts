@@ -1,16 +1,17 @@
 import { Blocks } from "@/blocks";
-import { registerBlocksFromJsonArray } from "@/blocks/block_definitions";
+import { registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
+import { ParentColorExtension } from "../extensions/parent_color";
 
-export default registerBlocksFromJsonArray([
+export default registerBlocks([
     {
         id: Blocks.Names.STRUCTS.IMMEDIATE,
         message0: "",
         output: t.struct(t.wildcard),
-        colour: Colors.categories.comparisons,
+        color: Colors.categories.comparisons,
         inputsInline: true,
-        extensions: ["parent_color"],
+        extensions: [ParentColorExtension],
         mutator: "struct_select_mutator"
     },
     {

@@ -1,11 +1,11 @@
 import { Blocks } from "@/blocks"
-import { languageAgnosticQueryGenerator, LanguageAgnosticQueryGenerator } from "../query_generator"
+import { languageAgnosticQueryGenerator } from "../query_generator"
 import { NodeBlock } from "@/blocks/extensions/node"
 import { QueryNodeInput } from "../query_tree"
 import { FieldSetSelection } from "@/blocks/fields/field_set_selection"
 import { FieldLabelTargetNode } from "@/blocks/fields/field_label_target_node"
 
-languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.SUBSET, (block, generator) => {
+languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.SUBSET, (block) => {
     // const fields = generator.multilineStatementToCode(block, "FILTERS", " && ").trim()
     // return { definition: `function ${procedureName}(default) {\n  return conditionalSplit(default, p => ${fields === "" ? "false" : fields});\n}\n`, invocation: `${procedureName}(${input})` }
 
@@ -21,21 +21,19 @@ languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.SUBSET, (block, ge
     }
 })
 
-languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.TARGET, (block, generator) => {
-    const label = block.getField("LABEL") as FieldLabelTargetNode
-
+languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.TARGET, (block) => {
     return {
         id: block.id,
         inputs: {
             input: processEdgeConnectionPoint("INPUT", block as NodeBlock) ?? []
         },
         attributes: {
-            name: label.getName() ?? ""
+            name: (block.getField("LABEL") as FieldLabelTargetNode).getName() ?? ""
         }
     }
 })
 
-languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.SET_ARITHMETIC, (block, generator) => {
+languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.SET_ARITHMETIC, (block) => {
     return {
         id: block.id,
         inputs: {
@@ -49,29 +47,22 @@ languageAgnosticQueryGenerator.registerNode(Blocks.Names.NODE.SET_ARITHMETIC, (b
 })
 
 function processEdgeConnectionPoint(inputName: string, block: NodeBlock): QueryNodeInput | QueryNodeInput[] | null {
-    const connection = block.edgeConnections.get(inputName)
+    const connection = block.edgeConnections.get(inputName);
 
-  
-    const connections = connection?.connections.map(conn => {
-        const targetBlock = conn.getSourceBlock().id === block.id ? conn.targetBlock() : conn.getSourceBlock()
+    const connections = connection?.connections
+        .map(conn => {
+            const targetBlock = conn.getSourceBlock().id === block.id ? conn.targetBlock() : conn.getSourceBlock();
 
-        if (targetBlock === null || !Blocks.Types.isNodeBlock(targetBlock)) {
-            return null
-        }
+            if (!targetBlock || !Blocks.Types.isNodeBlock(targetBlock)) return null;
 
-        if (targetBlock.type === Blocks.Names.NODE.SUBSET) {
-            const isPositive = targetBlock.edgeConnections.get("POSITIVE")?.connections.includes(conn.targetConnection!)
-            return {node: targetBlock.id, output: isPositive ? "positive" : "negative"}
-        }
+            return targetBlock.type === Blocks.Names.NODE.SUBSET
+                ? {
+                    node: targetBlock.id,
+                    output: targetBlock.edgeConnections.get("POSITIVE")?.connections.includes(conn.targetConnection!) ? "positive" : "negative"
+                }
+                : { node: targetBlock.id, output: null };
+        })
+        .filter(Boolean) as QueryNodeInput[];
 
-        return {node: targetBlock.id, output: null}
-    }).filter(c => c !== null) as QueryNodeInput[]
-
-    if(connections.length === 0) {
-        return null
-    } else if (connections.length === 1) {
-        return connections[0]
-    } else {
-        return connections
-    }
-} 
+    return connections?.length ? (connections.length === 1 ? connections[0] : connections) : null;
+}

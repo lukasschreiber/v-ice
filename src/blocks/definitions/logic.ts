@@ -1,9 +1,10 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, registerBlocksFromJsonArray } from "@/blocks/block_definitions";
+import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
+import { ParentColorExtension } from "../extensions/parent_color";
 
-export default registerBlocksFromJsonArray([
+export default registerBlocks([
     {
         id: Blocks.Names.LOGIC.OR,
         message0: "%{BKY_EITHER}",
@@ -24,8 +25,8 @@ export default registerBlocksFromJsonArray([
                 check: ConnectionType.BOOLEAN,
             },
         ],
-        previousStatement: ConnectionType.BOOLEAN,
-        nextStatement: ConnectionType.BOOLEAN,
+        
+        connectionType: ConnectionType.BOOLEAN,
         style: "logic_blocks",
         helpUrl: "#logic-or",
         mutator: "either_or_mutator",
@@ -41,8 +42,8 @@ export default registerBlocksFromJsonArray([
                 check: ConnectionType.BOOLEAN,
             },
         ],
-        previousStatement: ConnectionType.BOOLEAN,
-        nextStatement: ConnectionType.BOOLEAN,
+        
+        connectionType: ConnectionType.BOOLEAN,
         style: "logic_blocks",
         helpUrl: "#logic-not",
     },
@@ -60,8 +61,8 @@ export default registerBlocksFromJsonArray([
             },
         ],
         output: t.boolean,
-        extensions: ["parent_color"],
-        colour: Colors.categories.comparisons,
+        extensions: [ParentColorExtension],
+        color: Colors.categories.comparisons,
 
     }
 ] as const)

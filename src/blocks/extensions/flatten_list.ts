@@ -1,9 +1,13 @@
 import * as Blockly from "blockly/core"
 import types from "@/data/types"
+import { BlockExtension } from "@/blocks/block_extensions"
 
-Blockly.Extensions.register(
-    "flatten_list",
-    function (this: Blockly.Block) {
+export class FlattenListExtension extends BlockExtension<Blockly.Block> {
+    constructor() {
+        super("flatten_list")
+    }
+
+    extension(this: Blockly.Block) {
         const originalCheck = this.getInput("LIST")?.connection?.getCheck()
         this.setOnChange((event) => {
             if (event.type !== Blockly.Events.MOVE || event.getEventWorkspace_().isFlyout) return
@@ -26,4 +30,4 @@ Blockly.Extensions.register(
             }
         })
     }
-)
+}

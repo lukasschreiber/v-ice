@@ -1,8 +1,8 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, registerBlocksFromJsonArray } from "@/blocks/block_definitions";
+import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 
-export default registerBlocksFromJsonArray([
+export default registerBlocks([
     {
         id: Blocks.Names.MATH.MINUS,
         message0: "%1 - %2",
@@ -153,8 +153,8 @@ export default registerBlocksFromJsonArray([
                 ]
             }
         ],
-        previousStatement: ConnectionType.BOOLEAN,
-        nextStatement: ConnectionType.BOOLEAN,
+        
+        connectionType: ConnectionType.BOOLEAN,
         style: "math_blocks",
         helpUrl: "#math-properties",
         // the mutator is a default blockly mutator

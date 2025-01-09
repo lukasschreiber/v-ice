@@ -1,4 +1,3 @@
-/// <reference types="vitest" />
 import { mergeConfig } from 'vite'
 import { resolve } from 'path'
 import baseConfig from "./vite.config.base"

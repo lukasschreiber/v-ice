@@ -1,9 +1,11 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, registerBlocksFromJsonArray } from "../block_definitions";
+import { ConnectionType, registerBlocks } from "../block_definitions";
 import t from "@/data/types";
 import { Colors } from "@/themes/colors";
+import { ParentColorExtension } from "../extensions/parent_color";
+import { FlattenListExtension } from "../extensions/flatten_list";
 
-export default registerBlocksFromJsonArray([
+export default registerBlocks([
     {
         id: Blocks.Names.LIST.MATH,
         message0: "%1 %{BKY_OF} %2",
@@ -70,8 +72,8 @@ export default registerBlocksFromJsonArray([
         inputsInline: true,
         mutator: "dynamic_input_types",
         helpUrl: "#list-contains",
-        nextStatement: ConnectionType.BOOLEAN,
-        previousStatement: ConnectionType.BOOLEAN,
+        connectionType: ConnectionType.BOOLEAN,
+        
     },
     {
         id: Blocks.Names.LIST.ANY_ALL,
@@ -107,8 +109,8 @@ export default registerBlocksFromJsonArray([
         ],
         style: "list_blocks",
         inputsInline: true,
-        previousStatement: ConnectionType.BOOLEAN,
-        nextStatement: ConnectionType.BOOLEAN,
+        
+        connectionType: ConnectionType.BOOLEAN,
         helpUrl: "#list-any-all",
         mutator: "list_any_all_mutator"
     },
@@ -116,9 +118,9 @@ export default registerBlocksFromJsonArray([
         id: Blocks.Names.LIST.IMMEDIATE,
         message0: "",
         output: t.list(t.wildcard),
-        colour: Colors.categories.comparisons,
+        color: Colors.categories.comparisons,
         inputsInline: true,
-        extensions: ["parent_color"],
+        extensions: [ParentColorExtension],
         mutator: "list_select_mutator"
     },
     {
@@ -134,7 +136,7 @@ export default registerBlocksFromJsonArray([
         output: t.list(t.nullable(t.wildcard)),
         style: "list_blocks",
         helpUrl: "#list-flatten",
-        extensions: ["flatten_list"]
+        extensions: [FlattenListExtension]
     },
     {
         id: Blocks.Names.LIST.EQUALS,
@@ -166,7 +168,7 @@ export default registerBlocksFromJsonArray([
         inputsInline: true,
         mutator: "dynamic_input_types",
         helpUrl: "#list-equals",
-        nextStatement: ConnectionType.BOOLEAN,
-        previousStatement: ConnectionType.BOOLEAN,
+        connectionType: ConnectionType.BOOLEAN,
+        
     }
 ] as const)

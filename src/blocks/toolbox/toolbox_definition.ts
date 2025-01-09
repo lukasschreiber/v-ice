@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly/core';
 import { BlockDefinitions } from '@/blocks/definitions';
-import { BlockDefinitionJson } from '../block_definitions';
+import { BlockDefinition } from '../block_definitions';
 import { IType, ValueOf } from '@/data/types';
 import { SerializedTable } from '@/data/table';
 
@@ -313,7 +313,7 @@ interface IBlockCategoryFactory extends IBlockCategory {
 type ExtractById<T, Id extends keyof T> = Id extends string ? ExtractFromUnion<T[Id], Id> : never
 type ExtractFromUnion<T, Id extends string> = T extends { id: Id } ? T : never
 
-type ExtractFields<T extends BlockDefinitionJson> = {
+type ExtractFields<T extends BlockDefinition> = {
     [Key in keyof T]: T[Key] extends Array<infer U>
     ? U extends { type: `field_${string}`, name: string, check?: IType }
     ? { [K in U['name']]: {
@@ -324,7 +324,7 @@ type ExtractFields<T extends BlockDefinitionJson> = {
     : undefined;
 }[keyof T];
 
-type ExtractInputs<T extends BlockDefinitionJson> = {
+type ExtractInputs<T extends BlockDefinition> = {
     [Key in keyof T]: T[Key] extends Array<infer U>
     ? U extends { type: `input_${string}`, name: string }
     ? { [K in U['name']]: {

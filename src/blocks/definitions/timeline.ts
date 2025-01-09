@@ -1,10 +1,13 @@
-import { ConnectionType, registerBlocksFromJsonArray } from "../block_definitions";
+import { ConnectionType, registerBlocks } from "../block_definitions";
 import types from "@/data/types";
 import { Colors } from "@/themes/colors";
 import { Blocks } from "@/blocks";
 import { EventOp, SkipOp, TimeUnit } from "@/query/generation/timeline_templates";
+import { DynamicEventExtension } from "../extensions/dynamic_event";
+import { DynamicEventMatchesExtension } from "../extensions/dynamic_event_matches";
+import { ParentColorExtension } from "../extensions/parent_color";
 
-export default registerBlocksFromJsonArray([
+export default registerBlocks([
     {
         id: Blocks.Names.TIMELINE.QUERY,
         message0: "%{BKY_TIMELINE_MATCHES}",
@@ -23,10 +26,10 @@ export default registerBlocksFromJsonArray([
                 check: ConnectionType.TIMELINE_PROTOTYPE
             }
         ],
-        previousStatement: ConnectionType.BOOLEAN,
-        nextStatement: ConnectionType.BOOLEAN,
+        
+        connectionType: ConnectionType.BOOLEAN,
         helpUrl: "#timeline-match",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     },
     {
         id: Blocks.Names.TIMELINE.EVENT_OCCURS,
@@ -51,8 +54,8 @@ export default registerBlocksFromJsonArray([
         ],
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
-        extensions: ["dynamic_event"],
-        colour: Colors.categories.history,
+        extensions: [DynamicEventExtension],
+        color: Colors.categories.history,
         helpUrl: "#timeline-event",
         mutator: "event_does_not_occur_for_mutator"
     },
@@ -97,8 +100,8 @@ export default registerBlocksFromJsonArray([
         ],
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
-        extensions: ["dynamic_event_matches"],
-        colour: Colors.categories.history,
+        extensions: [DynamicEventMatchesExtension],
+        color: Colors.categories.history,
         helpUrl: "#timeline-event-query",
         mutator: "event_does_not_occur_for_mutator"
     },
@@ -114,7 +117,7 @@ export default registerBlocksFromJsonArray([
         ],
         output: types.event(types.enum(types.wildcard)),
         helpUrl: "#timeline-interval",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     },
     {
         id: Blocks.Names.TIMELINE.END_OF_INTERVAL,
@@ -128,7 +131,7 @@ export default registerBlocksFromJsonArray([
         ],
         output: types.event(types.enum(types.wildcard)),
         helpUrl: "#timeline-interval",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     },
     {
         id: Blocks.Names.TIMELINE.AFTER,
@@ -165,7 +168,7 @@ export default registerBlocksFromJsonArray([
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-after",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     },
     {
         id: Blocks.Names.TIMELINE.AFTER_INTERVAL,
@@ -198,7 +201,7 @@ export default registerBlocksFromJsonArray([
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-after-interval",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     },
     {
         id: Blocks.Names.TIMELINE.TIMESTAMP,
@@ -213,7 +216,7 @@ export default registerBlocksFromJsonArray([
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-timestamp",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     },
     {
         id: Blocks.Names.TIMELINE.DATE_PICKER,
@@ -225,8 +228,8 @@ export default registerBlocksFromJsonArray([
             },
         ],
         output: types.timestamp,
-        colour: Colors.categories.history,
-        extensions: ["parent_color"],
+        color: Colors.categories.history,
+        extensions: [ParentColorExtension],
     },
     {
         id: Blocks.Names.TIMELINE.EVENT_PICKER,
@@ -241,7 +244,7 @@ export default registerBlocksFromJsonArray([
             }
         ],
         output: types.event(types.enum(types.wildcard)),
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
         mutator: "event_select_mutator"
     },
     {
@@ -266,7 +269,7 @@ export default registerBlocksFromJsonArray([
         ],
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
         helpUrl: "#timeline-or",
         mutator: "either_or_mutator",
     },
@@ -290,9 +293,9 @@ export default registerBlocksFromJsonArray([
         ],
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
-        extensions: ["dynamic_event"],
+        extensions: [DynamicEventExtension],
         helpUrl: "#timeline-repeat-until",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     },
     {
         id: Blocks.Names.TIMELINE.LOOP_COUNT,
@@ -315,6 +318,6 @@ export default registerBlocksFromJsonArray([
         previousStatement: ConnectionType.TIMELINE_PROTOTYPE,
         nextStatement: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-repeat",
-        colour: Colors.categories.history,
+        color: Colors.categories.history,
     }
 ] as const)
