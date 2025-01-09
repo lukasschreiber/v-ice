@@ -7,7 +7,6 @@ import { ParentColorExtension } from "../extensions/parent_color";
 export default registerBlocks([
     {
         id: Blocks.Names.STRUCTS.IMMEDIATE,
-        message0: "",
         output: t.struct(t.wildcard),
         color: Colors.categories.comparisons,
         inputsInline: true,
@@ -16,17 +15,21 @@ export default registerBlocks([
     },
     {
         id: Blocks.Names.STRUCTS.GET_PROPERTY,
-        message0: "%1 %{BKY_OF} %2",
-        args0: [
+        lines: [
             {
-                type: 'field_dynamic_dropdown',
-                name: 'PROPERTY',
-                options: [["%{BKY_ATTRIBUTE}", "NAME"]]
-            },
-            {
-                type: 'input_value',
-                name: 'STRUCT',
-                check: t.union(t.struct(t.wildcard), t.list(t.struct(t.wildcard)))
+                text: "%1 %{BKY_OF} %2",
+                args: [
+                    {
+                        type: "field_dynamic_dropdown",
+                        name: "PROPERTY",
+                        options: [["%{BKY_ATTRIBUTE}", "NAME"]]
+                    },
+                    {
+                        type: "input_value",
+                        name: "STRUCT",
+                        check: t.union(t.struct(t.wildcard), t.list(t.struct(t.wildcard)))
+                    }
+                ]
             }
         ],
         output: t.wildcard,

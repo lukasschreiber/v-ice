@@ -216,7 +216,7 @@ function blockDefinitionToToolboxItem(block: GenericBlockDefinition): Blockly.ut
 
 }
 
-function categoryDefinitionToCategory(category: IDynamicCategory | IBlockCategory): Blockly.utils.toolbox.ToolboxItemInfo & { isHidden: IsHiddenFunc, register?: (workspace: Blockly.WorkspaceSvg) => void} {
+function categoryDefinitionToCategory(category: IDynamicCategory | IBlockCategory): Blockly.utils.toolbox.ToolboxItemInfo & { isHidden: IsHiddenFunc, register?: (workspace: Blockly.WorkspaceSvg) => void } {
     if (Object.prototype.hasOwnProperty.call(category, "blocks")) {
         return {
             kind: "category",
@@ -270,7 +270,7 @@ export interface AbstractBlockDefinition {
 }
 
 export interface BlockConnectionDefinition {
-    shadow?: GenericBlockDefinition, 
+    shadow?: GenericBlockDefinition,
     block?: GenericBlockDefinition
 }
 
@@ -313,8 +313,8 @@ interface IBlockCategoryFactory extends IBlockCategory {
 type ExtractById<T, Id extends keyof T> = Id extends string ? ExtractFromUnion<T[Id], Id> : never
 type ExtractFromUnion<T, Id extends string> = T extends { id: Id } ? T : never
 
-type ExtractFields<T extends BlockDefinition> = {
-    [Key in keyof T]: T[Key] extends Array<infer U>
+type ExtractFields<T extends BlockDefinition> =
+    T["lines"] extends Array<{ args: Array<infer U> }> 
     ? U extends { type: `field_${string}`, name: string, check?: IType }
     ? { [K in U['name']]: {
         value: U['check'] extends IType ? ValueOf<U['check']> : string | number | boolean | null,
@@ -322,18 +322,16 @@ type ExtractFields<T extends BlockDefinition> = {
     } }
     : undefined
     : undefined;
-}[keyof T];
 
-type ExtractInputs<T extends BlockDefinition> = {
-    [Key in keyof T]: T[Key] extends Array<infer U>
-    ? U extends { type: `input_${string}`, name: string }
+type ExtractInputs<T extends BlockDefinition> = 
+    T["lines"] extends Array<{ args: Array<infer U> }> 
+    ? U extends { type: `input_${string}`, name: string } 
     ? { [K in U['name']]: {
         shadow?: GenericBlockDefinition,
         block?: GenericBlockDefinition
-    } }
-    : undefined
+    } } 
+    : undefined 
     : undefined;
-}[keyof T];
 
 // This is copied from https://dev.to/lucianbc/union-type-merging-in-typescript-9al
 // We do not use the merge type from there but we modified it to FixTooltip to correctly show the tooltip in the editor

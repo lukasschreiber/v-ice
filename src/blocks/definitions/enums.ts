@@ -7,12 +7,16 @@ import { ParentColorExtension } from "../extensions/parent_color";
 export default registerBlocks([
     {
         id: Blocks.Names.ENUM.SELECT,
-        message0: "%1",
-        args0: [
+        lines: [
             {
-                type: 'field_autocomplete_text',
-                name: 'ENUM',
-            },
+                text: "%1",
+                args: [
+                    {
+                        type: "field_autocomplete_text",
+                        name: "ENUM",
+                    }
+                ]
+            }
         ],
         output: t.enum(t.wildcard),
         color: Colors.categories.comparisons,

@@ -53,7 +53,6 @@ export default registerBlocks([
                 ]
             }
         ],
-
         connectionType: ConnectionType.BOOLEAN,
         color: Colors.categories.comparisons,
         inputsInline: true,

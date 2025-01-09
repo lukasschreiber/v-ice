@@ -52,7 +52,7 @@ function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJso
     const extensions = []
 
     for (const extension of block.extensions ?? []) {
-        const ext = new extension()
+        const ext = getExtensionInstance(extension)
         if (!Blockly.Extensions.isRegistered(ext.name)) {
             ext.register()
         }
@@ -80,6 +80,16 @@ function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJso
     return result
 }
 
+function getExtensionInstance<T extends BlockExtension<any>>(extension: new (...args: any[]) => T): T {
+    const constructorName = extension.name
+    if (!extensionInstances[constructorName]) {
+        extensionInstances[constructorName] = new extension()
+    }
+    return extensionInstances[constructorName] as T
+}
+
+const extensionInstances: Record<string, BlockExtension<any>> = {}
+
 type BlocklyJsonBlockDefinition = {
     [key: `message${number}`]: string
     [key: `args${number}`]: (FieldDefinition | InputDefinition)[]
@@ -102,7 +112,7 @@ export type BlockDefinition = {
     id?: string
     color?: number | string
     helpUrl?: string
-    lines: {text: string, args: (FieldDefinition | InputDefinition)[], align?: "RIGHT" | "CENTRE" | "LEFT"}[]
+    lines?: {text: string, args: (FieldDefinition | InputDefinition)[], align?: "RIGHT" | "CENTRE" | "LEFT"}[]
     nextStatement?: null | string | string[]
     previousStatement?: null | string | string[]
     connectionType?: string

@@ -202,7 +202,7 @@ export const DefaultToolbox = defineToolbox([
             },
             END: {
                 shadow: mathNumberNull
-            }
+            },
         }),
         defineBlock(Blocks.Names.TIMELINE.EITHER_OR),
         // defineBlock(Blocks.Names.TIMELINE.LOOP_UNTIL),

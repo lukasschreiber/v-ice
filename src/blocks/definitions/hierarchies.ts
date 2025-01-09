@@ -7,12 +7,16 @@ import { ParentColorExtension } from "../extensions/parent_color";
 export default registerBlocks([
     {
         id: Blocks.Names.HIERARCHY.SELECT,
-        message0: "%1",
-        args0: [
+        lines: [
             {
-                type: 'field_hierarchy',
-                name: 'HIERARCHY',
-            },
+                text: "%1",
+                args: [
+                    {
+                        type: "field_hierarchy",
+                        name: "HIERARCHY",
+                    }
+                ]
+            }
         ],
         output: t.hierarchy(t.wildcard),
         color: Colors.categories.comparisons,

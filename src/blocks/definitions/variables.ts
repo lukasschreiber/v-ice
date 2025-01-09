@@ -6,20 +6,24 @@ import { ScopedExtension } from "../extensions/scoped";
 export default registerBlocks([
     {
         id: Blocks.Names.VARIABLE.GET_COLUMN,
-        message0: "%{BKY_COLUMN} %1 %2",
-        args0: [
+        lines: [
             {
-                type: 'field_dynamic_dropdown',
-                name: 'COLUMN',
-                options: [
-                    ["", ""],
-                ],
+                text: "%{BKY_COLUMN} %1 %2",
+                args: [
+                    {
+                        type: 'field_dynamic_dropdown',
+                        name: 'COLUMN',
+                        options: [
+                            ["", ""],
+                        ],
+                    },
+                    {
+                        type: 'field_type_label',
+                        name: 'TYPE',
+                        iconType: t.list(t.wildcard)
+                    }
+                ]
             },
-            {
-                type: 'field_type_label',
-                name: 'TYPE',
-                iconType: t.list(t.wildcard)
-            }
         ],
         output: t.list(t.wildcard),
         helpUrl: "#column-variable",
@@ -28,17 +32,21 @@ export default registerBlocks([
     },
     {
         id: Blocks.Names.VARIABLE.GET,
-        message0: "%1 %2",
-        args0: [
+        lines: [
             {
-                type: 'field_variable',
-                name: 'VAR',
-                variable: '%{BKY_VARIABLES_DEFAULT_NAME}',
-            },
-            {
-                type: 'field_type_label',
-                name: 'TYPE',
-                iconType: t.number
+                text: "%1 %2",
+                args: [
+                    {
+                        type: 'field_variable',
+                        name: 'VAR',
+                        variable: '%{BKY_VARIABLES_DEFAULT_NAME}',
+                    },
+                    {
+                        type: 'field_type_label',
+                        name: 'TYPE',
+                        iconType: t.number
+                    }
+                ]
             }
         ],
         output: t.wildcard,
@@ -48,17 +56,21 @@ export default registerBlocks([
     },
     {
         id: Blocks.Names.VARIABLE.LOCAL_GET,
-        message0: "%1 %2",
-        args0: [
+        lines: [
             {
-                type: 'field_label_serializable',
-                name: 'LABEL',
-                text: "value",
-            },
-            {
-                type: 'field_type_label',
-                name: 'TYPE',
-                iconType: t.number
+                text: "%1 %2",
+                args: [
+                    {
+                        type: 'field_label_serializable',
+                        name: 'LABEL',
+                        text: "value",
+                    },
+                    {
+                        type: 'field_type_label',
+                        name: 'TYPE',
+                        iconType: t.number
+                    }
+                ]
             }
         ],
         output: t.wildcard,
