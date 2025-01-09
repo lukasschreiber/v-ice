@@ -11,6 +11,7 @@ export abstract class BlockExtension<T extends Blockly.Block> {
 
     public register(): void {
         const outerThis = this
+        if (Blockly.Extensions.isRegistered(this.name)) Blockly.Extensions.unregister(this.name);
         Blockly.Extensions.register(
             this.name,
             function (this: Blockly.Block) { outerThis.extensionFunction.call(outerThis, this as T) }
@@ -18,6 +19,15 @@ export abstract class BlockExtension<T extends Blockly.Block> {
     }
 
     private extensionFunction(block: T) {
+       const mixinProperties = this.collectMixinProperties()
+         if (mixinProperties) block.mixin(mixinProperties)
+        
+        if (this.extension) {
+            this.extension.call(block)
+        }
+    }
+
+    protected collectMixinProperties() {
         const mixinPropertyKeys = Reflect.get(this, "mixinProperties") as PropertyKey[] | undefined
         if (mixinPropertyKeys && mixinPropertyKeys.length > 0) {
             const mixinProperties: Record<PropertyKey, any> = {}
@@ -25,19 +35,18 @@ export abstract class BlockExtension<T extends Blockly.Block> {
                 const propertyValue = Reflect.get(this, mixinPropertyKey)
                 mixinProperties[mixinPropertyKey] = propertyValue
             }
-            block.mixin(mixinProperties)
+            
+            return mixinProperties
         }
-        
-        if (this.extension) {
-            this.extension.call(block)
-        }
-    }
-}
 
-export function mixin(target: any, context: ClassMemberDecoratorContext | ClassMethodDecoratorContext<any>) {
-    if (!target.mixinProperties) {
-        target.mixinProperties = []
+        return undefined
     }
 
-    target.mixinProperties.push(context)
+    public static mixin(target: any, context: ClassMemberDecoratorContext | ClassMethodDecoratorContext<any>) {
+        if (!target.mixinProperties) {
+            target.mixinProperties = []
+        }
+    
+        target.mixinProperties.push(context)
+    }
 }

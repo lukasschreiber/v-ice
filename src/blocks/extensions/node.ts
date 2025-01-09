@@ -6,7 +6,7 @@ import { EdgeDelete } from "@/events/events_edge_delete"
 import { Edge } from "@/utils/edges"
 import { showNotification } from "@/store/notifications/notification_emitter"
 import { NotificationType } from "@/store/notifications/notification_config"
-import { BlockExtension, mixin } from "../block_extensions"
+import { BlockExtension } from "../block_extensions"
 
 export type EdgeConnection = { type: Blockly.ConnectionType, connections: Blockly.Connection[] }
 
@@ -35,26 +35,26 @@ export class NodeBlockExtension extends BlockExtension<Blockly.BlockSvg> impleme
         super("node_block")
     }
 
-    @mixin
+    @BlockExtension.mixin
     isNode_: boolean = true
     
-    @mixin
+    @BlockExtension.mixin
     drawEdges_: boolean = true
     
-    @mixin
+    @BlockExtension.mixin
     edgeConnections: Map<string, EdgeConnection> = new Map()
     
-    @mixin
+    @BlockExtension.mixin
     shouldDrawEdges(this: NodeBlockExtension & Blockly.BlockSvg) {
         return this.drawEdges_ && !this.isInFlyout && !this.isInsertionMarker!()
     }
 
-    @mixin
+    @BlockExtension.mixin
     getConnectionFields(this: NodeBlockExtension & Blockly.BlockSvg) {
         return (this.inputList?.map(input => input.fieldRow.find(field => field instanceof FieldEdgeConnection)) ?? []).filter(field => field !== undefined) as FieldEdgeConnection[]
     }
 
-    @mixin
+    @BlockExtension.mixin
     connectNode(this: NodeBlockExtension & Blockly.BlockSvg, node: NodeBlock, source: string, target: string) {
         const sourceConnections = this.edgeConnections.get(source)
         const targetConnections = node.edgeConnections.get(target)
@@ -108,7 +108,7 @@ export class NodeBlockExtension extends BlockExtension<Blockly.BlockSvg> impleme
         this.render!()
     }
 
-    @mixin
+    @BlockExtension.mixin
     unplugNodeConnection(this: NodeBlockExtension & Blockly.BlockSvg, connection: Blockly.Connection) {
         for (const [key, value] of this.edgeConnections.entries()) {
             const index = value.connections.indexOf(connection)
@@ -130,14 +130,14 @@ export class NodeBlockExtension extends BlockExtension<Blockly.BlockSvg> impleme
         }
     }
 
-    @mixin
+    @BlockExtension.mixin
     getConnectedNodes(this: NodeBlockExtension & Blockly.BlockSvg, field: string) {
         return this.edgeConnections.get(field)?.connections
             .filter(connection => connection.isConnected() && connection.targetBlock() !== null)
             .map(connection => connection.targetBlock()) as NodeBlock[]
     }
 
-    @mixin
+    @BlockExtension.mixin
     getEdges(this: NodeBlockExtension & Blockly.BlockSvg) {
         return [...this.edgeConnections.entries()].flatMap(([source, { connections }]) => {
             return connections.map(connection => {
@@ -149,7 +149,7 @@ export class NodeBlockExtension extends BlockExtension<Blockly.BlockSvg> impleme
         })
     }
     
-    @mixin
+    @BlockExtension.mixin
     deleteEdges(this: NodeBlockExtension & Blockly.BlockSvg) {
         this.edgeConnections.forEach(({ connections }) => {
             connections.forEach(connection => {

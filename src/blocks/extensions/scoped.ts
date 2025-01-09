@@ -1,5 +1,5 @@
 import * as Blockly from 'blockly/core';
-import { BlockExtension, mixin } from '../block_extensions';
+import { BlockExtension } from '../block_extensions';
 
 export interface ScopedBlockExtension{
     isScoped_: boolean
@@ -14,13 +14,13 @@ export class ScopedExtension extends BlockExtension<Blockly.Block> implements Sc
         super("scoped")
     }
 
-    @mixin
+    @BlockExtension.mixin
     isScoped_: boolean = true
 
-    @mixin
+    @BlockExtension.mixin
     scope: string = ""
 
-    @mixin
+    @BlockExtension.mixin
     setScope(scope: string) {
         this.scope = scope
     }
