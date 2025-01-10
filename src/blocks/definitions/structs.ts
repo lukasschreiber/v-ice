@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks";
-import { registerBlocks } from "@/blocks/block_definitions";
+import { createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
@@ -7,15 +7,15 @@ import { StructPropertySelectMutator } from "../mutators/struct_property_select"
 import { StructSelectMutator } from "../mutators/struct_select";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.STRUCTS.IMMEDIATE,
         output: t.struct(t.wildcard),
         color: Colors.categories.comparisons,
         inputsInline: true,
         extensions: [ParentColorExtension],
         mutator: StructSelectMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.STRUCTS.GET_PROPERTY,
         lines: [
             {
@@ -38,5 +38,5 @@ export default registerBlocks([
         style: "list_blocks",
         helpUrl: "#struct-get",
         mutator: StructPropertySelectMutator
-    }
+    })
 ] as const)

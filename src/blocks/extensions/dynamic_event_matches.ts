@@ -79,7 +79,7 @@ export class DynamicEventMatchesExtension extends BlockExtension<Blockly.BlockSv
                             variable.dispose(true)
                         }
                     } else if (oldParentBlock?.type === Blocks.Names.STRUCTS.GET_PROPERTY) {
-                        const propertySelectBlock = oldParentBlock as StructPropertySelectBlock
+                        const propertySelectBlock = oldParentBlock as StructPropertySelectBlock & Blockly.BlockSvg
                         propertySelectBlock.variableType = type.name
                         propertySelectBlock.update_()
     
@@ -137,7 +137,7 @@ export class DynamicEventMatchesExtension extends BlockExtension<Blockly.BlockSv
                     oldParentInput.connection.setCheck(oldParentBlock.originalTypes[oldParentInput.name].name)
                     success = oldParentBlock.setType(oldParentInput.name, type, true)
                 } else if (oldParentBlock?.type === Blocks.Names.STRUCTS.GET_PROPERTY) {
-                    const propertySelectBlock = oldParentBlock as StructPropertySelectBlock
+                    const propertySelectBlock = oldParentBlock as StructPropertySelectBlock & Blockly.BlockSvg
                     propertySelectBlock.variableType = type.name
                     propertySelectBlock.update_()
                 }

@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks";
-import { registerBlocks } from "@/blocks/block_definitions";
+import { createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { ScopedExtension } from "../extensions/scoped";
 import { LocalVariableMutator } from "../mutators/local_variable";
@@ -7,7 +7,7 @@ import { VariableSelectMutator } from "../mutators/variable_select";
 import { ColumnSelectMutator } from "../mutators/column_select";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.VARIABLE.GET_COLUMN,
         lines: [
             {
@@ -31,9 +31,9 @@ export default registerBlocks([
         output: t.list(t.wildcard),
         helpUrl: "#column-variable",
         style: "variable_blocks",
-        mutator: ColumnSelectMutator
-    },
-    {
+        mutator: ColumnSelectMutator,
+    }),
+    createBlockDefinition({
         id: Blocks.Names.VARIABLE.GET,
         lines: [
             {
@@ -56,8 +56,8 @@ export default registerBlocks([
         style: "variable_blocks",
         helpUrl: "#variables",
         mutator: VariableSelectMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.VARIABLE.LOCAL_GET,
         lines: [
             {
@@ -80,5 +80,5 @@ export default registerBlocks([
         style: "variable_blocks",
         extensions: [ScopedExtension],
         mutator: LocalVariableMutator
-    }
+    })
 ] as const)

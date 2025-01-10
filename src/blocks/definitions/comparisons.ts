@@ -1,11 +1,11 @@
 import { Colors } from "@/themes/colors";
-import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
+import { ConnectionType, createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Blocks } from "@/blocks";
 import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.EQUALS_WITHIN,
         lines: [
             {
@@ -34,8 +34,8 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         inputsInline: true,
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.EQUALS,
         lines: [
             {
@@ -59,8 +59,8 @@ export default registerBlocks([
         inputsInline: true,
         helpUrl: "#equals",
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.MATCHES,
         lines: [
             {
@@ -84,8 +84,8 @@ export default registerBlocks([
         inputsInline: true,
         helpUrl: "#matches",
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.GREATER,
         lines: [
             {
@@ -109,8 +109,8 @@ export default registerBlocks([
         helpUrl: "#comparison-numbers",
         inputsInline: true,
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.LESS,
         lines: [
             {
@@ -134,8 +134,8 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         inputsInline: true,
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.LESS_EQUALS,
         lines: [
             {
@@ -159,8 +159,8 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         inputsInline: true,
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.GREATER_EQUALS,
         lines: [
             {
@@ -184,8 +184,8 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         inputsInline: true,
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.NUMBERS,
         lines: [
             {
@@ -219,8 +219,8 @@ export default registerBlocks([
         helpUrl: "#comparison-numbers",
         inputsInline: true,
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.INTERVAL,
         lines: [
             {
@@ -249,8 +249,8 @@ export default registerBlocks([
         helpUrl: "#comparison-interval",
         inputsInline: true,
         mutator: DynamicInputTypesMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.COMPARISON.NULL,
         lines: [
             {
@@ -268,5 +268,5 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         helpUrl: "#comparison-null",
         inputsInline: true
-    },
+    }),
 ] as const)

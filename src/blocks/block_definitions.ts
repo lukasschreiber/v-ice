@@ -1,7 +1,7 @@
 import { IType } from "@/data/types"
 import * as Blockly from "blockly/core"
-import { BlockExtension } from "@/blocks/block_extensions"
-import { BlockMutator } from "./block_mutators"
+import { BlockExtension, ExtensionMixins, RegistrableExtension } from "@/blocks/block_extensions"
+import { MutatorMixin, RegistrableMutator } from "./block_mutators"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -17,7 +17,7 @@ export enum ConnectionType {
     TIMELINE_PROTOTYPE = "TimelinePrototype",
 }
 
-export function registerBlocks<T extends (BlockDefinition & { id: string })[]>(blocks: T): Readonly<Record<T[number]["id"], T[number]>> {
+export function registerBlocks<T extends Array<BlockDefinition<any[], any> & { id: string }>>(blocks: T): Readonly<Record<T[number]["id"], T[number]>> {
     for (const definition of blocks) {
         const block = convertBlockDefinitionToBlocklyJson(definition)
         if (block.output && typeof block.output !== "string") block.output = block.output.name
@@ -119,10 +119,7 @@ type BlocklyJsonBlockDefinition = {
     data?: object | string
 }
 
-type RegisterableExtension = new (...args: any[]) => BlockExtension<any>
-type RegisterableMutator = new (...args: any[]) => BlockMutator<any>
-
-export type BlockDefinition = {
+export type BlockDefinition<Es extends RegistrableExtension[] = any[], M extends RegistrableMutator = any> = {
     id?: string
     color?: number | string
     helpUrl?: string
@@ -134,9 +131,11 @@ export type BlockDefinition = {
     inputsInline?: boolean
     tooltip?: string
     style?: string
-    mutator?: RegisterableMutator
-    extensions?: RegisterableExtension[]
+    mutator?: M
+    extensions?: Es
     data?: object | string
+    code?: (block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>) => string
+    // code?: OperationGeneratorFn | NodeGeneratorFn
 }
 
 export type FieldDefinition = {
@@ -151,3 +150,9 @@ export type InputDefinition = {
     check?: IType | string
 }
 
+export function createBlockDefinition<
+    Es extends RegistrableExtension[] = any[],
+    M extends RegistrableMutator = any
+>(definition: BlockDefinition<Es, M> & {id: string}): BlockDefinition & {id: string}  {
+    return definition as BlockDefinition & {id: string};
+}

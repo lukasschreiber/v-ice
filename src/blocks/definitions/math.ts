@@ -1,11 +1,11 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
+import { ConnectionType, createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { DivisiblebyMutator } from "../mutators/math_is_divisibleby";
 import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.MATH.MINUS,
         lines: [
             {
@@ -28,9 +28,9 @@ export default registerBlocks([
         helpUrl: "#math-operations",
         style: "math_blocks",
         inputsInline: true,
-        mutator: DynamicInputTypesMutator
-    },
-    {
+        mutator: DynamicInputTypesMutator,
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.PLUS,
         lines: [
             {
@@ -53,8 +53,8 @@ export default registerBlocks([
         style: "math_blocks",
         helpUrl: "#math-operations",
         inputsInline: true,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.TIMES,
         lines: [
             {
@@ -77,8 +77,8 @@ export default registerBlocks([
         style: "math_blocks",
         helpUrl: "#math-operations",
         inputsInline: true,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.DIVIDED_BY,
         lines: [
             {
@@ -101,8 +101,8 @@ export default registerBlocks([
         style: "math_blocks",
         helpUrl: "#math-operations",
         inputsInline: true,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.NUMBER,
         lines: [
             {
@@ -118,8 +118,8 @@ export default registerBlocks([
         ],
         output: t.number,
         style: "math_blocks",
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.BINARY,
         lines: [
             {
@@ -154,8 +154,8 @@ export default registerBlocks([
         helpUrl: "#math-binary-operations",
         style: "math_blocks",
         inputsInline: true,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.NUMBER_PROPERTY,
         lines: [
             {
@@ -188,8 +188,8 @@ export default registerBlocks([
         helpUrl: "#math-properties",
         // the mutator is a default blockly mutator
         mutator: DivisiblebyMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.UNARY,
         lines: [
             {
@@ -225,8 +225,8 @@ export default registerBlocks([
         output: t.number,
         helpUrl: "#math-functions",
         style: "math_blocks",
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.CONSTANTS,
         lines: [
             {
@@ -248,8 +248,8 @@ export default registerBlocks([
         output: t.number,
         style: "math_blocks",
         helpUrl: "#math-constants",
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.MATH.CONSTRAIN,
         lines: [
             {
@@ -277,5 +277,5 @@ export default registerBlocks([
         style: "math_blocks",
         helpUrl: "#math-constrain",
         inputsInline: true,
-    }
+    })
 ] as const)

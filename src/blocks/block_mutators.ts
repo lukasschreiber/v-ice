@@ -1,5 +1,5 @@
 import * as Blockly from "blockly/core"
-import { BlockExtension } from "./block_extensions"
+import { BlockExtension, MixinProperties } from "./block_extensions"
 
 export abstract class BlockMutator<T extends Blockly.Block, S = {}> extends BlockExtension<T> {
  
@@ -43,3 +43,9 @@ export abstract class BlockMutator<T extends Blockly.Block, S = {}> extends Bloc
         )
     }
 }
+
+export type MixinMutatorProperties<T> = MixinProperties<T, BlockMutator<any>>
+
+export type RegistrableMutator = new (...args: any[]) => BlockMutator<any>
+
+export type MutatorMixin<M extends RegistrableMutator> = MixinMutatorProperties<M>

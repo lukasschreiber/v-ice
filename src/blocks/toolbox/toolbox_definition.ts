@@ -1,6 +1,6 @@
 import * as Blockly from 'blockly/core';
 import { BlockDefinitions } from '@/blocks/definitions';
-import { BlockDefinition } from '../block_definitions';
+import { BlockDefinition, RegisterableMutator } from '../block_definitions';
 import { IType, ValueOf } from '@/data/types';
 import { SerializedTable } from '@/data/table';
 
@@ -351,3 +351,15 @@ type FixTooltip<T extends object | undefined> = T extends object ? {
 type Merge<T> = FixTooltip<Partial<{
     [K in T extends object ? keyof T : never]: T extends { [k in K]: infer U } ? U : never
 }>>;
+
+
+
+
+// type TestType<T extends { mutator: RegisterableMutator }> = T extends { mutator: infer U } ? U : never;
+
+// type ExtractInterface<T> = T extends { new (...args: any[]): infer I } ? I : never;
+
+
+// const test: ExtractInterface<TestType<ExtractById<typeof BlockDefinitions, "comparison_equals">>> = null!
+
+// const test2: ExtractById<typeof BlockDefinitions, "comparison_equals"> = null!

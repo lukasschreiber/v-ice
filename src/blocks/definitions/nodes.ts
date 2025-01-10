@@ -1,10 +1,10 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
+import { ConnectionType, createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
 import { NodeConnectionType } from "@/blocks/fields/field_edge_connection";
 import { NodeBlockExtension } from "../extensions/node";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.NODE.SOURCE,
         lines: [
             {
@@ -26,8 +26,8 @@ export default registerBlocks([
         style: "node_blocks",
         helpUrl: "#source-node",
         extensions: [NodeBlockExtension]
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.NODE.TARGET,
         lines: [
             {
@@ -54,9 +54,9 @@ export default registerBlocks([
         ],
         style: "node_blocks",
         helpUrl: "#target-node",
-        extensions: [NodeBlockExtension]
-    },
-    {
+        extensions: [NodeBlockExtension],
+    }),
+    createBlockDefinition({
         id: Blocks.Names.NODE.SUBSET,
         lines: [
             {
@@ -115,8 +115,8 @@ export default registerBlocks([
         style: "capped_node_blocks",
         helpUrl: "#subset-node",
         extensions: [NodeBlockExtension]
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.NODE.SET_ARITHMETIC,
         lines: [
             {
@@ -161,5 +161,5 @@ export default registerBlocks([
         style: "node_blocks",
         helpUrl: "#set-arithmetic-node",
         extensions: [NodeBlockExtension]
-    }
+    })
 ] as const)

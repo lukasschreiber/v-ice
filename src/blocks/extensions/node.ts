@@ -26,10 +26,6 @@ export interface NodeExtension {
 export type NodeBlock = NodeExtension & Blockly.Block
 export type NodeBlockSvg = NodeExtension & Blockly.BlockSvg
 
-export interface INodeBlockState {
-    edges: { sourceBlockId: string, targetBlockId: string, sourceField: string, targetField: string }[]
-}
-
 export class NodeBlockExtension extends BlockExtension<Blockly.BlockSvg> implements NodeExtension {
     constructor() {
         super("node_block")

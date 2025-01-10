@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, registerBlocks } from "../block_definitions";
+import { ConnectionType, createBlockDefinition, registerBlocks } from "../block_definitions";
 import t from "@/data/types";
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
@@ -9,7 +9,7 @@ import { ListAnyAllMutator } from "../mutators/list_any_all";
 import { ListSelectMutator } from "../mutators/list_select";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.LIST.MATH,
         lines: [
             {
@@ -45,8 +45,8 @@ export default registerBlocks([
         output: t.number,
         helpUrl: "#list-operations",
         style: "list_blocks",
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LIST.LENGTH,
         lines: [
             {
@@ -63,8 +63,8 @@ export default registerBlocks([
         output: t.number,
         helpUrl: "#list-length",
         style: "list_blocks",
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LIST.CONTAINS,
         lines: [
             {
@@ -82,15 +82,15 @@ export default registerBlocks([
                     },
                 ]
             }
-        ],       
+        ],
         style: "list_blocks",
         inputsInline: true,
         mutator: DynamicInputTypesMutator,
         helpUrl: "#list-contains",
         connectionType: ConnectionType.BOOLEAN,
-        
-    },
-    {
+
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LIST.ANY_ALL,
         lines: [
             {
@@ -133,16 +133,16 @@ export default registerBlocks([
         connectionType: ConnectionType.BOOLEAN,
         helpUrl: "#list-any-all",
         mutator: ListAnyAllMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LIST.IMMEDIATE,
         output: t.list(t.wildcard),
         color: Colors.categories.comparisons,
         inputsInline: true,
         extensions: [ParentColorExtension],
         mutator: ListSelectMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LIST.FLATTEN,
         lines: [
             {
@@ -160,8 +160,8 @@ export default registerBlocks([
         style: "list_blocks",
         helpUrl: "#list-flatten",
         extensions: [FlattenListExtension]
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LIST.EQUALS,
         lines: [
             {
@@ -196,6 +196,6 @@ export default registerBlocks([
         mutator: DynamicInputTypesMutator,
         helpUrl: "#list-equals",
         connectionType: ConnectionType.BOOLEAN,
-        
-    }
+
+    })
 ] as const)

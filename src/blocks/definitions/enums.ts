@@ -1,12 +1,12 @@
 import { Blocks } from "@/blocks";
-import { registerBlocks } from "@/blocks/block_definitions";
+import { createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { EnumSelectMutator } from "../mutators/enum_select";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.ENUM.SELECT,
         lines: [
             {
@@ -23,5 +23,5 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         extensions: [ParentColorExtension],
         mutator: EnumSelectMutator
-    },
+    }),
 ] as const)

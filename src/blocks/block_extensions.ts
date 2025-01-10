@@ -53,3 +53,40 @@ export abstract class BlockExtension<T extends Blockly.Block> {
         target.mixinProperties.push(context)
     }
 }
+
+export type MixinKeys<T, U extends BlockExtension<any>> = T extends { constructor: Function }
+    ? keyof {
+        [K in keyof T as K extends string | symbol
+        ? K extends Exclude<keyof T, keyof U>
+        ? K
+        : never
+        : never]: T[K];
+    }
+    : never;
+
+export type MixinProperties<T, U extends BlockExtension<any>> = {
+    [K in MixinKeys<ExtractInterface<T>, U>]: ExtractInterface<T>[K extends keyof ExtractInterface<T> ? K : never];
+};
+
+type ExtractInterface<T> = T extends { new(...args: any[]): infer I } ? I : never;
+
+type UnionToIntersection<U> = (U extends any ? (x: U) => void : never) extends (x: infer I) => void ? I : never;
+
+export type RegistrableExtension = new (...args: any[]) => BlockExtension<any>
+
+export type ExtensionMixins<Es extends RegistrableExtension[]> = UnionToIntersection<
+    Es extends (infer E)[]
+        ? E extends RegistrableExtension
+            ? MixinExtensionProperties<E>
+            : never
+        : never
+>;
+
+/**
+ * Extracts the properties of a mixin.
+ * 
+ * Note that this type only takes the difference between a BlockExtension implementation and the BlockExtension class.
+ * This means that custom properties on the implementation that are not actually mixed in will be included nevertheless.
+ * @template T The mixin type.
+ */
+export type MixinExtensionProperties<T> = MixinProperties<T, BlockExtension<any>>;

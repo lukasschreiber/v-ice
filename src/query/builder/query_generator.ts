@@ -9,6 +9,9 @@ export const Order = JsOrder
 
 type GeneratorFn<B, T, R extends QueryNode | QueryOperation> = (block: B, generator: T) => R
 
+export type NodeGeneratorFn<B extends Blockly.Block, R extends QueryNode> = GeneratorFn<B, LanguageAgnosticQueryGenerator, R>
+export type OperationGeneratorFn<B extends Blockly.Block, R extends QueryOperation> = GeneratorFn<B, LanguageAgnosticQueryGenerator, R>
+
 export class LanguageAgnosticQueryGenerator {
     ROOT_NODE = "root"
 

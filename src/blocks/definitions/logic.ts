@@ -1,12 +1,12 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
+import { ConnectionType, createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { EitherOrMutator } from "../mutators/either_or";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.LOGIC.OR,
         lines: [
             {
@@ -42,8 +42,8 @@ export default registerBlocks([
         style: "logic_blocks",
         helpUrl: "#logic-or",
         mutator: EitherOrMutator,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LOGIC.NOT,
         lines: [
             {
@@ -64,8 +64,8 @@ export default registerBlocks([
         connectionType: ConnectionType.BOOLEAN,
         style: "logic_blocks",
         helpUrl: "#logic-not",
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.LOGIC.BOOLEAN,
         lines: [
             {
@@ -85,5 +85,5 @@ export default registerBlocks([
         output: t.boolean,
         extensions: [ParentColorExtension],
         color: Colors.categories.comparisons,
-    }
+    })
 ] as const)

@@ -1,4 +1,4 @@
-import { ConnectionType, registerBlocks } from "../block_definitions";
+import { ConnectionType, createBlockDefinition, registerBlocks } from "../block_definitions";
 import types from "@/data/types";
 import { Colors } from "@/themes/colors";
 import { Blocks } from "@/blocks";
@@ -11,7 +11,7 @@ import { EventSelectMutator } from "../mutators/event_select";
 import { EventDoesNotOccurForMutator } from "../mutators/event_does_not_occur_for";
 
 export default registerBlocks([
-    {
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.QUERY,
         lines: [
             {
@@ -38,8 +38,8 @@ export default registerBlocks([
         connectionType: ConnectionType.BOOLEAN,
         helpUrl: "#timeline-match",
         color: Colors.categories.history,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.EVENT_OCCURS,
         lines: [
             {
@@ -64,8 +64,8 @@ export default registerBlocks([
         helpUrl: "#timeline-event",
         extensions: [DynamicEventExtension],
         mutator: EventDoesNotOccurForMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.EVENT_OCCURS_MATCH,
         lines: [
             {
@@ -115,8 +115,8 @@ export default registerBlocks([
         color: Colors.categories.history,
         helpUrl: "#timeline-event-query",
         mutator: EventDoesNotOccurForMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.START_OF_INTERVAL,
         lines: [
             {
@@ -133,8 +133,8 @@ export default registerBlocks([
         output: types.event(types.enum(types.wildcard)),
         helpUrl: "#timeline-interval",
         color: Colors.categories.history,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.END_OF_INTERVAL,
         lines: [
             {
@@ -151,8 +151,8 @@ export default registerBlocks([
         output: types.event(types.enum(types.wildcard)),
         helpUrl: "#timeline-interval",
         color: Colors.categories.history,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.AFTER,
         lines: [
             {
@@ -191,8 +191,8 @@ export default registerBlocks([
         connectionType: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-after",
         color: Colors.categories.history,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.AFTER_INTERVAL,
         lines: [
             {
@@ -227,8 +227,8 @@ export default registerBlocks([
         connectionType: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-after-interval",
         color: Colors.categories.history,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.TIMESTAMP,
         lines: [
             {
@@ -245,8 +245,8 @@ export default registerBlocks([
         connectionType: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-timestamp",
         color: Colors.categories.history,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.DATE_PICKER,
         lines: [
             {
@@ -262,8 +262,8 @@ export default registerBlocks([
         output: types.timestamp,
         color: Colors.categories.history,
         extensions: [ParentColorExtension],
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.EVENT_PICKER,
         lines: [
             {
@@ -271,7 +271,7 @@ export default registerBlocks([
                 args: [
                     {
                         type: "field_event",
-                        name: "EVENT", 
+                        name: "EVENT",
                         options: [
                             ["", ""],
                         ],
@@ -282,8 +282,8 @@ export default registerBlocks([
         output: types.event(types.enum(types.wildcard)),
         color: Colors.categories.history,
         mutator: EventSelectMutator
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.EITHER_OR,
         lines: [
             {
@@ -319,8 +319,8 @@ export default registerBlocks([
         color: Colors.categories.history,
         helpUrl: "#timeline-or",
         mutator: EitherOrMutator,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.LOOP_UNTIL,
         lines: [
             {
@@ -348,8 +348,8 @@ export default registerBlocks([
         extensions: [DynamicEventExtension],
         helpUrl: "#timeline-repeat-until",
         color: Colors.categories.history,
-    },
-    {
+    }),
+    createBlockDefinition({
         id: Blocks.Names.TIMELINE.LOOP_COUNT,
         lines: [
             {
@@ -376,5 +376,5 @@ export default registerBlocks([
         connectionType: ConnectionType.TIMELINE_PROTOTYPE,
         helpUrl: "#timeline-repeat",
         color: Colors.categories.history,
-    }
+    })
 ] as const)
