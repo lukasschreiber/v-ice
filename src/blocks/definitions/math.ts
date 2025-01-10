@@ -1,6 +1,8 @@
 import { Blocks } from "@/blocks";
 import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
+import { DivisiblebyMutator } from "../mutators/math_is_divisibleby";
+import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
 
 export default registerBlocks([
     {
@@ -26,7 +28,7 @@ export default registerBlocks([
         helpUrl: "#math-operations",
         style: "math_blocks",
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.MATH.PLUS,
@@ -185,7 +187,7 @@ export default registerBlocks([
         style: "math_blocks",
         helpUrl: "#math-properties",
         // the mutator is a default blockly mutator
-        mutator: "math_is_divisibleby_mutator"
+        mutator: DivisiblebyMutator
     },
     {
         id: Blocks.Names.MATH.UNARY,

@@ -1,7 +1,7 @@
 import * as Blockly from 'blockly/core';
 import { BlockExtension } from '../block_extensions';
 
-export interface ScopedBlockExtension{
+export interface ScopedBlockExtension {
     isScoped_: boolean
     scope: string
     setScope: (scope: string) => void

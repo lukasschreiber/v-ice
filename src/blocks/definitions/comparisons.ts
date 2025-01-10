@@ -2,6 +2,7 @@ import { Colors } from "@/themes/colors";
 import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Blocks } from "@/blocks";
+import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
 
 export default registerBlocks([
     {
@@ -32,7 +33,7 @@ export default registerBlocks([
         helpUrl: "#equals-within",
         color: Colors.categories.comparisons,
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.EQUALS,
@@ -57,7 +58,7 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         inputsInline: true,
         helpUrl: "#equals",
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.MATCHES,
@@ -82,7 +83,7 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         inputsInline: true,
         helpUrl: "#matches",
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.GREATER,
@@ -107,7 +108,7 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         helpUrl: "#comparison-numbers",
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.LESS,
@@ -132,7 +133,7 @@ export default registerBlocks([
         helpUrl: "#comparison-numbers",
         color: Colors.categories.comparisons,
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.LESS_EQUALS,
@@ -157,7 +158,7 @@ export default registerBlocks([
         helpUrl: "#comparison-numbers",
         color: Colors.categories.comparisons,
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.GREATER_EQUALS,
@@ -182,7 +183,7 @@ export default registerBlocks([
         helpUrl: "#comparison-numbers",
         color: Colors.categories.comparisons,
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.NUMBERS,
@@ -217,7 +218,7 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         helpUrl: "#comparison-numbers",
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.INTERVAL,
@@ -247,7 +248,7 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         helpUrl: "#comparison-interval",
         inputsInline: true,
-        mutator: "dynamic_input_types"
+        mutator: DynamicInputTypesMutator
     },
     {
         id: Blocks.Names.COMPARISON.NULL,

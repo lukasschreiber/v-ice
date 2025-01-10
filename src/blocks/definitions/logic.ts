@@ -3,6 +3,7 @@ import { ConnectionType, registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
+import { EitherOrMutator } from "../mutators/either_or";
 
 export default registerBlocks([
     {
@@ -40,7 +41,7 @@ export default registerBlocks([
         connectionType: ConnectionType.BOOLEAN,
         style: "logic_blocks",
         helpUrl: "#logic-or",
-        mutator: "either_or_mutator",
+        mutator: EitherOrMutator,
     },
     {
         id: Blocks.Names.LOGIC.NOT,

@@ -4,8 +4,9 @@ import types, { IStructType, StructFields } from '@/data/types';
 import { FieldDynamicDropdown } from '../fields/field_dynamic_dropdown';
 import { Blocks } from '@/blocks';
 import { ListAnyAllBlock } from './list_any_all';
+import { BlockMutator } from '../block_mutators';
 
-export interface StructPropertySelectBlock extends Blockly.BlockSvg {
+export interface StructPropertySelectBlock {
     variableType: string,
     selectedProperty: string,
     update_(): void,
@@ -16,36 +17,20 @@ interface StructPropertySelectState {
     selectedProperty: string,
 }
 
-const structPropertySelectMixin: Partial<StructPropertySelectBlock> = {
-    saveExtraState: function (this: StructPropertySelectBlock) {
-        return {
-            variableType: this.variableType,
-            selectedProperty: this.getFieldValue("PROPERTY")
-        }
-    },
-    loadExtraState: function (this: StructPropertySelectBlock, state: StructPropertySelectState) {
-        this.variableType = state.variableType
-        
-        if (this.variableType) {
-            // TODO: Code duplication, see below, this was a quick fix, I am sorry
-            const type = types.utils.fromString(this.variableType)
-            if (!types.utils.isStruct(type) && !(types.utils.isList(type) && types.utils.isStruct(type.elementType))) return
+export class StructPropertySelectMutator extends BlockMutator<Blockly.Block & StructPropertySelectBlock, StructPropertySelectState> implements StructPropertySelectBlock {
 
-            const struct: IStructType<StructFields> = types.utils.isList(type) ? type.elementType as IStructType<StructFields> : type as IStructType<StructFields>
+    constructor() {
+        super("struct_property_select_mutator")
+    }
 
-            const dropdown = this.getField("PROPERTY") as FieldDynamicDropdown | null
-            if (!dropdown) return
+    @BlockMutator.mixin
+    variableType: string = ""
 
-            dropdown.updateOptions(() => {
-                const options = Object.keys(struct.fields)
-                return options.length >= 1 ? options.map(it => [it, it]) : [["", ""]]
-            })
-        }
+    @BlockMutator.mixin
+    selectedProperty: string = ""
 
-        this.setFieldValue(state.selectedProperty, "PROPERTY")
-        this.update_()
-    },
-    update_: function (this: StructPropertySelectBlock) {
+    @BlockMutator.mixin
+    update_(this: Blockly.Block & StructPropertySelectBlock): void {
         if (!this.variableType) return
         const type = types.utils.fromString(this.variableType)
         if (!types.utils.isStruct(type) && !(types.utils.isList(type) && types.utils.isStruct(type.elementType))) return
@@ -77,32 +62,64 @@ const structPropertySelectMixin: Partial<StructPropertySelectBlock> = {
                 this.setOutput(true, outputType.name)
             }
         }
-    },
-}
+    }
 
-function structPropertySelect(this: StructPropertySelectBlock) {
-    let lastChildren: string[] = []
+    public saveExtraState(this: Blockly.Block & StructPropertySelectBlock): StructPropertySelectState {
+        return {
+            variableType: this.variableType,
+            selectedProperty: this.getFieldValue("PROPERTY")
+        }
+    }
 
-    this.update_()
+    public loadExtraState(this: Blockly.Block & StructPropertySelectBlock, state: StructPropertySelectState): void {
+        this.variableType = state.variableType
 
-    this.setOnChange((event) => {
-        if (event.type === Blockly.Events.MOVE && !event.getEventWorkspace_().isFlyout) {
-            const payload = event.toJson() as Blockly.Events.BlockMoveJson
-            if (!(payload.reason?.includes("connect") || payload.reason?.includes("disconnect"))) return
+        if (this.variableType) {
+            // TODO: Code duplication, see below, this was a quick fix, I am sorry
+            const type = types.utils.fromString(this.variableType)
+            if (!types.utils.isStruct(type) && !(types.utils.isList(type) && types.utils.isStruct(type.elementType))) return
 
-            const children = this.getChildren(true).filter(child => child.outputConnection) // we are only interested in children that are inside of the block
-            const childrenNames = children.map(it => it.type + "/" + (it.outputConnection?.getCheck()?.[0] ?? "null"))
-            if (!arraysAreEquivalent(childrenNames, lastChildren)) {
+            const struct: IStructType<StructFields> = types.utils.isList(type) ? type.elementType as IStructType<StructFields> : type as IStructType<StructFields>
+
+            const dropdown = this.getField("PROPERTY") as FieldDynamicDropdown | null
+            if (!dropdown) return
+
+            dropdown.updateOptions(() => {
+                const options = Object.keys(struct.fields)
+                return options.length >= 1 ? options.map(it => [it, it]) : [["", ""]]
+            })
+        }
+
+        this.setFieldValue(state.selectedProperty, "PROPERTY")
+        this.update_()
+    }
+
+    public extension(this: Blockly.Block & StructPropertySelectBlock): void {
+        let lastChildren: string[] = []
+
+        this.update_()
+
+        this.setOnChange((event) => {
+            if (event.type === Blockly.Events.MOVE && !event.getEventWorkspace_().isFlyout) {
+                const payload = event.toJson() as Blockly.Events.BlockMoveJson
+                if (!(payload.reason?.includes("connect") || payload.reason?.includes("disconnect"))) return
+
+                const children = this.getChildren(true).filter(child => child.outputConnection) // we are only interested in children that are inside of the block
+                const childrenNames = children.map(it => it.type + "/" + (it.outputConnection?.getCheck()?.[0] ?? "null"))
+
+                if (arraysAreEquivalent(childrenNames, lastChildren)) return
+
                 lastChildren = childrenNames
                 const typeString = this.getInput("STRUCT")?.connection?.targetBlock()?.outputConnection?.getCheck()
                 if (typeString) {
                     this.variableType = typeString[0]
                     this.update_()
                 }
-            }
-        } else if (event.type === Blockly.Events.CHANGE) {
-            const payload = event.toJson() as Blockly.Events.BlockChangeJson
-            if (payload.name === "PROPERTY") {
+
+            } else if (event.type === Blockly.Events.CHANGE) {
+                const payload = event.toJson() as Blockly.Events.BlockChangeJson
+                if (payload.name !== "PROPERTY") return
+
                 // set the outputtype based on the property
                 const type = types.utils.fromString(this.variableType)
                 if (!types.utils.isStruct(type) && !(types.utils.isList(type) && types.utils.isStruct(type.elementType))) return
@@ -110,34 +127,26 @@ function structPropertySelect(this: StructPropertySelectBlock) {
                 const struct: IStructType<StructFields> = types.utils.isList(type) ? type.elementType as IStructType<StructFields> : type as IStructType<StructFields>
                 const property = this.getFieldValue("PROPERTY")
                 const propertyType = struct.fields[property]
-                if (propertyType) {
-                    // TODO: Code duplication, see above
-                    const outputType = types.utils.isList(type) ? types.list(propertyType) : propertyType
-                    if (this.outputConnection?.isConnected()) {
-                        const parent = this.outputConnection?.targetBlock()
-                        const parentInput = this.outputConnection?.targetConnection?.getParentInput()
-                        if (parent && parentInput && Blocks.Types.isDynamicInputBlock(parent)) {
-                            parent.setType(parentInput.name, outputType, true)
-                        }
-                        this.setOutput(true, outputType.name)
-
-                        if (parent && parent.type === Blocks.Names.LIST.ANY_ALL) {
-                            const listBlock = parent as unknown as ListAnyAllBlock
-                            listBlock.variableType = outputType.name
-                            listBlock.updateType()
-                        }
-                    } else {
-                        this.setOutput(true, outputType.name)
+                if (!propertyType) return
+                // TODO: Code duplication, see above
+                const outputType = types.utils.isList(type) ? types.list(propertyType) : propertyType
+                if (this.outputConnection?.isConnected()) {
+                    const parent = this.outputConnection?.targetBlock()
+                    const parentInput = this.outputConnection?.targetConnection?.getParentInput()
+                    if (parent && parentInput && Blocks.Types.isDynamicInputBlock(parent)) {
+                        parent.setType(parentInput.name, outputType, true)
                     }
+                    this.setOutput(true, outputType.name)
+
+                    if (parent && parent.type === Blocks.Names.LIST.ANY_ALL) {
+                        const listBlock = parent as unknown as ListAnyAllBlock
+                        listBlock.variableType = outputType.name
+                        listBlock.updateType()
+                    }
+                } else {
+                    this.setOutput(true, outputType.name)
                 }
             }
-        }
-    })
+        })
+    }
 }
-
-Blockly.Extensions.registerMutator(
-    'struct_property_select_mutator',
-    structPropertySelectMixin,
-    structPropertySelect
-);
-

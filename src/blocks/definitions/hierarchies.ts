@@ -3,6 +3,7 @@ import { registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
+import { HierarchySelectMutator } from "../mutators/hierarchy_select";
 
 export default registerBlocks([
     {
@@ -21,6 +22,6 @@ export default registerBlocks([
         output: t.hierarchy(t.wildcard),
         color: Colors.categories.comparisons,
         extensions: [ParentColorExtension],
-        mutator: "hierarchy_select_mutator"
+        mutator: HierarchySelectMutator
     }
 ] as const)

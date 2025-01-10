@@ -6,6 +6,9 @@ import { EventOp, SkipOp, TimeUnit } from "@/query/generation/timeline_templates
 import { DynamicEventExtension } from "../extensions/dynamic_event";
 import { DynamicEventMatchesExtension } from "../extensions/dynamic_event_matches";
 import { ParentColorExtension } from "../extensions/parent_color";
+import { EitherOrMutator } from "../mutators/either_or";
+import { EventSelectMutator } from "../mutators/event_select";
+import { EventDoesNotOccurForMutator } from "../mutators/event_does_not_occur_for";
 
 export default registerBlocks([
     {
@@ -60,7 +63,7 @@ export default registerBlocks([
         color: Colors.categories.history,
         helpUrl: "#timeline-event",
         extensions: [DynamicEventExtension],
-        mutator: "event_does_not_occur_for_mutator"
+        mutator: EventDoesNotOccurForMutator
     },
     {
         id: Blocks.Names.TIMELINE.EVENT_OCCURS_MATCH,
@@ -111,7 +114,7 @@ export default registerBlocks([
         extensions: [DynamicEventMatchesExtension],
         color: Colors.categories.history,
         helpUrl: "#timeline-event-query",
-        mutator: "event_does_not_occur_for_mutator"
+        mutator: EventDoesNotOccurForMutator
     },
     {
         id: Blocks.Names.TIMELINE.START_OF_INTERVAL,
@@ -278,7 +281,7 @@ export default registerBlocks([
         ],
         output: types.event(types.enum(types.wildcard)),
         color: Colors.categories.history,
-        mutator: "event_select_mutator"
+        mutator: EventSelectMutator
     },
     {
         id: Blocks.Names.TIMELINE.EITHER_OR,
@@ -315,7 +318,7 @@ export default registerBlocks([
         connectionType: ConnectionType.TIMELINE_PROTOTYPE,
         color: Colors.categories.history,
         helpUrl: "#timeline-or",
-        mutator: "either_or_mutator",
+        mutator: EitherOrMutator,
     },
     {
         id: Blocks.Names.TIMELINE.LOOP_UNTIL,

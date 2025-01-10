@@ -4,6 +4,9 @@ import t from "@/data/types";
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { FlattenListExtension } from "../extensions/flatten_list";
+import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
+import { ListAnyAllMutator } from "../mutators/list_any_all";
+import { ListSelectMutator } from "../mutators/list_select";
 
 export default registerBlocks([
     {
@@ -82,7 +85,7 @@ export default registerBlocks([
         ],       
         style: "list_blocks",
         inputsInline: true,
-        mutator: "dynamic_input_types",
+        mutator: DynamicInputTypesMutator,
         helpUrl: "#list-contains",
         connectionType: ConnectionType.BOOLEAN,
         
@@ -129,7 +132,7 @@ export default registerBlocks([
         inputsInline: true,
         connectionType: ConnectionType.BOOLEAN,
         helpUrl: "#list-any-all",
-        mutator: "list_any_all_mutator"
+        mutator: ListAnyAllMutator
     },
     {
         id: Blocks.Names.LIST.IMMEDIATE,
@@ -137,7 +140,7 @@ export default registerBlocks([
         color: Colors.categories.comparisons,
         inputsInline: true,
         extensions: [ParentColorExtension],
-        mutator: "list_select_mutator"
+        mutator: ListSelectMutator
     },
     {
         id: Blocks.Names.LIST.FLATTEN,
@@ -190,7 +193,7 @@ export default registerBlocks([
         ],
         style: "list_blocks",
         inputsInline: true,
-        mutator: "dynamic_input_types",
+        mutator: DynamicInputTypesMutator,
         helpUrl: "#list-equals",
         connectionType: ConnectionType.BOOLEAN,
         

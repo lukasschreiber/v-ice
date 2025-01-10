@@ -3,6 +3,7 @@ import { registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
+import { EnumSelectMutator } from "../mutators/enum_select";
 
 export default registerBlocks([
     {
@@ -21,6 +22,6 @@ export default registerBlocks([
         output: t.enum(t.wildcard),
         color: Colors.categories.comparisons,
         extensions: [ParentColorExtension],
-        mutator: "enum_select_mutator"
+        mutator: EnumSelectMutator
     },
 ] as const)

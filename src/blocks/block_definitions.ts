@@ -1,6 +1,7 @@
 import { IType } from "@/data/types"
 import * as Blockly from "blockly/core"
 import { BlockExtension } from "@/blocks/block_extensions"
+import { BlockMutator } from "./block_mutators"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -50,6 +51,7 @@ export function registerBlocks<T extends (BlockDefinition & { id: string })[]>(b
 function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJsonBlockDefinition {
 
     const extensions = []
+    let mutatorName: string | undefined = undefined
 
     for (const extension of block.extensions ?? []) {
         const ext = getExtensionInstance(extension)
@@ -59,9 +61,18 @@ function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJso
         extensions.push(ext.name)
     }
 
+    if (block.mutator) {
+        const mutator = getExtensionInstance(block.mutator)
+        if (!Blockly.Extensions.isRegistered(mutator.name)) {
+            mutator.register()
+        }
+        mutatorName = mutator.name
+    }
+
     const result: BlocklyJsonBlockDefinition = {
         ...block,
         extensions: extensions,
+        mutator: mutatorName,
         id: block.id!,
         previousStatement: block.connectionType !== undefined ? block.connectionType : block.previousStatement,
         nextStatement: block.connectionType !== undefined ? block.connectionType : block.nextStatement,
@@ -108,6 +119,9 @@ type BlocklyJsonBlockDefinition = {
     data?: object | string
 }
 
+type RegisterableExtension = new (...args: any[]) => BlockExtension<any>
+type RegisterableMutator = new (...args: any[]) => BlockMutator<any>
+
 export type BlockDefinition = {
     id?: string
     color?: number | string
@@ -120,8 +134,8 @@ export type BlockDefinition = {
     inputsInline?: boolean
     tooltip?: string
     style?: string
-    mutator?: string
-    extensions?: (new (...args: any[]) => BlockExtension<any>)[]
+    mutator?: RegisterableMutator
+    extensions?: RegisterableExtension[]
     data?: object | string
 }
 

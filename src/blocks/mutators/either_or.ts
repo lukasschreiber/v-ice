@@ -1,8 +1,9 @@
 import * as Blockly from 'blockly';
 import { FieldButton } from '../fields/field_button';
 import { IconFactory } from '../icon_factory';
+import { BlockMutator } from '../block_mutators';
 
-export interface EitherOrBlock extends Blockly.Block {
+export interface EitherOrBlock {
     addOrBranch(id?: string): void
     removeOrBranch(): void
     inputNames: string[]
@@ -12,27 +13,16 @@ interface EitherOrState {
     inputNames: string[]
 }
 
-const eitherOrMutator: Partial<EitherOrBlock> = {
-    inputNames: [],
-    saveExtraState: function (this: EitherOrBlock) {
-        return {
-            inputNames: this.inputNames
-        }
-    },
-    loadExtraState: function (this: EitherOrBlock, state: EitherOrState) {
-        this.inputNames = state.inputNames
+export class EitherOrMutator extends BlockMutator<Blockly.Block & EitherOrBlock, EitherOrState> implements EitherOrBlock {
+    constructor() {
+        super("either_or_mutator")
+    }
 
-        this.inputNames.forEach(uid => {
-            this.appendDummyInput(`OR_LABEL_${uid}`).appendField(Blockly.Msg.OR, `OR_LABEL_FIELD_${uid}`)
-            const statement = this.appendStatementInput(`OR_STATEMENT_${uid}`)
-            const check = this.inputList.find(input => input.type === Blockly.inputs.inputTypes.STATEMENT)?.connection?.getCheck()
-            if (check) {
-                statement.connection?.setCheck(check)
-            }
-        })
-        this.moveInputBefore("BUTTONS", null)
-    },
-    addOrBranch: function (this: EitherOrBlock, id?: string) {
+    @BlockMutator.mixin
+    inputNames: string[] = []
+
+    @BlockMutator.mixin
+    public addOrBranch(this: Blockly.Block & EitherOrBlock, id?: string) {
         const check = this.inputList.find(input => input.type === Blockly.inputs.inputTypes.STATEMENT)?.connection?.getCheck()
         if (!check || this.isInFlyout) return
 
@@ -44,8 +34,10 @@ const eitherOrMutator: Partial<EitherOrBlock> = {
         this.inputNames.push(uid)
 
         this.moveInputBefore("BUTTONS", null)
-    },
-    removeOrBranch: function (this: EitherOrBlock) {
+    }
+
+    @BlockMutator.mixin
+    public removeOrBranch(this: Blockly.Block & EitherOrBlock) {
         const customOrStatements = this.inputNames.map(uid => ({ label: this.getInput(`OR_LABEL_${uid}`)!, statement: this.getInput(`OR_STATEMENT_${uid}`)! }))
         if (customOrStatements.length === 0) return
 
@@ -71,25 +63,37 @@ const eitherOrMutator: Partial<EitherOrBlock> = {
         this.removeInput(statement.name)
         this.inputNames.splice(indexToDelete, 1)
     }
+
+    public saveExtraState(this: Blockly.Block & EitherOrBlock) {
+        return {
+            inputNames: this.inputNames
+        }
+    }
+
+    public loadExtraState(this: Blockly.Block & EitherOrBlock, state: EitherOrState) {
+        this.inputNames = state.inputNames
+
+        this.inputNames.forEach(uid => {
+            this.appendDummyInput(`OR_LABEL_${uid}`).appendField(Blockly.Msg.OR, `OR_LABEL_FIELD_${uid}`)
+            const statement = this.appendStatementInput(`OR_STATEMENT_${uid}`)
+            const check = this.inputList.find(input => input.type === Blockly.inputs.inputTypes.STATEMENT)?.connection?.getCheck()
+            if (check) {
+                statement.connection?.setCheck(check)
+            }
+        })
+        this.moveInputBefore("BUTTONS", null)
+    }
+
+    public extension(this: Blockly.Block & EitherOrBlock): void {
+        const addIcon = IconFactory.wrapIcon(IconFactory.createPlusIcon("white", 12))
+        const addButton = new FieldButton(addIcon, { width: 12, height: 12, svg: addIcon });
+        addButton.addClickListener(() => this.addOrBranch())
+
+        const removeIcon = IconFactory.wrapIcon(IconFactory.createMinusIcon("white", 12))
+        const removeButton = new FieldButton(removeIcon, { width: 12, height: 12, svg: removeIcon });
+        removeButton.addClickListener(() => this.removeOrBranch())
+
+        this.appendDummyInput("BUTTONS").appendField(addButton, "ADD").appendField(removeButton, "REMOVE")
+    }
 }
-
-function eitherOrHelper(this: EitherOrBlock) {
-    // we start with two empty branches
-
-    const addIcon = IconFactory.wrapIcon(IconFactory.createPlusIcon("white", 12))
-    const addButton = new FieldButton(addIcon, { width: 12, height: 12, svg: addIcon });
-    addButton.addClickListener(() => this.addOrBranch())
-
-    const removeIcon = IconFactory.wrapIcon(IconFactory.createMinusIcon("white", 12))
-    const removeButton = new FieldButton(removeIcon, { width: 12, height: 12, svg: removeIcon });
-    removeButton.addClickListener(() => this.removeOrBranch())
-
-    this.appendDummyInput("BUTTONS").appendField(addButton, "ADD").appendField(removeButton, "REMOVE")
-}
-
-Blockly.Extensions.registerMutator(
-    'either_or_mutator',
-    eitherOrMutator,
-    eitherOrHelper
-);
 

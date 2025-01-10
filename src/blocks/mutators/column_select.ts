@@ -7,37 +7,30 @@ import types from '@/data/types';
 // import { TypeChecker } from '@/data/type_checker';
 import { FieldTypeLabel } from '../fields/field_type_label';
 import { Blocks } from '@/blocks';
+import { BlockMutator } from '../block_mutators';
 
-export interface ColumnSelectBlock extends Blockly.Block {
+export interface ColumnSelectBlock {
     updateDropdown_(opt_updateOutputType?: boolean): void,
     getDropDownOptions_(): string[],
     columnTypeMap: Map<string, string>,
 }
 
-interface ColumnSelectBlockState {
+interface ColumnSelectState {
     column: string
     elementType: string
 }
 
-const columnSelectMixin: Partial<ColumnSelectBlock> = {
-    columnTypeMap: new Map(),
-    saveExtraState: function (this: ColumnSelectBlock): ColumnSelectBlockState {
-        if(this.getFieldValue("COLUMN") === "") this.updateDropdown_()
-        
-        return {
-            column: this.getFieldValue("COLUMN"),
-            elementType: this.columnTypeMap.get(this.getFieldValue("COLUMN"))!
-        }
-    },
-    loadExtraState: function (this: ColumnSelectBlock, state: ColumnSelectBlockState) {
-        const type = types.utils.fromString(state.elementType)
-        this.setOutput(true, types.list(type).name)
+export class ColumnSelectMutator extends BlockMutator<Blockly.Block & ColumnSelectBlock, ColumnSelectState> implements ColumnSelectBlock {
 
-        subscribe(state => state.data.source, () => {
-            this.updateDropdown_(false)
-        }, { immediate: true })
-    },
-    updateDropdown_: function (this: ColumnSelectBlock, opt_updateOutputType = true) {
+    constructor() {
+        super("column_select_mutator")
+    }
+
+    @BlockMutator.mixin
+    columnTypeMap: Map<string, string> = new Map()
+
+    @BlockMutator.mixin
+    updateDropdown_(this: Blockly.Block & ColumnSelectBlock, opt_updateOutputType = true) {
         const dropdown = this.getField("COLUMN") as FieldDynamicDropdown | null
         if (!dropdown) return
 
@@ -64,8 +57,10 @@ const columnSelectMixin: Partial<ColumnSelectBlock> = {
                 return options.length >= 1 ? options.map(it => [it, it]) : [["", ""]];
             }
         )
-    },
-    getDropDownOptions_: function (this: ColumnSelectBlock) {
+    }
+
+    @BlockMutator.mixin
+    getDropDownOptions_(this: Blockly.Block & ColumnSelectBlock) {
         const source = store.getState().data.source
         const columnNames: string[] = []
 
@@ -76,27 +71,37 @@ const columnSelectMixin: Partial<ColumnSelectBlock> = {
         }
 
         return columnNames
-    },
-}
+    }
 
-const columnSelectExtension = function (this: ColumnSelectBlock) {
-    this.setOnChange((e) => {
-        if (e.type === Blockly.Events.CHANGE) {
-            const payload = e.toJson() as Blockly.Events.BlockChangeJson
-            if (payload.name === "COLUMN") {
-                const type = this.columnTypeMap.get(payload.newValue as string)
-                if (type) {
-                    this.updateDropdown_()
+    public saveExtraState(this: Blockly.Block & ColumnSelectBlock) {
+        if(this.getFieldValue("COLUMN") === "") this.updateDropdown_()
+        
+        return {
+            column: this.getFieldValue("COLUMN"),
+            elementType: this.columnTypeMap.get(this.getFieldValue("COLUMN"))!
+        }
+    }
+
+    public loadExtraState(this: Blockly.Block & ColumnSelectBlock, state: ColumnSelectState) {
+        const type = types.utils.fromString(state.elementType)
+        this.setOutput(true, types.list(type).name)
+
+        subscribe(state => state.data.source, () => {
+            this.updateDropdown_(false)
+        }, { immediate: true })
+    }
+
+    public extension(this: Blockly.Block & ColumnSelectBlock): void {
+        this.setOnChange((e) => {
+            if (e.type === Blockly.Events.BLOCK_CHANGE) {
+                const payload = e.toJson() as Blockly.Events.BlockChangeJson
+                if (payload.name === "COLUMN") {
+                    const type = this.columnTypeMap.get(payload.newValue as string)
+                    if (type) {
+                        this.updateDropdown_()
+                    }
                 }
             }
-        }
-    })
+        })
+    }
 }
-
-
-Blockly.Extensions.registerMutator(
-    'column_select_mutator',
-    columnSelectMixin,
-    columnSelectExtension,
-);
-

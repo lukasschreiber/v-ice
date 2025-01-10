@@ -2,8 +2,9 @@ import * as Blockly from "blockly/core"
 import t, { IType } from "@/data/types"
 import { arraysAreEquivalent } from "@/utils/array"
 import { ShadowFactory } from "../shadow_factory"
+import { BlockMutator } from "../block_mutators"
 
-export interface DynamicInputBlock extends Blockly.Block {
+export interface DynamicInputBlock {
     updateShape_(inputName: string, type: IType, opt_updateChildOutputType?: boolean): void,
     inputTypes: Record<string, IType>,
     originalTypes: Record<string, IType>,
@@ -15,35 +16,30 @@ interface DynamicInputState {
     originalTypes: Record<string, string>
 }
 
-const dynamicInputTypeMixin: Partial<DynamicInputBlock> = {
-    saveExtraState: function (this: DynamicInputBlock) {
-        return {
-            inputTypes: Object.entries(this.inputTypes).reduce((acc, [name, type]) => {
-                if (type) acc[name] = type.name
-                return acc
-            }, {} as Record<string, string>),
-            originalTypes: Object.entries(this.originalTypes).reduce((acc, [name, type]) => {
-                if (type) acc[name] = type.name
-                return acc
-            }, {} as Record<string, string>)
-        }
-    },
-    loadExtraState: function (this: DynamicInputBlock, state: DynamicInputState) {
-        Object.entries(state.originalTypes).forEach(([name, originalType]) => {
-            this.updateShape_(name, t.utils.fromString(originalType))
-        })
-    },
-    originalTypes: {},
-    inputTypes: {},
-    updateShape_: function (this: DynamicInputBlock, inputName: string, type: IType, opt_updateChildOutputType: boolean = false) {
+export class DynamicInputTypesMutator extends BlockMutator<Blockly.Block & DynamicInputBlock, DynamicInputState> implements DynamicInputBlock {
+
+    constructor() {
+        super("dynamic_input_types")
+    }
+
+    @BlockMutator.mixin
+    inputTypes: Record<string, IType> = {}
+
+    @BlockMutator.mixin
+    originalTypes: Record<string, IType> = {}
+
+    @BlockMutator.mixin
+    updateShape_(this: Blockly.Block & DynamicInputBlock, inputName: string, type: IType, opt_updateChildOutputType = false) {
         const input = this.getInput(inputName)
         if (!input) return
-    
+
         if (ShadowFactory.addShadowToInput(input, type, opt_updateChildOutputType)) {
             this.inputTypes[inputName] = type
         }
-    },
-    setType: function (this: DynamicInputBlock, inputName: string, type: IType, opt_updateChildOutputType: boolean = false) {
+    }
+
+    @BlockMutator.mixin
+    setType(this: Blockly.Block & DynamicInputBlock, inputName: string, type: IType, opt_updateChildOutputType = false) {
         const referenceType = this.originalTypes[inputName]
         let inferredType: IType | null = null
         try {
@@ -63,11 +59,28 @@ const dynamicInputTypeMixin: Partial<DynamicInputBlock> = {
 
         return true
     }
-};
 
+    public saveExtraState(this: Blockly.Block & DynamicInputBlock) {
+        return {
+            inputTypes: Object.entries(this.inputTypes).reduce((acc, [name, type]) => {
+                if (type) acc[name] = type.name
+                return acc
+            }, {} as Record<string, string>),
+            originalTypes: Object.entries(this.originalTypes).reduce((acc, [name, type]) => {
+                if (type) acc[name] = type.name
+                return acc
+            }, {} as Record<string, string>)
+        }
+    }
 
-const dynamicInputTypeExtension = function (this: DynamicInputBlock) {
-    this.originalTypes = {}
+    public loadExtraState(this: Blockly.Block & DynamicInputBlock, state: DynamicInputState) {
+        Object.entries(state.originalTypes).forEach(([name, originalType]) => {
+            this.updateShape_(name, t.utils.fromString(originalType))
+        })
+    }
+
+    public extension(this: Blockly.Block & DynamicInputBlock): void {
+        this.originalTypes = {}
     for (const input of this.inputList) {
         const check = input.connection?.getCheck()?.[0] ?? null
         this.originalTypes[input.name] = check ? t.utils.fromString(check) : t.wildcard
@@ -76,7 +89,7 @@ const dynamicInputTypeExtension = function (this: DynamicInputBlock) {
     let lastChildren: string[] = []
 
     this.setOnChange((event) => {
-        if (event.type !== Blockly.Events.MOVE || event.getEventWorkspace_().isFlyout) return
+        if (event.type !== Blockly.Events.BLOCK_MOVE || event.getEventWorkspace_().isFlyout) return
         const reason = (event.toJson() as Blockly.Events.BlockMoveJson).reason
         if (!(reason?.includes("connect") || reason?.includes("disconnect"))) return
         const children = this.getChildren(true).filter(child => child.outputConnection) // we are only interested in children that are inside of the block
@@ -106,10 +119,5 @@ const dynamicInputTypeExtension = function (this: DynamicInputBlock) {
             }
         }
     })
-};
-
-Blockly.Extensions.registerMutator(
-    'dynamic_input_types',
-    dynamicInputTypeMixin,
-    dynamicInputTypeExtension,
-);
+    }
+}

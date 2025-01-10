@@ -2,6 +2,9 @@ import { Blocks } from "@/blocks";
 import { registerBlocks } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { ScopedExtension } from "../extensions/scoped";
+import { LocalVariableMutator } from "../mutators/local_variable";
+import { VariableSelectMutator } from "../mutators/variable_select";
+import { ColumnSelectMutator } from "../mutators/column_select";
 
 export default registerBlocks([
     {
@@ -28,7 +31,7 @@ export default registerBlocks([
         output: t.list(t.wildcard),
         helpUrl: "#column-variable",
         style: "variable_blocks",
-        mutator: "column_select_mutator"
+        mutator: ColumnSelectMutator
     },
     {
         id: Blocks.Names.VARIABLE.GET,
@@ -52,7 +55,7 @@ export default registerBlocks([
         output: t.wildcard,
         style: "variable_blocks",
         helpUrl: "#variables",
-        mutator: "variable_select_mutator"
+        mutator: VariableSelectMutator
     },
     {
         id: Blocks.Names.VARIABLE.LOCAL_GET,
@@ -76,6 +79,6 @@ export default registerBlocks([
         output: t.wildcard,
         style: "variable_blocks",
         extensions: [ScopedExtension],
-        mutator: "local_variable_mutator"
+        mutator: LocalVariableMutator
     }
 ] as const)

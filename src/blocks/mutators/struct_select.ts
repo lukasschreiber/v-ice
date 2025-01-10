@@ -4,8 +4,9 @@ import { IconFactory } from '../icon_factory';
 import { FieldButton } from '../fields/field_button';
 import types from '@/data/types';
 import { ShadowFactory } from '../shadow_factory';
+import { BlockMutator } from '../block_mutators';
 
-export interface StructSelectBlock extends Blockly.BlockSvg {
+export interface StructSelectBlock {
     variableType: string,
     renderedProperties: Map<string, string>,
     updateOutputType_(): void,
@@ -14,6 +15,7 @@ export interface StructSelectBlock extends Blockly.BlockSvg {
     addPropertyInput_(name: string, id?: string): Blockly.Input | null,
     removePropertyInput_(input: Blockly.Input): void,
     getPropertyInputs(): Blockly.Input[],
+    focusInput(input: Blockly.Input, workspace: Blockly.WorkspaceSvg): void,
 }
 
 interface StructSelectState {
@@ -21,43 +23,25 @@ interface StructSelectState {
     inputs: { name: string, propertyName: string, shadow: Blockly.serialization.blocks.State | null }[],
 }
 
-const structSelectMixin: Partial<StructSelectBlock> = {
-    renderedProperties: new Map(),
-    saveExtraState: function (this: StructSelectBlock): StructSelectState {
-        return {
-            variableType: this.variableType,
-            inputs: this.inputList.filter(input => input.name.startsWith("PROPERTY")).map(input => ({
-                name: input.name,
-                propertyName: this.renderedProperties.get(input.name)!,
-                shadow: input.connection?.targetBlock() ? Blockly.serialization.blocks.save(input.connection!.targetBlock()!) : null
-            }))
-        }
-    },
-    loadExtraState: function (this: StructSelectBlock, state: StructSelectState) {
-        this.variableType = state.variableType
-        this.updateOutputType_()
+export class StructSelectMutator extends BlockMutator<Blockly.BlockSvg & StructSelectBlock, StructSelectState> implements StructSelectBlock {
 
-        for (const input of state.inputs) {
-            this.addPropertyInput_(input.propertyName, input.name)
-        }
-    },
-    domToMutation: function (this: StructSelectBlock, xmlElement: Element) {
-        this.variableType = xmlElement.getAttribute("variableType")!
+    constructor() {
+        super("struct_select_mutator")
+    }
 
-        subscribe(state => state.data.source, () => {
-            this.updateOutputType_()
-        }, { immediate: true })
-    },
-    mutationToDom: function (this: StructSelectBlock) {
-        const mutation = Blockly.utils.xml.createElement("mutation")
-        mutation.setAttribute("variableType", this.variableType)
+    @BlockMutator.mixin
+    variableType: string = ""
 
-        return mutation
-    },
-    updateOutputType_: function (this: StructSelectBlock) {
+    @BlockMutator.mixin
+    renderedProperties: Map<string, string> = new Map()
+
+    @BlockMutator.mixin
+    updateOutputType_(this: Blockly.BlockSvg & StructSelectBlock): void {
         this.setOutput(true, this.variableType)
-    },
-    showAddPropertyMenu_: function (this: StructSelectBlock) {
+    }
+
+    @BlockMutator.mixin
+    showAddPropertyMenu_(this: Blockly.BlockSvg & StructSelectBlock): void {
         Blockly.DropDownDiv.setColour(
             this.style.colourPrimary,
             this.style.colourTertiary,
@@ -86,11 +70,15 @@ const structSelectMixin: Partial<StructSelectBlock> = {
 
         Blockly.DropDownDiv.getContentDiv().appendChild(menu)
         Blockly.DropDownDiv.showPositionedByBlock(this.getField("ADD")!, this)
-    },
-    hideAddPropertyMenu_: function (this: StructSelectBlock) {
+    }
+
+    @BlockMutator.mixin
+    hideAddPropertyMenu_(this: Blockly.BlockSvg & StructSelectBlock): void {
         Blockly.DropDownDiv.hideIfOwner(this.getField("ADD")!, true);
-    },
-    addPropertyInput_: function (this: StructSelectBlock, name: string, id?: string): Blockly.Input | null {
+    }
+
+    @BlockMutator.mixin
+    addPropertyInput_(this: Blockly.BlockSvg & StructSelectBlock, name: string, id?: string): Blockly.Input | null {
         const type = types.utils.fromString(this.variableType)
         if (!types.utils.isStruct(type)) return null
 
@@ -111,177 +99,211 @@ const structSelectMixin: Partial<StructSelectBlock> = {
         this.moveInputBefore("ADD", null) // move add to the end
 
         return input
-    },
-    removePropertyInput_: function (this: StructSelectBlock, input: Blockly.Input) {
+    }
+
+    @BlockMutator.mixin
+    removePropertyInput_(this: Blockly.BlockSvg & StructSelectBlock, input: Blockly.Input): void {
         const name = input.name
         const label = this.inputList.find(i => i.name.startsWith("LABEL") && i.name === `LABEL_${name}`)
 
         if (label) this.removeInput(label.name)
         this.removeInput(name)
         this.renderedProperties.delete(name)
-    },
-    getPropertyInputs: function (this: StructSelectBlock): Blockly.Input[] {
+    }
+
+    @BlockMutator.mixin
+    getPropertyInputs(this: Blockly.BlockSvg & StructSelectBlock): Blockly.Input[] {
         return this.inputList.filter(i => i.name.startsWith("PROPERTY"))
-    },
-}
+    }
 
-function structSelectHelper(this: StructSelectBlock) {
-    this.renderedProperties = new Map()
-    const icon = IconFactory.wrapIcon(IconFactory.createPlusIcon("white", 12))
-    const addButton = new FieldButton(icon, { width: 12, height: 12, svg: icon });
-    this.appendDummyInput("ADD").appendField(addButton, "ADD")
+    // TODO: copied from list
+    @BlockMutator.mixin
+    focusInput(this: Blockly.BlockSvg & StructSelectBlock, input: Blockly.Input, workspace: Blockly.WorkspaceSvg): void {
+        Blockly.WidgetDiv.hide()
+        Blockly.DropDownDiv.hideWithoutAnimation()
+        const targetBlock = input.connection?.targetBlock() as Blockly.BlockSvg;
+        Blockly.renderManagement.finishQueuedRenders().then(() => {
+            // dispatch a click on this block with the center of the next block as the position
 
-    addButton.addClickListener(() => {
-        this.showAddPropertyMenu_()
-    })
+            const metrics = targetBlock.getRelativeToSurfaceXY()
+            const offset = workspace.getOriginOffsetInPixels()
+            const scale = workspace.scale
+            const centerX = metrics.x * scale + offset.x + targetBlock.width * scale / 2
+            const centerY = metrics.y * scale + offset.y + targetBlock.height * scale / 2
 
-    const observers: MutationObserver[] = []
+            targetBlock.inputList.find(input => input.fieldRow.length > 0)?.fieldRow[0].showEditor()
+            targetBlock.getSvgRoot().querySelector(".blocklyPath")?.dispatchEvent(new PointerEvent("click", {
+                bubbles: true,
+                cancelable: true,
+                clientX: centerX,
+                clientY: centerY,
+                composed: true,
+                pointerId: 1,
+                view: window
+            })
+            )
+        })
+    }
 
-    Blockly.browserEvents.bind(this.getSvgRoot(), "click", this, (e: MouseEvent) => {
-        observers.forEach(observer => observer.disconnect())
-        observers.length = 0
-
-        if (!Blockly.WidgetDiv.isVisible()) return
-
-        Blockly.Events.disable()
-
-        const target = e.target as Element
-        let shadowBlockSvg: null | Element = target
-        while (shadowBlockSvg && (shadowBlockSvg.tagName !== "g" || !shadowBlockSvg.hasAttribute("data-id"))) {
-            shadowBlockSvg = shadowBlockSvg.parentElement
+    public saveExtraState(this: Blockly.BlockSvg & StructSelectBlock): StructSelectState {
+        return {
+            variableType: this.variableType,
+            inputs: this.inputList.filter(input => input.name.startsWith("PROPERTY")).map(input => ({
+                name: input.name,
+                propertyName: this.renderedProperties.get(input.name)!,
+                shadow: input.connection?.targetBlock() ? Blockly.serialization.blocks.save(input.connection!.targetBlock()!) : null
+            }))
         }
-        const input = this.inputList.find(i => i.connection?.getShadowDom()?.id === shadowBlockSvg?.getAttribute("data-id"))
-        const label = this.inputList.find(i => i.name.startsWith("LABEL") && i.name === `LABEL_${input?.name}`)
+    }
 
-        const div = Blockly.WidgetDiv.getDiv()
-        if (div && input && label) {
-            const labelBBox = label.fieldRow[0].getScaledBBox()
-            const xPosition = labelBBox.left - 1 // we need to offset the widget by 1px to account for the padding between label and input
+    public loadExtraState(this: Blockly.BlockSvg & StructSelectBlock, state: StructSelectState) {
+        this.variableType = state.variableType
+        this.updateOutputType_()
 
-            div.dataset.xOffset = parseFloat(div.style.left) - xPosition + ""
+        for (const input of state.inputs) {
+            this.addPropertyInput_(input.propertyName, input.name)
+        }
+    }
 
-            const inputElement = div.querySelector("input")!
+    public domToMutation(this: Blockly.BlockSvg & StructSelectBlock, xmlElement: Element) {
+        this.variableType = xmlElement.getAttribute("variableType")!
 
-            inputElement.addEventListener("keydown", (e) => {
-                const inputs = this.getPropertyInputs()
+        subscribe(state => state.data.source, () => {
+            this.updateOutputType_()
+        }, { immediate: true })
+    }
 
-                if ((e.key === "Backspace" || e.key === "Delete") && inputElement.value === "") {
-                    const index = inputs.indexOf(input!)
-                    let next: Blockly.Input | null = null
-                    if (index !== -1) {
+    public mutationToDom(this: Blockly.BlockSvg & StructSelectBlock): Element {
+        const mutation = Blockly.utils.xml.createElement("mutation")
+        mutation.setAttribute("variableType", this.variableType)
+
+        return mutation
+    }
+
+    public extension(this: Blockly.BlockSvg & StructSelectBlock): void {
+        this.renderedProperties = new Map()
+        const icon = IconFactory.wrapIcon(IconFactory.createPlusIcon("white", 12))
+        const addButton = new FieldButton(icon, { width: 12, height: 12, svg: icon });
+        this.appendDummyInput("ADD").appendField(addButton, "ADD")
+
+        addButton.addClickListener(() => {
+            this.showAddPropertyMenu_()
+        })
+
+        const observers: MutationObserver[] = []
+
+        Blockly.browserEvents.bind(this.getSvgRoot(), "click", this, (e: MouseEvent) => {
+            observers.forEach(observer => observer.disconnect())
+            observers.length = 0
+
+            if (!Blockly.WidgetDiv.isVisible()) return
+
+            Blockly.Events.disable()
+
+            const target = e.target as Element
+            let shadowBlockSvg: null | Element = target
+            while (shadowBlockSvg && (shadowBlockSvg.tagName !== "g" || !shadowBlockSvg.hasAttribute("data-id"))) {
+                shadowBlockSvg = shadowBlockSvg.parentElement
+            }
+            const input = this.inputList.find(i => i.connection?.getShadowDom()?.id === shadowBlockSvg?.getAttribute("data-id"))
+            const label = this.inputList.find(i => i.name.startsWith("LABEL") && i.name === `LABEL_${input?.name}`)
+
+            const div = Blockly.WidgetDiv.getDiv()
+            if (div && input && label) {
+                const labelBBox = label.fieldRow[0].getScaledBBox()
+                const xPosition = labelBBox.left - 1 // we need to offset the widget by 1px to account for the padding between label and input
+
+                div.dataset.xOffset = parseFloat(div.style.left) - xPosition + ""
+
+                const inputElement = div.querySelector("input")!
+
+                inputElement.addEventListener("keydown", (e) => {
+                    const inputs = this.getPropertyInputs()
+
+                    if ((e.key === "Backspace" || e.key === "Delete") && inputElement.value === "") {
+                        const index = inputs.indexOf(input!)
+                        let next: Blockly.Input | null = null
+                        if (index !== -1) {
+                            if (index > 0) {
+                                next = inputs[index - 1]
+                            } else {
+                                next = inputs[index + 1]
+                            }
+
+                            if (next) {
+                                this.focusInput(next, this.workspace)
+                            }
+                        }
+
+                        Blockly.DropDownDiv.hideWithoutAnimation()
+                        this.removePropertyInput_(input)
+                    } else if (e.key === "ArrowLeft" && inputElement.selectionStart === 0) {
+                        const index = inputs.indexOf(input!)
                         if (index > 0) {
-                            next = inputs[index - 1]
-                        } else {
-                            next = inputs[index + 1]
+                            this.focusInput(inputs[index - 1], this.workspace)
                         }
-
-                        if (next) {
-                            focusInput(next, this.workspace)
+                    } else if (e.key === "ArrowRight" && inputElement.selectionStart === inputElement.value.length) {
+                        const index = inputs.indexOf(input!)
+                        if (index < inputs.length - 1) {
+                            this.focusInput(inputs[index + 1], this.workspace)
                         }
                     }
+                })
 
-                    Blockly.DropDownDiv.hideWithoutAnimation()
-                    this.removePropertyInput_(input)
-                } else if (e.key === "ArrowLeft" && inputElement.selectionStart === 0) {
-                    const index = inputs.indexOf(input!)
-                    if (index > 0) {
-                        focusInput(inputs[index - 1], this.workspace)
+                const labelElement = document.createElement("div")
+                labelElement.className = "px-1.5 text-white"
+                labelElement.textContent = label.fieldRow[0].getText()
+
+                const minus = document.createElement("div")
+                minus.className = "pr-1 cursor-pointer h-6 flex items-center justify-center"
+                minus.appendChild(IconFactory.wrapIcon(IconFactory.createMinusIcon("white", 10)))
+                minus.addEventListener("click", () => {
+                    Blockly.WidgetDiv.hide()
+                    if (input) {
+                        this.removePropertyInput_(input)
                     }
-                } else if (e.key === "ArrowRight" && inputElement.selectionStart === inputElement.value.length) {
-                    const index = inputs.indexOf(input!)
-                    if (index < inputs.length - 1) {
-                        focusInput(inputs[index + 1], this.workspace)
+                })
+
+                div.insertBefore(labelElement, div.firstChild)
+                div.appendChild(minus)
+
+                const observer = new MutationObserver(() => {
+                    if (div.style.display === "none") {
+                        // if the widget is hidden, we disconnect the observer
+                        observer.disconnect()
+                        delete div.dataset.xOffset
+                        delete div.dataset.input
+                        delete div.dataset.block
+                        return
                     }
-                }
-            })
 
-            const labelElement = document.createElement("div")
-            labelElement.className = "px-1.5 text-white"
-            labelElement.textContent = label.fieldRow[0].getText()
+                    inputElement.style.width = div.style.width
 
-            const minus = document.createElement("div")
-            minus.className = "pr-1 cursor-pointer h-6 flex items-center justify-center"
-            minus.appendChild(IconFactory.wrapIcon(IconFactory.createMinusIcon("white", 10)))
-            minus.addEventListener("click", () => {
-                Blockly.WidgetDiv.hide()
-                if (input) {
-                    this.removePropertyInput_(input)
-                }
-            })
-
-            div.insertBefore(labelElement, div.firstChild)
-            div.appendChild(minus)
-
-            const observer = new MutationObserver(() => {
-                if (div.style.display === "none") {
-                    // if the widget is hidden, we disconnect the observer
                     observer.disconnect()
-                    delete div.dataset.xOffset
-                    delete div.dataset.input
-                    delete div.dataset.block
-                    return
-                }
+                    div.style.width = "auto"
+                    div.style.left = xPosition + "px"
+                    observer.observe(div, { attributes: true, attributeFilter: ["style"], attributeOldValue: true })
+                })
+                observers.push(observer)
 
                 inputElement.style.width = div.style.width
-
-                observer.disconnect()
                 div.style.width = "auto"
-                div.style.left = xPosition + "px"
+                div.style.display = "flex"
+                div.style.flexDirection = "row"
+                div.style.gap = "2px"
+                div.style.alignItems = "center"
+                div.style.backgroundColor = this.getColourSecondary() ?? this.getColour()
+
                 observer.observe(div, { attributes: true, attributeFilter: ["style"], attributeOldValue: true })
-            })
-            observers.push(observer)
 
-            inputElement.style.width = div.style.width
-            div.style.width = "auto"
-            div.style.display = "flex"
-            div.style.flexDirection = "row"
-            div.style.gap = "2px"
-            div.style.alignItems = "center"
-            div.style.backgroundColor = this.getColourSecondary() ?? this.getColour()
+                div.dataset.input = input.name
+                div.dataset.block = this.id
+                // we do need to rerender the block here to make sure the input is sized according to the larger widget overlay
+                this.render()
+            }
 
-            observer.observe(div, { attributes: true, attributeFilter: ["style"], attributeOldValue: true })
+            Blockly.Events.enable()
+        })
+    }
 
-            div.dataset.input = input.name
-            div.dataset.block = this.id
-            // we do need to rerender the block here to make sure the input is sized according to the larger widget overlay
-            this.render()
-        }
-
-        Blockly.Events.enable()
-    })
 }
-
-// TODO: copied from list
-function focusInput(input: Blockly.Input, workspace: Blockly.WorkspaceSvg) {
-    Blockly.WidgetDiv.hide()
-    Blockly.DropDownDiv.hideWithoutAnimation()
-    const targetBlock = input.connection?.targetBlock() as Blockly.BlockSvg;
-    Blockly.renderManagement.finishQueuedRenders().then(() => {
-        // dispatch a click on this block with the center of the next block as the position
-
-        const metrics = targetBlock.getRelativeToSurfaceXY()
-        const offset = workspace.getOriginOffsetInPixels()
-        const scale = workspace.scale
-        const centerX = metrics.x * scale + offset.x + targetBlock.width * scale / 2
-        const centerY = metrics.y * scale + offset.y + targetBlock.height * scale / 2
-
-        targetBlock.inputList.find(input => input.fieldRow.length > 0)?.fieldRow[0].showEditor()
-        targetBlock.getSvgRoot().querySelector(".blocklyPath")?.dispatchEvent(new PointerEvent("click", {
-            bubbles: true,
-            cancelable: true,
-            clientX: centerX,
-            clientY: centerY,
-            composed: true,
-            pointerId: 1,
-            view: window
-        }))
-    })
-}
-
-Blockly.Extensions.registerMutator(
-    'struct_select_mutator',
-    structSelectMixin,
-    structSelectHelper
-);
-
-

@@ -1,7 +1,7 @@
 import * as Blockly from "blockly/core"
 import { BlockExtension } from "./block_extensions"
 
-export abstract class BlockMutator<T extends Blockly.Block, S> extends BlockExtension<T> {
+export abstract class BlockMutator<T extends Blockly.Block, S = {}> extends BlockExtension<T> {
  
     constructor(name: string) {
         super(name)
@@ -34,10 +34,11 @@ export abstract class BlockMutator<T extends Blockly.Block, S> extends BlockExte
     public register(): void {
         if (Blockly.Extensions.isRegistered(this.name)) Blockly.Extensions.unregister(this.name);
 
+        console.log("Registering mutator", this.name)
         // we do not use the extensionFunction here because we cannot mixin properties directly
         Blockly.Extensions.registerMutator(
             this.name,
-            this.mutator,
+            this.mutator(),
             this.extension
         )
     }
