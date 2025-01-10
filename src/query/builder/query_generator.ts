@@ -1,6 +1,6 @@
 import * as Blockly from "blockly/core";
 import { Order as JsOrder } from 'blockly/javascript';
-import { QueryNode, QueryOperation, QueryTree } from "./query_tree";
+import { QueryNode, QueryNodeInput, QueryOperation, QueryTree } from "./query_tree";
 import { Blocks } from "@/blocks";
 import { bfsWithDependencies } from "@/utils/nodes";
 import { NodeBlock } from "@/blocks/extensions/node";
@@ -36,6 +36,26 @@ export class LanguageAgnosticQueryGenerator {
         this.operationSnippets[name] = generator as unknown as GeneratorFn<Blockly.Block, LanguageAgnosticQueryGenerator, QueryOperation>
     }
 
+    public processEdgeConnectionPoint(inputName: string, block: NodeBlock): QueryNodeInput | QueryNodeInput[] {
+        const connection = block.edgeConnections.get(inputName);
+    
+        const connections = connection?.connections
+            .map(conn => {
+                const targetBlock = conn.getSourceBlock().id === block.id ? conn.targetBlock() : conn.getSourceBlock();
+    
+                if (!targetBlock || !Blocks.Types.isNodeBlock(targetBlock)) return [];
+    
+                return targetBlock.type === Blocks.Names.NODE.SUBSET
+                    ? {
+                        node: targetBlock.id,
+                        output: targetBlock.edgeConnections.get("POSITIVE")?.connections.includes(conn.targetConnection!) ? "positive" : "negative"
+                    }
+                    : { node: targetBlock.id, output: null };
+            })
+            .filter(Boolean) as QueryNodeInput[];
+    
+        return connections?.length ? (connections.length === 1 ? connections[0] : connections) : [];
+    }
 
     public generateQuery(workspace: Blockly.Workspace): QueryTree {
         const root = workspace.getBlocksByType(Blocks.Names.NODE.SOURCE)?.[0]

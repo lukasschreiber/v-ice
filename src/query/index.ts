@@ -7,6 +7,4 @@ import "@/query/generation/logic"
 import "@/query/generation/timeline"
 import "@/query/generation/nodes"
 
-import "@/query/builder/generation"
-
 export * from "@/query/query_generator"

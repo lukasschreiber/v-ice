@@ -2,6 +2,9 @@ import { IType } from "@/data/types"
 import * as Blockly from "blockly/core"
 import { BlockExtension, ExtensionMixins, RegistrableExtension } from "@/blocks/block_extensions"
 import { MutatorMixin, RegistrableMutator } from "./block_mutators"
+import { LanguageAgnosticQueryGenerator, languageAgnosticQueryGenerator } from "@/query/builder/query_generator"
+import { QueryNode, QueryOperation } from "@/query/builder/query_tree"
+import { NodeBlockExtension } from "./extensions/node"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -17,7 +20,7 @@ export enum ConnectionType {
     TIMELINE_PROTOTYPE = "TimelinePrototype",
 }
 
-export function registerBlocks<T extends Array<BlockDefinition<any[], any> & { id: string }>>(blocks: T): Readonly<Record<T[number]["id"], T[number]>> {
+export function registerBlocks<T extends Array<BlockDefinition<never[], never> & { id: string }>>(blocks: T): Readonly<Record<T[number]["id"], T[number]>> {
     for (const definition of blocks) {
         const block = convertBlockDefinitionToBlocklyJson(definition)
         if (block.output && typeof block.output !== "string") block.output = block.output.name
@@ -50,7 +53,7 @@ export function registerBlocks<T extends Array<BlockDefinition<any[], any> & { i
 
 function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJsonBlockDefinition {
 
-    const extensions = []
+    const extensions: string[] = []
     let mutatorName: string | undefined = undefined
 
     for (const extension of block.extensions ?? []) {
@@ -67,6 +70,15 @@ function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJso
             mutator.register()
         }
         mutatorName = mutator.name
+    }
+
+    if (block.code) {
+        if (extensions.includes(getExtensionInstance(NodeBlockExtension).name)) {
+            languageAgnosticQueryGenerator.registerNode(block.id, block.code)
+        } else {
+            // TODO this could probably have nicer types but at the moment it's not worth the effort
+            languageAgnosticQueryGenerator.registerOperation(block.id, block.code as any)
+        }
     }
 
     const result: BlocklyJsonBlockDefinition = {
@@ -119,11 +131,11 @@ type BlocklyJsonBlockDefinition = {
     data?: object | string
 }
 
-export type BlockDefinition<Es extends RegistrableExtension[] = any[], M extends RegistrableMutator = any> = {
-    id?: string
+export interface BlockDefinition<Es extends RegistrableExtension[] = never[], M extends RegistrableMutator = never> {
+    id: string
     color?: number | string
     helpUrl?: string
-    lines?: {text: string, args: (FieldDefinition | InputDefinition)[], align?: "RIGHT" | "CENTRE" | "LEFT"}[]
+    lines?: { text: string, args: (FieldDefinition | InputDefinition)[], align?: "RIGHT" | "CENTRE" | "LEFT" }[]
     nextStatement?: null | string | string[]
     previousStatement?: null | string | string[]
     connectionType?: string
@@ -134,8 +146,11 @@ export type BlockDefinition<Es extends RegistrableExtension[] = any[], M extends
     mutator?: M
     extensions?: Es
     data?: object | string
-    code?: (block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>) => string
-    // code?: OperationGeneratorFn | NodeGeneratorFn
+    code?: (block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>, generator: LanguageAgnosticQueryGenerator) => ExtensionsMatch<Es, typeof NodeBlockExtension> extends true ? QueryNode : QueryOperation
+}
+
+export interface RegistrableBlock extends BlockDefinition {
+    register(): void
 }
 
 export type FieldDefinition = {
@@ -153,6 +168,14 @@ export type InputDefinition = {
 export function createBlockDefinition<
     Es extends RegistrableExtension[] = any[],
     M extends RegistrableMutator = any
->(definition: BlockDefinition<Es, M> & {id: string}): BlockDefinition & {id: string}  {
-    return definition as BlockDefinition & {id: string};
+>(definition: BlockDefinition<Es, M>): RegistrableBlock {
+    const genericDefinition = definition as BlockDefinition
+    return {
+        ...genericDefinition,
+        register() {
+            registerBlock(genericDefinition)
+        }
+    };
 }
+
+type ExtensionsMatch<T, U> = T extends (infer R)[] ? R extends U ? true : false : false

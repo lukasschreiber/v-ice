@@ -5,6 +5,7 @@ import { ScopedExtension } from "../extensions/scoped";
 import { LocalVariableMutator } from "../mutators/local_variable";
 import { VariableSelectMutator } from "../mutators/variable_select";
 import { ColumnSelectMutator } from "../mutators/column_select";
+import types from "@/data/types";
 
 export default registerBlocks([
     createBlockDefinition({
@@ -32,6 +33,14 @@ export default registerBlocks([
         helpUrl: "#column-variable",
         style: "variable_blocks",
         mutator: ColumnSelectMutator,
+        code: (block) => {
+            return {
+                name: block.getFieldValue("COLUMN"),
+                args: {
+                    COLUMN: types.boolean
+                }
+            }
+        }
     }),
     createBlockDefinition({
         id: Blocks.Names.VARIABLE.GET,
