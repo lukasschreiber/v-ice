@@ -23,13 +23,13 @@ export abstract class BlockMutator<T extends Blockly.Block, S = {}> extends Bloc
         return null
     }
     
-    public domToMutation(this: T, xmlElement: Element): void { }
+    public domToMutation(this: T, _xmlElement: Element): void { }
 
     public saveExtraState(this: T): S {
         return {} as S
     }
 
-    public loadExtraState(this: T, state: S): void { }
+    public loadExtraState(this: T, _state: S): void { }
 
     public register(): void {
         if (Blockly.Extensions.isRegistered(this.name)) Blockly.Extensions.unregister(this.name);
