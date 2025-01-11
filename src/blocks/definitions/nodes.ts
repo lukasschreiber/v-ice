@@ -65,7 +65,7 @@ export const TargetNodeBlock = createBlock({
                 input: scope.generateForConnectionPoint("INPUT")
             },
             attributes: {
-                name: (block.getField("LABEL") as FieldLabelTargetNode).getName() ?? ""
+                name: scope.getField<FieldLabelTargetNode>("LABEL").getName() ?? ""
             }
         }
     }
@@ -140,7 +140,7 @@ export const SubsetNodeBlock = createBlock({
                 input: scope.generateForConnectionPoint("INPUT")
             },
             attributes: {
-                name: block.getFieldValue("NAME")
+                name: scope.getFieldValue("NAME")
             },
             operations: []
         }
@@ -200,7 +200,7 @@ export const SetArithmeticNodeBlock = createBlock({
                 right: scope.generateForConnectionPoint("RIGHT")
             },
             attributes: {
-                selection: (block.getField("SELECTION") as FieldSetSelection).getSelection()
+                selection: scope.getField<FieldSetSelection>("SELECTION").getSelection()
             },
         }
     }

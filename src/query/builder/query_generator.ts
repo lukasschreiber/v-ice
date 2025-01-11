@@ -107,6 +107,14 @@ export class BlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRe
             }
         }
     }
+
+    public getField<F extends Blockly.Field<any>>(name: BlockFieldNames<L, D>): F {
+        return this.block.getField(name) as F
+    }
+
+    public getFieldValue(name: BlockFieldNames<L, D>): string {
+        return this.getFieldValue(name)
+    }
 }
 
 export class NodeBlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock> extends BlockQueryGenerator<L, D, B> {
