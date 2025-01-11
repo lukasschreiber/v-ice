@@ -11,8 +11,28 @@ import { NodeBlockExtension } from "./extensions/node"
 // All functions of Block need to be called with ! because they always exist although typescript does not know that
 export type BlocklyBlockDefinition = { [Property in keyof Blockly.Block]?: Blockly.Block[Property] } & { [key: string]: unknown }
 
-export function registerBlock<T extends (BlockDefinition & { id: string })>(block: T): Readonly<Record<T["id"], T>> {
-    return registerBlocks([block])
+export function registerBlock<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): void {
+    const definition = convertBlockDefinitionToBlocklyJson<Es, M, L, T>(block)
+    if (definition.output && typeof definition.output !== "string") definition.output = definition.output.name
+    for (const key in definition) {
+        if (key.startsWith("args")) {
+            for (const arg of definition[key as keyof BlocklyJsonBlockDefinition] as (FieldDefinition | InputDefinition)[]) {
+                if (arg.check && typeof arg.check !== "string") {
+                    arg.check = (arg.check as IType).name
+                }
+            }
+        }
+    }
+    const blockDefinition: BlocklyBlockDefinition = {
+        init: function () {
+            this.jsonInit!(definition)
+            if (definition.data) {
+                this.data = JSON.stringify(definition.data)
+            }
+        },
+    }
+
+    Blockly.Blocks[definition.id] = blockDefinition
 }
 
 export enum ConnectionType {
@@ -20,38 +40,12 @@ export enum ConnectionType {
     TIMELINE_PROTOTYPE = "TimelinePrototype",
 }
 
-export function registerBlocks<T extends Array<BlockDefinition<never[], never> & { id: string }>>(blocks: T): Readonly<Record<T[number]["id"], T[number]>> {
-    for (const definition of blocks) {
-        const block = convertBlockDefinitionToBlocklyJson(definition)
-        if (block.output && typeof block.output !== "string") block.output = block.output.name
+// export function registerBlocks<T extends Array<RegistrableBlock<never[], never> & { id: string }>>(blocks: T): Readonly<Record<T[number]["id"], T[number]>> {
+//     for (const definition of blocks) {
 
-        for (const key in block) {
-            if (key.startsWith("args")) {
-                for (const arg of block[key as keyof BlocklyJsonBlockDefinition] as (FieldDefinition | InputDefinition)[]) {
-                    if (arg.check && typeof arg.check !== "string") {
-                        arg.check = (arg.check as IType).name
-                    }
-                }
-            }
-        }
-        const blockDefinition: BlocklyBlockDefinition = {
-            init: function () {
-                this.jsonInit!(block)
-                if (block.data) {
-                    this.data = JSON.stringify(block.data)
-                }
-            },
-        }
-        Blockly.Blocks[block.id] = blockDefinition
-    }
+// }
 
-    return blocks.reduce((acc, block) => {
-        acc[block.id as T[number]["id"]] = block
-        return acc
-    }, {} as Record<T[number]["id"], T[number]>)
-}
-
-function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJsonBlockDefinition {
+function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): BlocklyJsonBlockDefinition {
 
     const extensions: string[] = []
     let mutatorName: string | undefined = undefined
@@ -73,16 +67,22 @@ function convertBlockDefinitionToBlocklyJson(block: BlockDefinition): BlocklyJso
     }
 
     if (block.code) {
+        // TODO this could probably have nicer types but at the moment it's not worth the effort
+
         if (extensions.includes(getExtensionInstance(NodeBlockExtension).name)) {
-            languageAgnosticQueryGenerator.registerNode(block.id, block.code)
+            languageAgnosticQueryGenerator.registerNode(block.id, block.code as (...args: any[]) => QueryNode)
         } else {
-            // TODO this could probably have nicer types but at the moment it's not worth the effort
-            languageAgnosticQueryGenerator.registerOperation(block.id, block.code as any)
+            languageAgnosticQueryGenerator.registerOperation(block.id, block.code as (...args: any[]) => QueryOperation)
         }
     }
 
     const result: BlocklyJsonBlockDefinition = {
-        ...block,
+        data: block.data,
+        style: block.style,
+        helpUrl: block.helpUrl,
+        tooltip: block.tooltip,
+        inputsInline: block.inputsInline,
+        output: block.output,
         extensions: extensions,
         mutator: mutatorName,
         id: block.id!,
@@ -131,11 +131,23 @@ type BlocklyJsonBlockDefinition = {
     data?: object | string
 }
 
-export interface BlockDefinition<Es extends RegistrableExtension[] = never[], M extends RegistrableMutator = never> {
+export interface BlockLineDefinition {
+    text: string
+    args: (FieldDefinition | InputDefinition)[]
+    align?: "RIGHT" | "CENTRE" | "LEFT"
+}
+
+export type BlockLinesDefinition = BlockLineDefinition[]
+
+export interface RegistrableBlock<
+    Es extends RegistrableExtension[], 
+    M extends RegistrableMutator,
+    L extends BlockLinesDefinition
+> {
     id: string
     color?: number | string
     helpUrl?: string
-    lines?: { text: string, args: (FieldDefinition | InputDefinition)[], align?: "RIGHT" | "CENTRE" | "LEFT" }[]
+    lines: L
     nextStatement?: null | string | string[]
     previousStatement?: null | string | string[]
     connectionType?: string
@@ -146,11 +158,7 @@ export interface BlockDefinition<Es extends RegistrableExtension[] = never[], M 
     mutator?: M
     extensions?: Es
     data?: object | string
-    code?: (block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>, generator: LanguageAgnosticQueryGenerator) => ExtensionsMatch<Es, typeof NodeBlockExtension> extends true ? QueryNode : QueryOperation
-}
-
-export interface RegistrableBlock extends BlockDefinition {
-    register(): void
+    code?: (block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>, generator: LanguageAgnosticQueryGenerator) => NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation
 }
 
 export type FieldDefinition = {
@@ -165,17 +173,14 @@ export type InputDefinition = {
     check?: IType | string
 }
 
-export function createBlockDefinition<
-    Es extends RegistrableExtension[] = any[],
-    M extends RegistrableMutator = any
->(definition: BlockDefinition<Es, M>): RegistrableBlock {
-    const genericDefinition = definition as BlockDefinition
-    return {
-        ...genericDefinition,
-        register() {
-            registerBlock(genericDefinition)
-        }
-    };
+export function createBlock<
+Es extends RegistrableExtension[],
+M extends RegistrableMutator,
+L extends BlockLinesDefinition,
+>(definition: RegistrableBlock<Es, M, L>): RegistrableBlock<Es, M, L> {
+    registerBlock<Es, M, L, RegistrableBlock<Es, M, L>>(definition)
+    return definition
 }
 
 type ExtensionsMatch<T, U> = T extends (infer R)[] ? R extends U ? true : false : false
+type NotNever<T> = [T] extends [never] ? false : true;

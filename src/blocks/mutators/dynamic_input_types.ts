@@ -52,7 +52,6 @@ export class DynamicInputTypesMutator extends BlockMutator<Blockly.Block & Dynam
 
         this.inputList.forEach(input => {
             if (!input.connection) return
-            console.log(input.name)
             const check = this.originalTypes[input.name].name
             this.updateShape_(input.name, t.utils.replaceAbstractType(t.utils.fromString(check), inferredType!), opt_updateChildOutputType)
         })

@@ -1,8 +1,8 @@
 import * as Blockly from 'blockly/core';
-import { BlockDefinitions } from '@/blocks/definitions';
-import { BlockDefinition, RegisterableMutator } from '../block_definitions';
 import { IType, ValueOf } from '@/data/types';
 import { SerializedTable } from '@/data/table';
+import { BlockLinesDefinition, RegistrableBlock } from '../block_definitions';
+import { NumberBlock } from '../definitions/math';
 
 export function defineToolbox(toolbox: ToolboxDefinition): Blockly.utils.toolbox.ToolboxDefinition {
     return {
@@ -55,22 +55,22 @@ export function defineCategory(name: string, style: string): ICategoryDefinition
     }
 }
 
-export function defineBlock<Id extends keyof typeof BlockDefinitions>(id: Id): IBlockDefinitionFactory<Id> {
+export function defineBlock<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>>(block: T): IBlockDefinitionFactory<L, T> {
     return {
-        type: id,
-        withFields(fields: Merge<ExtractFields<ExtractById<typeof BlockDefinitions, Id>>>): IBlockDefinitionFactory<Id> {
+        type: block.id,
+        withFields(fields: Merge<ExtractFields<L, T>>): IBlockDefinitionFactory<L, T> {
             return {
                 ...this,
                 fields
             }
         },
-        withInputs(inputs: Merge<ExtractInputs<ExtractById<typeof BlockDefinitions, Id>>>): IBlockDefinitionFactory<Id> {
+        withInputs(inputs: Merge<ExtractInputs<L, T>>): IBlockDefinitionFactory<L, T> {
             return {
                 ...this,
                 inputs
             }
         },
-        withCondition(condition: IsHiddenFunc): IBlockDefinitionFactory<Id> {
+        withCondition(condition: IsHiddenFunc): IBlockDefinitionFactory<L, T> {
             return {
                 ...this,
                 isHidden: condition,
@@ -139,7 +139,7 @@ export function blockToBlockDefinition(block: Blockly.serialization.blocks.State
         : undefined;
 
     return {
-        type: block.type as keyof typeof BlockDefinitions,
+        type: block.type,
         fields,
         inputs,
         extraState: block.extraState,
@@ -173,7 +173,7 @@ export function blockDefinitionToBlock(block: GenericBlockDefinition): Blockly.s
         : undefined;
 
     return {
-        type: block.type,
+        type: block.type as string, // TODO: This is a hack
         fields,
         inputs,
         extraState: block.extraState,
@@ -206,9 +206,17 @@ function blockDefinitionToToolboxItem(block: GenericBlockDefinition): Blockly.ut
         }, {} as { [key: string]: string | number | boolean | null | { [key: string]: unknown } })
         : undefined;
 
+    console.log({
+        kind: "block",
+        type: block.type as string, // TODO: This is a hack
+        fields,
+        inputs,
+        isHidden: block.isHidden || false
+    })
+
     return {
         kind: "block",
-        type: block.type,
+        type: block.type as string, // TODO: This is a hack
         fields,
         inputs,
         isHidden: block.isHidden || false
@@ -265,7 +273,7 @@ interface IBlockCategory extends IToolboxCategoryDefinition {
 }
 
 export interface AbstractBlockDefinition {
-    type: keyof typeof BlockDefinitions
+    type: string
     isHidden?: IsHiddenFunc
 }
 
@@ -281,18 +289,18 @@ export interface GenericBlockDefinition extends AbstractBlockDefinition {
     next?: BlockConnectionDefinition
 }
 
-export interface IBlockDefinition<T extends keyof typeof BlockDefinitions> extends AbstractBlockDefinition {
-    type: T
-    fields?: Merge<ExtractFields<ExtractById<typeof BlockDefinitions, T>>>
-    inputs?: Merge<ExtractInputs<ExtractById<typeof BlockDefinitions, T>>>
+export interface IBlockDefinition<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> extends AbstractBlockDefinition {
+    type: T["id"]
+    fields?: Merge<ExtractFields<L, T>>
+    inputs?: Merge<ExtractInputs<L, T>>
 }
 
 // TODO: The semantics of withCondition should be switched to reflect isShown instead of isHidden
 
-interface IBlockDefinitionFactory<T extends keyof typeof BlockDefinitions> extends IBlockDefinition<T> {
-    withFields(fields: Merge<ExtractFields<ExtractById<typeof BlockDefinitions, T>>>): IBlockDefinitionFactory<T>
-    withInputs(inputs: Merge<ExtractInputs<ExtractById<typeof BlockDefinitions, T>>>): IBlockDefinitionFactory<T>
-    withCondition(condition: IsHiddenFunc): IBlockDefinitionFactory<T>
+interface IBlockDefinitionFactory<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> extends IBlockDefinition<L, T> {
+    withFields(fields: Merge<ExtractFields<L, T>>): IBlockDefinitionFactory<L, T>
+    withInputs(inputs: Merge<ExtractInputs<L, T>>): IBlockDefinitionFactory<L, T>
+    withCondition(condition: IsHiddenFunc): IBlockDefinitionFactory<L, T>
 }
 
 interface ICategoryDefinitionFactory extends IToolboxCategoryDefinition {
@@ -310,10 +318,10 @@ interface IBlockCategoryFactory extends IBlockCategory {
     withCondition(condition: IsHiddenFunc): IBlockCategory
 }
 
-type ExtractById<T, Id extends keyof T> = Id extends string ? ExtractFromUnion<T[Id], Id> : never
-type ExtractFromUnion<T, Id extends string> = T extends { id: Id } ? T : never
+// type ExtractById<T, Id extends keyof T> = Id extends string ? ExtractFromUnion<T[Id], Id> : never
+// type ExtractFromUnion<T, Id extends string> = T extends { id: Id } ? T : never
 
-type ExtractFields<T extends BlockDefinition> =
+type ExtractFields<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> =
     T["lines"] extends Array<{ args: Array<infer U> }> 
     ? U extends { type: `field_${string}`, name: string, check?: IType }
     ? { [K in U['name']]: {
@@ -323,7 +331,7 @@ type ExtractFields<T extends BlockDefinition> =
     : undefined
     : undefined;
 
-type ExtractInputs<T extends BlockDefinition> = 
+type ExtractInputs<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>>= 
     T["lines"] extends Array<{ args: Array<infer U> }> 
     ? U extends { type: `input_${string}`, name: string } 
     ? { [K in U['name']]: {
@@ -352,14 +360,4 @@ type Merge<T> = FixTooltip<Partial<{
     [K in T extends object ? keyof T : never]: T extends { [k in K]: infer U } ? U : never
 }>>;
 
-
-
-
-// type TestType<T extends { mutator: RegisterableMutator }> = T extends { mutator: infer U } ? U : never;
-
-// type ExtractInterface<T> = T extends { new (...args: any[]): infer I } ? I : never;
-
-
-// const test: ExtractInterface<TestType<ExtractById<typeof BlockDefinitions, "comparison_equals">>> = null!
-
-// const test2: ExtractById<typeof BlockDefinitions, "comparison_equals"> = null!
+type AnyRegistrableBlock<L extends BlockLinesDefinition> = RegistrableBlock<any[], any, L> | RegistrableBlock<never[], never, L>

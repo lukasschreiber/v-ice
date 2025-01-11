@@ -1,89 +1,89 @@
 import { Blocks } from "@/blocks";
-import { ConnectionType, createBlockDefinition, registerBlocks } from "@/blocks/block_definitions";
+import { ConnectionType, createBlock } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { EitherOrMutator } from "../mutators/either_or";
 
-export default registerBlocks([
-    createBlockDefinition({
-        id: Blocks.Names.LOGIC.OR,
-        lines: [
-            {
-                text: "%{BKY_EITHER}",
-                args: []
-            },
-            {
-                text: "%1",
-                args: [
-                    {
-                        type: "input_statement",
-                        name: "OR_STATEMENT_0",
-                        check: ConnectionType.BOOLEAN,
-                    },
-                ]
-            },
-            {
-                text: "%{BKY_OR}",
-                args: []
-            },
-            {
-                text: "%1",
-                args: [
-                    {
-                        type: "input_statement",
-                        name: "OR_STATEMENT_1",
-                        check: ConnectionType.BOOLEAN,
-                    },
-                ]
-            }
-        ],
-        connectionType: ConnectionType.BOOLEAN,
-        style: "logic_blocks",
-        helpUrl: "#logic-or",
-        mutator: EitherOrMutator,
-    }),
-    createBlockDefinition({
-        id: Blocks.Names.LOGIC.NOT,
-        lines: [
-            {
-                text: "%{BKY_NOT}",
-                args: []
-            },
-            {
-                text: "%1",
-                args: [
-                    {
-                        type: "input_statement",
-                        name: "STATEMENTS",
-                        check: ConnectionType.BOOLEAN,
-                    },
-                ]
-            }
-        ],
-        connectionType: ConnectionType.BOOLEAN,
-        style: "logic_blocks",
-        helpUrl: "#logic-not",
-    }),
-    createBlockDefinition({
-        id: Blocks.Names.LOGIC.BOOLEAN,
-        lines: [
-            {
-                text: "%1",
-                args: [
-                    {
-                        type: "field_dropdown",
-                        name: "BOOL",
-                        options: [
-                            ["%{BKY_TRUE}", "TRUE"],
-                            ["%{BKY_FALSE}", "FALSE"],
-                        ],
-                    },
-                ]
-            }
-        ],
-        output: t.boolean,
-        extensions: [ParentColorExtension],
-        color: Colors.categories.comparisons,
-    })
-] as const)
+export const LogicOrBlock = createBlock({
+    id: Blocks.Names.LOGIC.OR,
+    lines: [
+        {
+            text: "%{BKY_EITHER}",
+            args: []
+        },
+        {
+            text: "%1",
+            args: [
+                {
+                    type: "input_statement",
+                    name: "OR_STATEMENT_0",
+                    check: ConnectionType.BOOLEAN,
+                },
+            ]
+        },
+        {
+            text: "%{BKY_OR}",
+            args: []
+        },
+        {
+            text: "%1",
+            args: [
+                {
+                    type: "input_statement",
+                    name: "OR_STATEMENT_1",
+                    check: ConnectionType.BOOLEAN,
+                },
+            ]
+        }
+    ] as const,
+    connectionType: ConnectionType.BOOLEAN,
+    style: "logic_blocks",
+    helpUrl: "#logic-or",
+    mutator: EitherOrMutator,
+})
+
+export const LogicNotBlock = createBlock({
+    id: Blocks.Names.LOGIC.NOT,
+    lines: [
+        {
+            text: "%{BKY_NOT}",
+            args: []
+        },
+        {
+            text: "%1",
+            args: [
+                {
+                    type: "input_statement",
+                    name: "STATEMENTS",
+                    check: ConnectionType.BOOLEAN,
+                },
+            ]
+        }
+    ] as const,
+    connectionType: ConnectionType.BOOLEAN,
+    style: "logic_blocks",
+    helpUrl: "#logic-not",
+})
+
+export const BooleanBlock = createBlock({
+    id: Blocks.Names.LOGIC.BOOLEAN,
+    lines: [
+        {
+            text: "%1",
+            args: [
+                {
+                    type: "field_dropdown",
+                    name: "BOOL",
+                    options: [
+                        ["%{BKY_TRUE}", "TRUE"],
+                        ["%{BKY_FALSE}", "FALSE"],
+                    ],
+                },
+            ]
+        }
+    ] as const,
+    output: t.boolean,
+    extensions: [ParentColorExtension],
+    color: Colors.categories.comparisons,
+})
