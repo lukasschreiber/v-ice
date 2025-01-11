@@ -32,7 +32,13 @@ export const EqualsWithinBlock = createBlock({
     helpUrl: "#equals-within",
     color: Colors.categories.comparisons,
     inputsInline: true,
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    // code: (block, generator) => {
+    //     const a = scope.getValue("A")
+    //     const b = scope.getValue("B")
+    //     const delta = scope.getValue("DELTA")
+    //     return `Math.abs(${a} - ${b}) <= ${delta}`
+    // }
 })
 
 export const EqualsBlock = createBlock({

@@ -1,8 +1,7 @@
 import * as Blockly from 'blockly/core';
 import { IType, ValueOf } from '@/data/types';
 import { SerializedTable } from '@/data/table';
-import { BlockLinesDefinition, RegistrableBlock } from '../block_definitions';
-import { NumberBlock } from '../definitions/math';
+import { AnyRegistrableBlock, BlockLinesDefinition } from '../block_definitions';
 
 export function defineToolbox(toolbox: ToolboxDefinition): Blockly.utils.toolbox.ToolboxDefinition {
     return {
@@ -359,5 +358,3 @@ type FixTooltip<T extends object | undefined> = T extends object ? {
 type Merge<T> = FixTooltip<Partial<{
     [K in T extends object ? keyof T : never]: T extends { [k in K]: infer U } ? U : never
 }>>;
-
-type AnyRegistrableBlock<L extends BlockLinesDefinition> = RegistrableBlock<any[], any, L> | RegistrableBlock<never[], never, L>

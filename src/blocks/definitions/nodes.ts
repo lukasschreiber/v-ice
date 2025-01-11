@@ -58,11 +58,11 @@ export const TargetNodeBlock = createBlock({
     style: "node_blocks",
     helpUrl: "#target-node",
     extensions: [NodeBlockExtension],
-    code: (block, generator) => {
+    code: (block, scope) => {
         return {
             id: block.id,
             inputs: {
-                input: generator.processEdgeConnectionPoint("INPUT", block)
+                input: scope.generateForConnectionPoint("INPUT")
             },
             attributes: {
                 name: (block.getField("LABEL") as FieldLabelTargetNode).getName() ?? ""
@@ -130,14 +130,14 @@ export const SubsetNodeBlock = createBlock({
     style: "capped_node_blocks",
     helpUrl: "#subset-node",
     extensions: [NodeBlockExtension],
-    code: (block, generator) => {
+    code: (block, scope) => {
         // const fields = generator.multilineStatementToCode(block, "FILTERS", " && ").trim()
         // return { definition: `function ${procedureName}(default) {\n  return conditionalSplit(default, p => ${fields === "" ? "false" : fields});\n}\n`, invocation: `${procedureName}(${input})` }
 
         return {
             id: block.id,
             inputs: {
-                input: generator.processEdgeConnectionPoint("INPUT", block)
+                input: scope.generateForConnectionPoint("INPUT")
             },
             attributes: {
                 name: block.getFieldValue("NAME")
@@ -192,12 +192,12 @@ export const SetArithmeticNodeBlock = createBlock({
     style: "node_blocks",
     helpUrl: "#set-arithmetic-node",
     extensions: [NodeBlockExtension, ScopedExtension],
-    code: (block, generator) => {
+    code: (block, scope) => {
         return {
             id: block.id,
             inputs: {
-                left: generator.processEdgeConnectionPoint("LEFT", block),
-                right: generator.processEdgeConnectionPoint("RIGHT", block)
+                left: scope.generateForConnectionPoint("LEFT"),
+                right: scope.generateForConnectionPoint("RIGHT")
             },
             attributes: {
                 selection: (block.getField("SELECTION") as FieldSetSelection).getSelection()

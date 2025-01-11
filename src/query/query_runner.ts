@@ -4,7 +4,7 @@ import * as ambient from "@/query/ambient_functions"
 import * as timeline_matcher from "@/query/timeline_matcher"
 
 export type QueryFnReturnType<T> = {targets: Record<string, T>, edgeCounts: Record<string, number>}
-export function runQuery(query: string, source: DataTable): QueryFnReturnType<DataTable> {
+export function runQuery(_query: string, _source: DataTable): QueryFnReturnType<DataTable> {
     // if(source.getColumns().length === 0 || query === "" || !verifyCode(query)) return {targets: {}, edgeCounts: {}}
     // const rows = source.getRows()
 
@@ -27,7 +27,7 @@ export function runQuery(query: string, source: DataTable): QueryFnReturnType<Da
     return {targets: {}, edgeCounts: {}}
 }
 
-function verifyCode(code: string): boolean {
+export function verifyCode(code: string): boolean {
     let program: Program | undefined = undefined
     try {
         program = Parser.parse(code, {ecmaVersion: 2020})

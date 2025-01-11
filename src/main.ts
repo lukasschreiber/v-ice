@@ -6,6 +6,35 @@ import "@/i18n"
 import "@/blockly_patches"
 import "@/contextmenu_items"
 
+import "@/blocks/block_extensions"
+import "@/blocks/block_definitions"
+
+import "@/blocks/fields"
+import "@/blocks/extensions"
+import "@/blocks/mutators"
+
+import "@/blocks/definitions/math"
+import "@/blocks/definitions/variables"
+import "@/blocks/definitions/nodes"
+import "@/blocks/definitions/comparisons"
+import "@/blocks/definitions/lists"
+import "@/blocks/definitions/structs"
+import "@/blocks/definitions/logic"
+import "@/blocks/definitions/timeline"
+
+import "@/query/generation/comparisons"
+import "@/query/generation/variables"
+import "@/query/generation/math"
+import "@/query/generation/lists"
+import "@/query/generation/enum"
+import "@/query/generation/logic"
+import "@/query/generation/timeline"
+import "@/query/generation/nodes"
+
+import "@/connection_checker";
+
+export * from "@/query/query_generator"
+
 import { useContext, useMemo } from "react"
 import { IPublicSettingsContext, SettingsContext } from "@/store/settings/settings_context"
 import { ApplicationContextProvider } from "@/store/app_context_provider"
@@ -21,8 +50,8 @@ import { ISerializedWorkspace, clearWorkspace, deserializeWorkspace, serializeWo
 import { defineToolbox, defineBlock, defineCategory, blockDefinitionToBlock, blockToBlockDefinition } from "./blocks/toolbox/toolbox_definition"
 import emitter, { EvaluationAction } from "./evaluation_emitter"
 import { HelpPage as HelpPageElement } from "./components/HelpPage"
-import { queryGenerator } from "./query"
-import { runQuery } from "./query/query_runner"
+import { queryGenerator } from "@/query/query_generator"
+import { runQuery } from "@/query/query_runner"
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `BlocklyProvider`.

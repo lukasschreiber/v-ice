@@ -1,5 +1,4 @@
 import "blockly/blocks";
-import "@/blocks/definitions"
 import { Variables } from "@/blocks/toolbox/categories/variables";
 import { Nodes } from "./categories/nodes";
 import { DateTime } from "luxon";

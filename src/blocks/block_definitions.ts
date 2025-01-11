@@ -2,9 +2,10 @@ import { IType } from "@/data/types"
 import * as Blockly from "blockly/core"
 import { BlockExtension, ExtensionMixins, RegistrableExtension } from "@/blocks/block_extensions"
 import { MutatorMixin, RegistrableMutator } from "./block_mutators"
-import { LanguageAgnosticQueryGenerator, languageAgnosticQueryGenerator } from "@/query/builder/query_generator"
+import { BlockQueryGenerator, NodeBlockQueryGenerator, QueryGenerator } from "@/query/builder/query_generator"
 import { QueryNode, QueryOperation } from "@/query/builder/query_tree"
-import { NodeBlockExtension } from "./extensions/node"
+import { NodeBlock, NodeBlockExtension } from "./extensions/node"
+import { getQueryGeneratorInstance } from "@/query/builder/query_generator_instance"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -70,9 +71,9 @@ function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], 
         // TODO this could probably have nicer types but at the moment it's not worth the effort
 
         if (extensions.includes(getExtensionInstance(NodeBlockExtension).name)) {
-            languageAgnosticQueryGenerator.registerNode(block.id, block.code as (...args: any[]) => QueryNode)
+            getQueryGeneratorInstance().registerNode(block.id, block, block.code as (...args: any[]) => QueryNode)
         } else {
-            languageAgnosticQueryGenerator.registerOperation(block.id, block.code as (...args: any[]) => QueryOperation)
+            getQueryGeneratorInstance().registerOperation(block.id, block, block.code as (...args: any[]) => QueryOperation)
         }
     }
 
@@ -103,6 +104,8 @@ function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], 
     return result
 }
 
+const extensionInstances: Record<string, BlockExtension<any>> = {}
+
 function getExtensionInstance<T extends BlockExtension<any>>(extension: new (...args: any[]) => T): T {
     const constructorName = extension.name
     if (!extensionInstances[constructorName]) {
@@ -110,8 +113,6 @@ function getExtensionInstance<T extends BlockExtension<any>>(extension: new (...
     }
     return extensionInstances[constructorName] as T
 }
-
-const extensionInstances: Record<string, BlockExtension<any>> = {}
 
 type BlocklyJsonBlockDefinition = {
     [key: `message${number}`]: string
@@ -140,9 +141,9 @@ export interface BlockLineDefinition {
 export type BlockLinesDefinition = BlockLineDefinition[]
 
 export interface RegistrableBlock<
-    Es extends RegistrableExtension[], 
+    Es extends RegistrableExtension[],
     M extends RegistrableMutator,
-    L extends BlockLinesDefinition
+    L extends BlockLinesDefinition,
 > {
     id: string
     color?: number | string
@@ -158,7 +159,11 @@ export interface RegistrableBlock<
     mutator?: M
     extensions?: Es
     data?: object | string
-    code?: (block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>, generator: LanguageAgnosticQueryGenerator) => NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation
+    code?: (
+        block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>,
+        scope: NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? NodeBlockQueryGenerator<L, AnyRegistrableBlock<L>, NodeBlock & ExtensionMixins<Es> & MutatorMixin<M>> : BlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>>,
+        generator: QueryGenerator
+    ) => NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation
 }
 
 export type FieldDefinition = {
@@ -174,9 +179,9 @@ export type InputDefinition = {
 }
 
 export function createBlock<
-Es extends RegistrableExtension[],
-M extends RegistrableMutator,
-L extends BlockLinesDefinition,
+    Es extends RegistrableExtension[] = never[],
+    M extends RegistrableMutator = never,
+    L extends BlockLinesDefinition = never,
 >(definition: RegistrableBlock<Es, M, L>): RegistrableBlock<Es, M, L> {
     registerBlock<Es, M, L, RegistrableBlock<Es, M, L>>(definition)
     return definition
@@ -184,3 +189,32 @@ L extends BlockLinesDefinition,
 
 type ExtensionsMatch<T, U> = T extends (infer R)[] ? R extends U ? true : false : false
 type NotNever<T> = [T] extends [never] ? false : true;
+
+
+export type AnyRegistrableBlock<L extends BlockLinesDefinition> = RegistrableBlock<any[], any, L> | RegistrableBlock<never[], never, L> | RegistrableBlock<any[], never, L> | RegistrableBlock<never[], any, L>
+
+export type BlockFieldNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> =
+    T["lines"] extends Array<{ args: Array<infer U> }>
+    ? U extends { type: `field_${string}`, name: string }
+    ? U["name"]
+    : never
+    : never;
+
+export type BlockInputNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> =
+    T["lines"] extends Array<{ args: Array<infer U> }>
+    ? U extends { type: `input_${string}`, name: string }
+    ? U["name"]
+    : never
+    : never;
+
+export type BlockFieldByType<
+    L extends BlockLinesDefinition,
+    T extends AnyRegistrableBlock<L>,
+    FieldType extends string // The specific type to filter
+> = T["lines"] extends Array<{ args: Array<infer U> }>
+    ? U extends { type: `${FieldType}`, name: string }
+    ? U["name"]
+    : never
+    : never;
+
+export type ConnectionPointNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> = BlockFieldByType<L, T, "field_edge_connection">

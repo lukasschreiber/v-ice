@@ -10,8 +10,8 @@ export class FieldTextInput extends Blockly.FieldTextInput {
     }
 
 
-    private onKeyDownWrapper: Blockly.browserEvents.Data | null = null;
-    private onKeyInputWrapper: Blockly.browserEvents.Data | null = null;
+    private onKeyDownWrapper_: Blockly.browserEvents.Data | null = null;
+    private onKeyInputWrapper_: Blockly.browserEvents.Data | null = null;
     private onKeyUpWrapper_: Blockly.browserEvents.Data | null = null;
     private onKeyPressWrapper_: Blockly.browserEvents.Data | null = null;
     private onInputWrapper_: Blockly.browserEvents.Data | null = null;
@@ -24,29 +24,29 @@ export class FieldTextInput extends Blockly.FieldTextInput {
 
     protected override bindInputEvents_(htmlInput: HTMLElement): void {
         // Trap Enter without IME and Esc to hide.
-        this.onKeyDownWrapper = Blockly.browserEvents.conditionalBind(
+        this.onKeyDownWrapper_ = Blockly.browserEvents.conditionalBind(
             htmlInput,
             'keydown',
             this,
             this.onHtmlInputKeyDown_,
         );
         // Resize after every input change.
-        this.onKeyInputWrapper = Blockly.browserEvents.conditionalBind(
+        this.onKeyInputWrapper_ = Blockly.browserEvents.conditionalBind(
             htmlInput,
             'keypress',
             this,
-            this.onHtmlInputChange,
+            this.onHtmlInputChange_,
         );
     }
 
     protected override unbindInputEvents_() {
-        if (this.onKeyDownWrapper) {
-            Blockly.browserEvents.unbind(this.onKeyDownWrapper);
-            this.onKeyDownWrapper = null;
+        if (this.onKeyDownWrapper_) {
+            Blockly.browserEvents.unbind(this.onKeyDownWrapper_);
+            this.onKeyDownWrapper_ = null;
         }
-        if (this.onKeyInputWrapper) {
-            Blockly.browserEvents.unbind(this.onKeyInputWrapper);
-            this.onKeyInputWrapper = null;
+        if (this.onKeyInputWrapper_) {
+            Blockly.browserEvents.unbind(this.onKeyInputWrapper_);
+            this.onKeyInputWrapper_ = null;
         }
     }
 
@@ -73,9 +73,9 @@ export class FieldTextInput extends Blockly.FieldTextInput {
        
 
         if (this.htmlInput_ !== null) {
-            this.onKeyUpWrapper_ = Blockly.browserEvents.conditionalBind(this.htmlInput_, 'keyup', this, this.onHtmlInputChange);
-            this.onKeyPressWrapper_ = Blockly.browserEvents.conditionalBind(this.htmlInput_, 'keypress', this, this.onHtmlInputChange);
-            this.onInputWrapper_ = Blockly.browserEvents.bind(this.htmlInput_, 'input', this, this.onHtmlInputChange);
+            this.onKeyUpWrapper_ = Blockly.browserEvents.conditionalBind(this.htmlInput_, 'keyup', this, this.onHtmlInputChange_);
+            this.onKeyPressWrapper_ = Blockly.browserEvents.conditionalBind(this.htmlInput_, 'keypress', this, this.onHtmlInputChange_);
+            this.onInputWrapper_ = Blockly.browserEvents.bind(this.htmlInput_, 'input', this, this.onHtmlInputChange_);
         }
     }
 
@@ -84,7 +84,7 @@ export class FieldTextInput extends Blockly.FieldTextInput {
         this.unbindEvents_()
     }
 
-    private onHtmlInputChange(e: KeyboardEvent) {
+    private onHtmlInputChange_(e: KeyboardEvent) {
         // Check if the key matches the restrictor.
         if (e.type === 'keypress' && this.restrictor_ !== undefined) {
             const isWhitelisted = false;
@@ -95,7 +95,7 @@ export class FieldTextInput extends Blockly.FieldTextInput {
             }
         }
 
-        // the normal Blockly implementation of onHtmlInputChange_ which cannot be called because it is private
+        // the normal Blockly implementation of onHtmlInputChange__ which cannot be called because it is private
         const oldValue = this.value_;
         this.setValue(this.getValueFromEditorText_(this.htmlInput_!.value), false);
         if (

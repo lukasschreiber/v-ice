@@ -62,7 +62,7 @@ export class EdgeDrawer {
 
     drawMarker(mouseEvent: MouseEvent) {
         const origin = this.edge_.sourceField
-        const workspace = this.edge_.sourceBlock?.workspace
+        const workspace = this.edge_.sourceBlock?.workspace as Blockly.WorkspaceSvg | undefined
 
         if (origin && workspace) {
             const target = getFieldFromEvent(mouseEvent, workspace)

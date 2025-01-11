@@ -55,7 +55,7 @@ queryGenerator.registerBlock(Blocks.Names.LIST.ANY_ALL, (block, generator) => {
 })
 
 queryGenerator.registerBlock(Blocks.Names.LIST.IMMEDIATE, (block, generator) => {
-    const values = (block as ListSelectBlock).getListElementInputs_().map(input => generator.valueToCode(block, input.name, Order.ATOMIC)).filter(value => value !== "")
+    const values = (block as unknown as ListSelectBlock).getListElementInputs_().map(input => generator.valueToCode(block, input.name, Order.ATOMIC)).filter(value => value !== "")
     return [`[${values.join(", ")}]`, Order.ATOMIC]
 })
 
