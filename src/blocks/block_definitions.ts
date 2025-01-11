@@ -160,7 +160,6 @@ export interface RegistrableBlock<
     extensions?: Es
     data?: object | string
     code?: (
-        block: Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>,
         scope: NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? NodeBlockQueryGenerator<L, AnyRegistrableBlock<L>, NodeBlock & ExtensionMixins<Es> & MutatorMixin<M>> : BlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>>,
         generator: QueryGenerator
     ) => NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation

@@ -6,7 +6,7 @@ import { NodeBlock } from "@/blocks/extensions/node";
 import { AnyRegistrableBlock, BlockFieldNames, BlockInputNames, BlockLinesDefinition, ConnectionPointNames } from "@/blocks/block_definitions";
 import types from "@/data/types";
 
-type GeneratorFn<B extends Blockly.Block, T, S extends ScopeQueryGenerator<B>, R extends QueryNode | QueryOperation> = (block: B, scope: S, generator: T) => R
+type GeneratorFn<B extends Blockly.Block, T, S extends ScopeQueryGenerator<B>, R extends QueryNode | QueryOperation> = (scope: S, generator: T) => R
 
 export type NodeGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends QueryNode> = GeneratorFn<B, QueryGenerator, NodeBlockQueryGenerator<L, D, B>, R>
 export type OperationGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends QueryOperation> = GeneratorFn<B, QueryGenerator, BlockQueryGenerator<L, D, B>, R>
@@ -75,7 +75,7 @@ export class QueryGenerator {
         R extends QueryNode
     >(block: B) {
         const generator = this.nodeSnippets[block.type] as NodeGeneratorFn<L, AnyRegistrableBlock<L>, B, R>
-        return generator(block, new NodeBlockQueryGenerator(this.definitions[block.type], block), this)
+        return generator(new NodeBlockQueryGenerator(this.definitions[block.type], block), this)
     }
 
     private nodeSnippets: Record<string, GeneratorFn<any, QueryGenerator, NodeBlockQueryGenerator<any[], any, any>, QueryNode>> = {}
@@ -113,7 +113,7 @@ export class BlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRe
     }
 
     public getFieldValue(name: BlockFieldNames<L, D>): string {
-        return this.getFieldValue(name)
+        return this.block.getFieldValue(name)
     }
 }
 

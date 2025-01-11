@@ -32,9 +32,9 @@ export const ColumnSelectBlock = createBlock({
     helpUrl: "#column-variable",
     style: "variable_blocks",
     mutator: ColumnSelectMutator,
-    code: (block) => {
+    code: (scope) => {
         return {
-            name: block.getFieldValue("COLUMN"),
+            name: scope.getFieldValue("COLUMN"),
             args: {
                 COLUMN: types.boolean
             }

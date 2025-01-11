@@ -58,9 +58,9 @@ export const TargetNodeBlock = createBlock({
     style: "node_blocks",
     helpUrl: "#target-node",
     extensions: [NodeBlockExtension],
-    code: (block, scope) => {
+    code: (scope) => {
         return {
-            id: block.id,
+            id: scope.block.id,
             inputs: {
                 input: scope.generateForConnectionPoint("INPUT")
             },
@@ -130,12 +130,12 @@ export const SubsetNodeBlock = createBlock({
     style: "capped_node_blocks",
     helpUrl: "#subset-node",
     extensions: [NodeBlockExtension],
-    code: (block, scope) => {
+    code: (scope) => {
         // const fields = generator.multilineStatementToCode(block, "FILTERS", " && ").trim()
         // return { definition: `function ${procedureName}(default) {\n  return conditionalSplit(default, p => ${fields === "" ? "false" : fields});\n}\n`, invocation: `${procedureName}(${input})` }
 
         return {
-            id: block.id,
+            id: scope.block.id,
             inputs: {
                 input: scope.generateForConnectionPoint("INPUT")
             },
@@ -192,9 +192,9 @@ export const SetArithmeticNodeBlock = createBlock({
     style: "node_blocks",
     helpUrl: "#set-arithmetic-node",
     extensions: [NodeBlockExtension, ScopedExtension],
-    code: (block, scope) => {
+    code: (scope) => {
         return {
-            id: block.id,
+            id: scope.block.id,
             inputs: {
                 left: scope.generateForConnectionPoint("LEFT"),
                 right: scope.generateForConnectionPoint("RIGHT")
