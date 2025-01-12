@@ -4,9 +4,23 @@ import { Button } from "../Button";
 import { useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
 import { DataContext, DataTableDefinition } from "../DataContext";
 import { ImportModal } from "../ImportModal";
+import { Accordion } from "../Accordion";
 
 export function DataPanel() {
-    const { source, queryResults, addCol, addRow, reset, save, sort, isExpandable, addTarget, removeTarget, dataTables, setDataTables } = useContext(DataContext);
+    const {
+        source,
+        queryResults,
+        addCol,
+        addRow,
+        reset,
+        save,
+        sort,
+        isExpandable,
+        addTarget,
+        removeTarget,
+        dataTables,
+        setDataTables,
+    } = useContext(DataContext);
     const [page, setPage] = useState(0);
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -20,14 +34,14 @@ export function DataPanel() {
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const getSelectedTable = useCallback(() => {
-        if(selectedTable?.type === "SOURCE") {
-            return source
+        if (selectedTable?.type === "SOURCE") {
+            return source;
         }
-        if(selectedTable && selectedTable.uid && selectedTable.type === "TARGET" && queryResults[selectedTable.uid]) {
-            return queryResults[selectedTable.uid]
+        if (selectedTable && selectedTable.uid && selectedTable.type === "TARGET" && queryResults[selectedTable.uid]) {
+            return queryResults[selectedTable.uid];
         }
-        return DataTable.fromRows([], source.getColumnTypes(), source.getColumnNames())
-    }, [queryResults, selectedTable, source])
+        return DataTable.fromRows([], source.getColumnTypes(), source.getColumnNames());
+    }, [queryResults, selectedTable, source]);
 
     const highlightedRows = useMemo(() => {
         return highlightOnly
@@ -35,7 +49,11 @@ export function DataPanel() {
                   .getRows()
                   .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                   .map((row, index) => [row, index])
-                  .filter(([row]) => getSelectedTable().getRows().find((r) => (row as IndexedDataRow).index_ === r.index_))
+                  .filter(([row]) =>
+                      getSelectedTable()
+                          .getRows()
+                          .find((r) => (row as IndexedDataRow).index_ === r.index_)
+                  )
                   .map(([, index]) => index as number)
             : undefined;
     }, [highlightOnly, source, getSelectedTable, page, rowsPerPage]);
@@ -66,89 +84,93 @@ export function DataPanel() {
     }, [page, lastPage]);
 
     useEffect(() => {
-        if(selectedTable === undefined && dataTables.length > 0) {
-            setSelectedTable(dataTables.find((table) => table.type === "TARGET") ?? dataTables[0])
+        if (selectedTable === undefined && dataTables.length > 0) {
+            setSelectedTable(dataTables.find((table) => table.type === "TARGET") ?? dataTables[0]);
         }
-    }, [dataTables, selectedTable])
-
+    }, [dataTables, selectedTable]);
 
     return (
         <>
-            <table className="overflow-hidden text-sm text-left text-gray-500 table-auto min-w-full">
-                <thead className="text-xs text-gray-700 bg-gray-100">
-                    <tr>
-                        <th className="px-2 py-2 whitespace-nowrap font-medium">Name</th>
-                        <th className="px-2 py-2 whitespace-nowrap font-medium">Type</th>
-                        <th className="px-2 py-2 whitespace-nowrap font-medium text-center">Selected</th>
-                        <th className="px-2 py-2 whitespace-nowrap font-medium text-center">Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {dataTables.map((table, index) => (
-                        <tr key={index} className="border-b">
-                            <td className="px-2 py-1 whitespace-nowrap">{table.name}</td>
-                            <td className="px-2 py-1 whitespace-nowrap">{table.type}</td>
-                            <td className="px-2 py-1 whitespace-nowrap text-center">
+            <Accordion title="Manage Targets" defaultOpen={false}>
+                <table className="overflow-hidden text-sm text-left text-gray-500 table-auto min-w-full">
+                    <thead className="text-xs text-gray-700 bg-gray-100">
+                        <tr>
+                            <th className="px-2 py-1 whitespace-nowrap font-medium">Name</th>
+                            <th className="px-2 py-1 whitespace-nowrap font-medium">Type</th>
+                            <th className="px-2 py-1 whitespace-nowrap font-medium text-center">Selected</th>
+                            <th className="px-2 py-1 whitespace-nowrap font-medium text-center">Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody className="text-xs">
+                        {dataTables.map((table, index) => (
+                            <tr key={index} className="border-b">
+                                <td className="px-2 py-1 whitespace-nowrap">{table.name}</td>
+                                <td className="px-2 py-1 whitespace-nowrap">{table.type}</td>
+                                <td className="px-2 py-1 whitespace-nowrap text-center">
+                                    <input
+                                        type="radio"
+                                        name="viewTable"
+                                        onChange={() =>
+                                            setSelectedTable(dataTables.find((t) => t.name === table.name)!)
+                                        }
+                                        checked={selectedTable?.name === table.name}
+                                    />
+                                </td>
+                                <td className="px-2 py-1 whitespace-nowrap text-center">
+                                    {table.immutable ? null : (
+                                        <Button
+                                            onClick={() => {
+                                                removeTarget(table.uid!);
+                                                setDataTables((prev) => {
+                                                    const newTables = [...prev];
+                                                    newTables.splice(index, 1);
+                                                    return newTables;
+                                                });
+                                            }}
+                                            className="!text-red-600 bg-red-200 bg-transparent text-xs uppercase"
+                                        >
+                                            Remove
+                                        </Button>
+                                    )}
+                                </td>
+                            </tr>
+                        ))}
+                        <tr className="border-b">
+                            <td className="px-2 py-1 whitespace-nowrap">
                                 <input
-                                    type="radio"
-                                    name="viewTable"
-                                    onChange={() => setSelectedTable(dataTables.find((t) => t.name === table.name)!)}
-                                    checked={selectedTable?.name === table.name}
+                                    type="text"
+                                    placeholder="My new target"
+                                    className="w-full outline-0"
+                                    value={newTarget.name}
+                                    onChange={(e) => {
+                                        setNewTarget({ ...newTarget, name: e.target.value });
+                                    }}
                                 />
                             </td>
+                            <td className="px-2 py-1 whitespace-nowrap">TARGET</td>
+                            <td></td>
                             <td className="px-2 py-1 whitespace-nowrap text-center">
-                                {table.immutable ? null : (
-                                    <Button
-                                        onClick={() => {
-                                            removeTarget(table.uid!);
-                                            setDataTables((prev) => {
-                                                const newTables = [...prev];
-                                                newTables.splice(index, 1);
-                                                return newTables;
-                                            });
-                                        }}
-                                        className="bg-red-300 !text-red-900 w-6 h-6"
-                                    >
-                                        -
-                                    </Button>
-                                )}
+                                <Button
+                                    onClick={() => {
+                                        const uid = addTarget(newTarget.name);
+                                        newTarget.uid = uid;
+                                        setDataTables((prev) => [...prev, newTarget]);
+                                        setNewTarget({ name: "", type: "TARGET", immutable: false });
+                                    }}
+                                    className="text-green-600 bg-green-200 text-xs uppercase disabled:bg-gray-200 disabled:text-gray-400"
+                                    disabled={
+                                        newTarget.name === "" ||
+                                        dataTables.find((table) => table.name === newTarget.name) !== undefined
+                                    }
+                                >
+                                    Add
+                                </Button>
                             </td>
                         </tr>
-                    ))}
-                    <tr className="border-b">
-                        <td className="px-2 py-1 whitespace-nowrap">
-                            <input
-                                type="text"
-                                placeholder="My new target"
-                                className="w-full outline-0"
-                                value={newTarget.name}
-                                onChange={(e) => {
-                                    setNewTarget({ ...newTarget, name: e.target.value });
-                                }}
-                            />
-                        </td>
-                        <td className="px-2 py-1 whitespace-nowrap">TARGET</td>
-                        <td></td>
-                        <td className="px-2 py-1 whitespace-nowrap text-center">
-                            <Button
-                                onClick={() => {
-                                    const uid = addTarget(newTarget.name);
-                                    newTarget.uid = uid;
-                                    setDataTables((prev) => [...prev, newTarget]);
-                                    setNewTarget({ name: "", type: "TARGET", immutable: false });
-                                }}
-                                className="bg-primary-200 !text-primary-800 w-6 h-6 font-bold"
-                                disabled={
-                                    newTarget.name === "" ||
-                                    dataTables.find((table) => table.name === newTarget.name) !== undefined
-                                }
-                            >
-                                +
-                            </Button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+                    </tbody>
+                </table>
+            </Accordion>
+            <Accordion title="Test Data" defaultOpen={true}>
             <div className="m-2 gap-2 flex flex-row items-center text-sm justify-between">
                 <div className="flex flex-row gap-1 items-center">
                     <input
@@ -334,6 +356,7 @@ export function DataPanel() {
                     </>
                 )}
             </Table>
+            </Accordion>
             <ImportModal
                 open={importModalOpen}
                 file={importModalFile}

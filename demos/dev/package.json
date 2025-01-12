@@ -11,9 +11,10 @@
   },
   "dependencies": {
     "@faker-js/faker": "^8.4.1",
-    "prismjs": "^1.29.0",
+    "@monaco-editor/react": "^4.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
+    "react-resizable-panels": "^2.1.7",
     "v-ice": "file:../../",
     "v-ice-commons": "file:../../commons"
   },
@@ -30,7 +31,6 @@
     "eslint-plugin-react-refresh": "^0.4.5",
     "typescript": "^5.2.2",
     "vite": "^6.0.7",
-    "vite-plugin-prismjs": "^0.0.11",
     "vite-plugin-svgr": "^4.3.0"
   }
 }
