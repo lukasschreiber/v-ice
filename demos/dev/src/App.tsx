@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab } from "./components/tabs/Tabs";
 import { Code } from "./components/Code";
 import { DataPanel } from "./components/tabs/DataPanel";
+import { useLocalStorage } from "v-ice-commons";
 import { MiscPanel } from "./components/tabs/MiscPanel";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 
@@ -12,7 +13,7 @@ function App() {
     const [width, setWidth] = useState(document.documentElement.clientWidth - 500); // TODO: this is a hack
     const [height, setHeight] = useState(document.documentElement.clientHeight);
     const [size, setSize] = useState(75);
-    const [orientation, setOrientation] = useState<"horizontal" | "vertical">("horizontal");
+    const [orientation, setOrientation] = useLocalStorage<"horizontal" | "vertical">("panel-direction", "horizontal");
 
     useEffect(() => {
         window.addEventListener("resize", () => {

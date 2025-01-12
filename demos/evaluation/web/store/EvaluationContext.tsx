@@ -1,5 +1,5 @@
 import { createContext } from "react";
-import useLocalStorage from "./useLocalStorage";
+import { useLocalStorage } from "v-ice-commons/src/hooks/useLocalStorage";
 import { EvaluationAction, EvaluationActionPayloads } from "v-ice/dist/evaluation_emitter";
 import { ISerializedWorkspace } from "../../../../dist/serializer";
 

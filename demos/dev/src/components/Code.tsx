@@ -10,6 +10,6 @@ export function Code(props: React.HTMLProps<HTMLPreElement> & { code: string; la
     }
 
     return (
-        <Editor defaultLanguage={language} value={code} height="100%" width="100%" theme="github-light" options={{readOnly: true}} beforeMount={setEditorTheme} />
+        <Editor defaultLanguage={language} value={code} height="100%" width="100%" theme="github-light" options={{readOnly: true, fontSize: 12}} beforeMount={setEditorTheme} />
     )
 }
