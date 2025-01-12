@@ -21,5 +21,13 @@ export const EnumSelectBlock = createBlock({
     output: t.enum(t.wildcard),
     color: Colors.categories.comparisons,
     extensions: [ParentColorExtension],
-    mutator: EnumSelectMutator
+    mutator: EnumSelectMutator,
+    code: (scope) => {
+        return {
+            operation: "enum",
+            args: {
+                name: scope.generateForField("ENUM"),
+            }
+        }
+    }
 })

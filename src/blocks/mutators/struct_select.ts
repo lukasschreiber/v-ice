@@ -16,6 +16,7 @@ export interface StructSelectBlock {
     removePropertyInput_(input: Blockly.Input): void,
     getPropertyInputs(): Blockly.Input[],
     focusInput(input: Blockly.Input, workspace: Blockly.WorkspaceSvg): void,
+    getStruct(): { [key: string]: string | number | boolean | null },
 }
 
 interface StructSelectState {
@@ -143,6 +144,18 @@ export class StructSelectMutator extends BlockMutator<Blockly.BlockSvg & StructS
             })
             )
         })
+    }
+
+    @BlockMutator.mixin
+    getStruct(this: Blockly.BlockSvg & StructSelectBlock): { [key: string]: string | number | boolean | null } {
+        const struct: { [key: string]: string | number | boolean | null } = {}
+        for (const input of this.getPropertyInputs()) {
+            const propertyName = this.renderedProperties.get(input.name)
+            const value = input.connection?.targetBlock()?.getFieldValue("ENUM")
+            struct[propertyName!] = value
+        }
+
+        return struct
     }
 
     public saveExtraState(this: Blockly.BlockSvg & StructSelectBlock): StructSelectState {

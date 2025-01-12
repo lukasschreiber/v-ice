@@ -13,7 +13,12 @@ export const StructBlock = createBlock({
     color: Colors.categories.comparisons,
     inputsInline: true,
     extensions: [ParentColorExtension],
-    mutator: StructSelectMutator
+    mutator: StructSelectMutator,
+    code: (scope) => {
+        return {
+            value: scope.block.getStruct(),
+        }
+    }
 })
 
 export const ProperySelectBlock = createBlock({
@@ -38,5 +43,14 @@ export const ProperySelectBlock = createBlock({
     output: t.wildcard,
     style: "list_blocks",
     helpUrl: "#struct-get",
-    mutator: StructPropertySelectMutator
+    mutator: StructPropertySelectMutator,
+    code: (scope) => {
+        return {
+            operation: "get_struct_property",
+            args: {
+                property: scope.generateForField("PROPERTY"),
+                struct: scope.generateForInput("STRUCT"),
+            }
+        }
+    }
 })

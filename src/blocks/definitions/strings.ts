@@ -21,4 +21,12 @@ export const StringBlock = createBlock({
     output: t.string,
     color: Colors.categories.comparisons,
     extensions: [ParentColorExtension],
+    code: (scope) => {
+        return {
+            operation: "string",
+            args: {
+                value: scope.generateForField("VALUE"),
+            }
+        }
+    }
 })

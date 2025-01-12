@@ -31,7 +31,15 @@ export const ColumnSelectBlock = createBlock({
     output: t.list(t.wildcard),
     helpUrl: "#column-variable",
     style: "variable_blocks",
-    mutator: ColumnSelectMutator
+    mutator: ColumnSelectMutator,
+    code: (scope) => {
+        return {
+            operation: "get_column",
+            args: {
+                name: {value: scope.getFieldValue("COLUMN")},
+            }
+        }
+    }
 })
 
 export const VariableBlock = createBlock({
@@ -59,7 +67,7 @@ export const VariableBlock = createBlock({
     mutator: VariableSelectMutator,
     code: (scope) => {
         return {
-            operation: "variable",
+            operation: "get_variable",
             args: {
                 name: {value: scope.getField<FieldVariable>("VAR").getVariable()?.name ?? ""},
             }
@@ -92,7 +100,7 @@ export const LocalVariableBlock = createBlock({
     mutator: LocalVariableMutator,
     code: (scope) => {
         return {
-            operation: "local_variable",
+            operation: "get_local_variable",
             args: {
                 name: {value: scope.getFieldValue("LABEL")},
             }

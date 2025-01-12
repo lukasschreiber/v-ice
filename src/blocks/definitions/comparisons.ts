@@ -33,6 +33,16 @@ export const EqualsWithinBlock = createBlock({
     color: Colors.categories.comparisons,
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "equals_within",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B"),
+                delta: scope.generateForInput("DELTA")
+            }
+        }
+    }
 })
 
 export const EqualsBlock = createBlock({
@@ -93,7 +103,16 @@ export const MatchesBlock = createBlock({
     color: Colors.categories.comparisons,
     inputsInline: true,
     helpUrl: "#matches",
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "matches",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B")
+            }
+        }
+    }
 })
 
 export const GreaterBlock = createBlock({
@@ -119,7 +138,16 @@ export const GreaterBlock = createBlock({
     color: Colors.categories.comparisons,
     helpUrl: "#comparison-numbers",
     inputsInline: true,
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "greater",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B")
+            }
+        }
+    }
 })
 
 export const LessBlock = createBlock({
@@ -145,7 +173,16 @@ export const LessBlock = createBlock({
     helpUrl: "#comparison-numbers",
     color: Colors.categories.comparisons,
     inputsInline: true,
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "less",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B")
+            }
+        }
+    }
 })
 
 export const LessEqualsBlock = createBlock({
@@ -171,7 +208,16 @@ export const LessEqualsBlock = createBlock({
     helpUrl: "#comparison-numbers",
     color: Colors.categories.comparisons,
     inputsInline: true,
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "less_equals",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B")
+            }
+        }
+    }
 })
 
 export const GreaterEqualsBlock = createBlock({
@@ -197,7 +243,16 @@ export const GreaterEqualsBlock = createBlock({
     helpUrl: "#comparison-numbers",
     color: Colors.categories.comparisons,
     inputsInline: true,
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "greater_equals",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B")
+            }
+        }
+    }
 })
 
 export const CompareNumbersBlock = createBlock({
@@ -233,7 +288,17 @@ export const CompareNumbersBlock = createBlock({
     color: Colors.categories.comparisons,
     helpUrl: "#comparison-numbers",
     inputsInline: true,
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "compare_numbers",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B"),
+                operator: scope.generateForField("OP")
+            }
+        }
+    }
 })
 
 export const CompareIntervalBlock = createBlock({
@@ -264,7 +329,17 @@ export const CompareIntervalBlock = createBlock({
     color: Colors.categories.comparisons,
     helpUrl: "#comparison-interval",
     inputsInline: true,
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "compare_interval",
+            args: {
+                a: scope.generateForInput("A"),
+                min: scope.generateForInput("B"),
+                max: scope.generateForInput("C")
+            }
+        }
+    }
 })
 
 export const IsNullBlock = createBlock({
@@ -284,5 +359,13 @@ export const IsNullBlock = createBlock({
     connectionType: ConnectionType.BOOLEAN,
     color: Colors.categories.comparisons,
     helpUrl: "#comparison-null",
-    inputsInline: true
+    inputsInline: true,
+    code: (scope) => {
+        return {
+            operation: "is_null",
+            args: {
+                a: scope.generateForInput("A")
+            }
+        }
+    }
 })

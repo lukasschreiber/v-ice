@@ -33,6 +33,7 @@ export function registerBlock<Es extends RegistrableExtension[], M extends Regis
         },
     }
 
+    console.log("Registering block", definition.id)
     Blockly.Blocks[definition.id] = blockDefinition
 }
 
@@ -157,7 +158,7 @@ export interface RegistrableBlock<
     extensions?: Es
     data?: object | string
     code?: (
-        scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>>,
+        scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
     ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation | QueryPrimitive
 }
 

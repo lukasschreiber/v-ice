@@ -116,6 +116,10 @@ export class BlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRe
         return this.generator.generateForOperationBlock(targetBlock);
     }
 
+    public generateForUnknownInput(name: BlockInputNames<L, D> | string): QueryOperation | QueryPrimitive {
+        return this.generateForInput(name as BlockInputNames<L, D>);
+    }
+
     public generateForField(name: BlockFieldNames<L, D>, fn: (value: string) => QueryPrimitive["value"] = (value) => value): QueryOperation | QueryPrimitive {
         return { value: fn(this.block.getFieldValue(name)) }
     }
@@ -136,7 +140,7 @@ export class BlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRe
             if ((segment as QueryPrimitive).value) {
                 throw new Error(`Unexpected primitive value in statement input ${name}`)
             }
-            
+
             segments.push(segment as QueryOperation);
             targetBlock = targetBlock.getNextBlock();
         }

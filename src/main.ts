@@ -14,6 +14,7 @@ import "@/blocks/extensions"
 import "@/blocks/mutators"
 
 import "@/blocks/definitions/math"
+import "@/blocks/definitions/enums"
 import "@/blocks/definitions/variables"
 import "@/blocks/definitions/nodes"
 import "@/blocks/definitions/comparisons"

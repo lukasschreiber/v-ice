@@ -21,5 +21,13 @@ export const HierarchySelectBlock = createBlock({
     output: t.hierarchy(t.wildcard),
     color: Colors.categories.comparisons,
     extensions: [ParentColorExtension],
-    mutator: HierarchySelectMutator
+    mutator: HierarchySelectMutator,
+    code: (scope) => {
+        return {
+            operation: "hierarchy",
+            args: {
+                name: scope.generateForField("HIERARCHY"),
+            }
+        }
+    }
 })

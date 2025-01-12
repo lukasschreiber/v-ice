@@ -9,8 +9,14 @@ export interface QueryNode {
     attributes: Record<string, any>
 }
 
+export type JSONSerializablePrimitive = string | number | boolean | null
+export interface JSONSerializableRecord {
+    [key: string]: JSONSerializablePrimitive | JSONSerializableRecord | JSONSerializablePrimitive[] | JSONSerializableRecord[]
+}
+export type JSONSerializable = JSONSerializablePrimitive | JSONSerializableRecord | JSONSerializablePrimitive[] | JSONSerializableRecord[]
+
 export interface QueryPrimitive {
-    value: string | number | boolean
+    value: JSONSerializable
 }
 
 export interface QueryNodeInput {

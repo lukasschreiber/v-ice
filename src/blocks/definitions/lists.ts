@@ -44,6 +44,16 @@ export const ListArithmeticBlock = createBlock({
     output: t.number,
     helpUrl: "#list-operations",
     style: "list_blocks",
+    inputsInline: true,
+    code: (scope) => {
+        return {
+            operation: "unary_list_operation",
+            args: {
+                operator: scope.generateForField("OP"),
+                list: scope.generateForInput("LIST"),
+            },
+        }
+    }
 })
 
 export const ListLengthBlock = createBlock({
@@ -63,6 +73,15 @@ export const ListLengthBlock = createBlock({
     output: t.number,
     helpUrl: "#list-length",
     style: "list_blocks",
+    inputsInline: true,
+    code: (scope) => {
+        return {
+            operation: "list_length",
+            args: {
+                list: scope.generateForInput("LIST"),
+            }
+        }
+    }
 })
 
 export const ListContainsBlock = createBlock({
@@ -89,7 +108,15 @@ export const ListContainsBlock = createBlock({
     mutator: DynamicInputTypesMutator,
     helpUrl: "#list-contains",
     connectionType: ConnectionType.BOOLEAN,
-
+    code: (scope) => {
+        return {
+            operation: "list_contains",
+            args: {
+                list: scope.generateForInput("LIST"),
+                value: scope.generateForInput("VALUE"),
+            }
+        }
+    }
 })
 
 export const ListAnyAllBlock = createBlock({
@@ -134,7 +161,18 @@ export const ListAnyAllBlock = createBlock({
     inputsInline: true,
     connectionType: ConnectionType.BOOLEAN,
     helpUrl: "#list-any-all",
-    mutator: ListAnyAllMutator
+    mutator: ListAnyAllMutator,
+    code: (scope) => {
+        return {
+            operation: "list_any_all",
+            args: {
+                operation: scope.generateForField("OP"),
+                value: scope.generateForField("VALUE"),
+                list: scope.generateForInput("LIST"),
+                query: scope.generateForStatementInput("QUERY"),
+            }
+        }
+    }
 })
 
 export const ListImmediateBlock = createBlock({
@@ -202,4 +240,14 @@ export const ListEqualsBlock = createBlock({
     mutator: DynamicInputTypesMutator,
     helpUrl: "#list-equals",
     connectionType: ConnectionType.BOOLEAN,
+    code: (scope) => {
+        return {
+            operation: "list_equals",
+            args: {
+                a: scope.generateForInput("LIST1"),
+                b: scope.generateForInput("LIST2"),
+                operator: scope.generateForField("OP"),
+            }
+        }
+    }
 })
