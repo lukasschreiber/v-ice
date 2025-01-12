@@ -61,6 +61,7 @@ export function Canvas(props: CanvasProps) {
     const { settings, set, layout } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
     const code = useSelector((state) => state.generatedCode.code);
+    const queryJson = useSelector((state) => state.generatedCode.queryJson);
     const source = useSelector((state) => state.data.source);
     const memoizedSource = useMemo(() => DataTable.deserialize(source), [source]);
     const dispatch = useDispatch();
@@ -203,9 +204,13 @@ export function Canvas(props: CanvasProps) {
                 return;
 
             const query = queryGenerator.workspaceToCode(workspace!);
+            const queryJsonCode = JSON.stringify(getQueryGeneratorInstance().generateQuery(workspace!), null, 2);
             if (code !== query) {
                 dispatch(setCode(query));
-                dispatch(setQueryJson(JSON.stringify(getQueryGeneratorInstance().generateQuery(workspace!), null, 2)));
+            }
+
+            if (queryJson !== queryJsonCode) {
+                dispatch(setQueryJson(queryJsonCode));
             }
         }
 

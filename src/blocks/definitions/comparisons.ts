@@ -58,7 +58,16 @@ export const EqualsBlock = createBlock({
     color: Colors.categories.comparisons,
     inputsInline: true,
     helpUrl: "#equals",
-    mutator: DynamicInputTypesMutator
+    mutator: DynamicInputTypesMutator,
+    code: (scope) => {
+        return {
+            operation: "equals",
+            args: {
+                a: scope.generateForInput("A"),
+                b: scope.generateForInput("B")
+            }
+        }
+    }
 })
 
 export const MatchesBlock = createBlock({

@@ -2,9 +2,9 @@ import { IType } from "@/data/types"
 import * as Blockly from "blockly/core"
 import { BlockExtension, ExtensionMixins, RegistrableExtension } from "@/blocks/block_extensions"
 import { MutatorMixin, RegistrableMutator } from "./block_mutators"
-import { BlockQueryGenerator, NodeBlockQueryGenerator, QueryGenerator } from "@/query/builder/query_generator"
-import { QueryNode, QueryOperation } from "@/query/builder/query_tree"
-import { NodeBlock, NodeBlockExtension } from "./extensions/node"
+import { BlockQueryGenerator, NodeBlockQueryGenerator } from "@/query/builder/query_generator"
+import { QueryNode, QueryOperation, QueryPrimitive } from "@/query/builder/query_tree"
+import { NodeExtension, NodeBlockExtension } from "./extensions/node"
 import { getQueryGeneratorInstance } from "@/query/builder/query_generator_instance"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
@@ -40,11 +40,6 @@ export enum ConnectionType {
     BOOLEAN = "Boolean",
     TIMELINE_PROTOTYPE = "TimelinePrototype",
 }
-
-// export function registerBlocks<T extends Array<RegistrableBlock<never[], never> & { id: string }>>(blocks: T): Readonly<Record<T[number]["id"], T[number]>> {
-//     for (const definition of blocks) {
-
-// }
 
 function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): BlocklyJsonBlockDefinition {
 
@@ -140,6 +135,8 @@ export interface BlockLineDefinition {
 
 export type BlockLinesDefinition = BlockLineDefinition[]
 
+// TODO: I think that the code function triggers some weird typescript bug.
+// It works most of the time but if I edit something in query_generator.ts it sometimes stops working.
 export interface RegistrableBlock<
     Es extends RegistrableExtension[],
     M extends RegistrableMutator,
@@ -160,9 +157,8 @@ export interface RegistrableBlock<
     extensions?: Es
     data?: object | string
     code?: (
-        scope: NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? NodeBlockQueryGenerator<L, AnyRegistrableBlock<L>, NodeBlock & ExtensionMixins<Es> & MutatorMixin<M>> : BlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>>,
-        generator: QueryGenerator
-    ) => NotNever<ExtensionsMatch<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation
+        scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.Block & ExtensionMixins<Es> & MutatorMixin<M>>,
+    ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation | QueryPrimitive
 }
 
 export type FieldDefinition = {
@@ -186,9 +182,10 @@ export function createBlock<
     return definition
 }
 
-type ExtensionsMatch<T, U> = T extends (infer R)[] ? R extends U ? true : false : false
-type NotNever<T> = [T] extends [never] ? false : true;
-
+type Match<T, U> = T extends (infer R)[] ? R extends U ? true : false : false
+type ReduceToTrue<T> = [T] extends [true] ? true : [T] extends [false] ? false : [T] extends [true | false] ? true : T;
+type NotNever<T> = [T] extends [never] ? false : T;
+type MatchAny<T, U> = ReduceToTrue<NotNever<Match<T, U>>>;
 
 export type AnyRegistrableBlock<L extends BlockLinesDefinition> = RegistrableBlock<any[], any, L> | RegistrableBlock<never[], never, L> | RegistrableBlock<any[], never, L> | RegistrableBlock<never[], any, L>
 
@@ -217,3 +214,4 @@ export type BlockFieldByType<
     : never;
 
 export type ConnectionPointNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> = BlockFieldByType<L, T, "field_edge_connection">
+export type StatementInputTypeNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> = BlockFieldByType<L, T, "input_statement">

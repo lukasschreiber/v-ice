@@ -205,17 +205,9 @@ function blockDefinitionToToolboxItem(block: GenericBlockDefinition): Blockly.ut
         }, {} as { [key: string]: string | number | boolean | null | { [key: string]: unknown } })
         : undefined;
 
-    console.log({
-        kind: "block",
-        type: block.type as string, // TODO: This is a hack
-        fields,
-        inputs,
-        isHidden: block.isHidden || false
-    })
-
     return {
         kind: "block",
-        type: block.type as string, // TODO: This is a hack
+        type: block.type,
         fields,
         inputs,
         isHidden: block.isHidden || false

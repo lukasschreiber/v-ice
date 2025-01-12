@@ -1,5 +1,3 @@
-import { IType } from "@/data/types"
-
 export interface QueryTree {
     root: QueryNode
     sets: QueryNode[]
@@ -9,6 +7,10 @@ export interface QueryTree {
 export interface QueryNode {
     id: string
     attributes: Record<string, any>
+}
+
+export interface QueryPrimitive {
+    value: string | number | boolean
 }
 
 export interface QueryNodeInput {
@@ -25,7 +27,7 @@ export interface SubsetQueryNode extends InputQueryNode {
 }
 
 export interface QueryOperation {
-    name: string
+    operation: string
     // maybe only support positional arguments because the names are only used internally
-    args: Record<string, IType>
+    args: Record<string, QueryOperation | QueryPrimitive | QueryOperation[]>
 }

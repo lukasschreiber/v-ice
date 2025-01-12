@@ -142,7 +142,7 @@ export const SubsetNodeBlock = createBlock({
             attributes: {
                 name: scope.getFieldValue("NAME")
             },
-            operations: []
+            operations: scope.generateForStatementInput("FILTERS"),
         }
     }
 })

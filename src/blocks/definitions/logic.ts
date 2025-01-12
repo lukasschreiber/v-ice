@@ -41,6 +41,23 @@ export const LogicOrBlock = createBlock({
     style: "logic_blocks",
     helpUrl: "#logic-or",
     mutator: EitherOrMutator,
+    code: (scope) => {
+        // TODO: This only takes the first inner statement because
+
+        const additionalArgs: { [key: string]: any } = {}
+        scope.block.getAdditionalOrBranchInputNames().forEach((name, i) => {
+            additionalArgs[`OR_STATEMENT_${i + 2}`] = scope.generateForUnknownStatementInput(name)
+        })
+
+        return {
+            operation: "or",
+            args: {
+                OR_STATEMENT_0: scope.generateForStatementInput("OR_STATEMENT_0"),
+                OR_STATEMENT_1: scope.generateForStatementInput("OR_STATEMENT_1"),
+                ...additionalArgs,
+            },
+        }
+    }
 })
 
 export const LogicNotBlock = createBlock({
@@ -64,6 +81,14 @@ export const LogicNotBlock = createBlock({
     connectionType: ConnectionType.BOOLEAN,
     style: "logic_blocks",
     helpUrl: "#logic-not",
+    code: (scope) => {
+        return {
+            operation: "not",
+            args: {
+                STATEMENTS: scope.generateForStatementInput("STATEMENTS"),
+            }
+        }
+    }
 })
 
 export const BooleanBlock = createBlock({
@@ -86,4 +111,7 @@ export const BooleanBlock = createBlock({
     output: t.boolean,
     extensions: [ParentColorExtension],
     color: Colors.categories.comparisons,
+    code: (scope) => {
+        return { value: scope.getFieldValue("BOOL") === "TRUE" }
+    }
 })

@@ -6,6 +6,7 @@ import { BlockMutator } from '../block_mutators';
 export interface EitherOrBlock {
     addOrBranch(id?: string): void
     removeOrBranch(): void
+    getAdditionalOrBranchInputNames(): string[]
     inputNames: string[]
 }
 
@@ -62,6 +63,12 @@ export class EitherOrMutator extends BlockMutator<Blockly.Block & EitherOrBlock,
         this.removeInput(label.name)
         this.removeInput(statement.name)
         this.inputNames.splice(indexToDelete, 1)
+    }
+
+    @BlockMutator.mixin
+    public getAdditionalOrBranchInputNames(this: Blockly.Block & EitherOrBlock) {
+        return this.inputNames.map(uid => (`OR_STATEMENT_${uid}`))
+
     }
 
     public saveExtraState(this: Blockly.Block & EitherOrBlock) {

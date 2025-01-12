@@ -5,7 +5,7 @@ import { ScopedExtension } from "../extensions/scoped";
 import { LocalVariableMutator } from "../mutators/local_variable";
 import { VariableSelectMutator } from "../mutators/variable_select";
 import { ColumnSelectMutator } from "../mutators/column_select";
-import types from "@/data/types";
+import { FieldVariable } from "../fields/field_variable";
 
 export const ColumnSelectBlock = createBlock({
     id: Blocks.Names.VARIABLE.GET_COLUMN,
@@ -31,15 +31,7 @@ export const ColumnSelectBlock = createBlock({
     output: t.list(t.wildcard),
     helpUrl: "#column-variable",
     style: "variable_blocks",
-    mutator: ColumnSelectMutator,
-    code: (scope) => {
-        return {
-            name: scope.getFieldValue("COLUMN"),
-            args: {
-                COLUMN: types.boolean
-            }
-        }
-    }
+    mutator: ColumnSelectMutator
 })
 
 export const VariableBlock = createBlock({
@@ -60,11 +52,19 @@ export const VariableBlock = createBlock({
                 }
             ]
         }
-    ],
+    ] as const,
     output: t.wildcard,
     style: "variable_blocks",
     helpUrl: "#variables",
-    mutator: VariableSelectMutator
+    mutator: VariableSelectMutator,
+    code: (scope) => {
+        return {
+            operation: "variable",
+            args: {
+                name: {value: scope.getField<FieldVariable>("VAR").getVariable()?.name ?? ""},
+            }
+        }
+    }
 })
 
 export const LocalVariableBlock = createBlock({
@@ -85,9 +85,17 @@ export const LocalVariableBlock = createBlock({
                 }
             ]
         }
-    ],
+    ] as const,
     output: t.wildcard,
     style: "variable_blocks",
     extensions: [ScopedExtension],
-    mutator: LocalVariableMutator
+    mutator: LocalVariableMutator,
+    code: (scope) => {
+        return {
+            operation: "local_variable",
+            args: {
+                name: {value: scope.getFieldValue("LABEL")},
+            }
+        }
+    }
 })
