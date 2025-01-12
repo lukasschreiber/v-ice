@@ -1,5 +1,5 @@
 import { Canvas, useGeneratedCode } from "v-ice";
-import { useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab } from "./components/tabs/Tabs";
 import { Code } from "./components/Code";
 import { DataPanel } from "./components/tabs/DataPanel";
@@ -12,29 +12,43 @@ function App() {
     const [width, setWidth] = useState(document.documentElement.clientWidth - 500); // TODO: this is a hack
     const [height, setHeight] = useState(document.documentElement.clientHeight);
     const [size, setSize] = useState(75);
+    const [orientation, setOrientation] = useState<"horizontal" | "vertical">("horizontal");
 
     useEffect(() => {
         window.addEventListener("resize", () => {
+            if (orientation === "horizontal") {
+                setHeight(document.documentElement.clientHeight);
+                setWidth(document.documentElement.clientWidth * size / 100);
+            } else {
+                setHeight(document.documentElement.clientHeight * size / 100);
+                setWidth(document.documentElement.clientWidth);
+            }
+        });
+    }, [size, orientation]);
+
+    const handleResize = useCallback((size: number) => {
+        setSize(size);
+    }, [orientation]);
+
+    useEffect(() => {
+        if (orientation === "horizontal") {
             setHeight(document.documentElement.clientHeight);
             setWidth(document.documentElement.clientWidth * size / 100);
-        });
-    }, [size]);
-
-    function handleResize(size: number) {
-        setSize(size);
-        setHeight(document.documentElement.clientHeight);
-        setWidth(document.documentElement.clientWidth * size / 100);
-    }
+        } else {
+            setHeight(document.documentElement.clientHeight * size / 100);
+            setWidth(document.documentElement.clientWidth);
+        }
+    }, [orientation, size])
 
     return (
         <>
-            <PanelGroup autoSaveId={"main-panel"} direction="horizontal" className="!w-screen !h-screen">
+            <PanelGroup autoSaveId={"main-panel"} direction={orientation} className="!w-screen !h-screen">
                 <Panel defaultSize={75} onResize={(size) => handleResize(size)} className="border-r border-solid border-gray-200">
                     <Canvas width={width} height={height} language={language} media="/media/" />
                 </Panel>
                 <PanelResizeHandle />
                 <Panel defaultSize={25}>
-                    <Tabs>
+                    <Tabs orientation={orientation} setOrientation={setOrientation}>
                         <Tab label="Data" description="Manage the test data">
                             <DataPanel />
                         </Tab>
