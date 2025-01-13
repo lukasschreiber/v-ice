@@ -2,6 +2,7 @@
     "blockly": {
         "Variables": "Variables",
         "Comparisons": "Comparisons",
+        "Primitives": "Primitives",
         "Nodes": "Nodes",
         "Arithmetic": "Math",
         "Timeline": "Time",

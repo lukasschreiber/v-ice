@@ -22,6 +22,9 @@ export default Blockly.Theme.defineTheme(LIGHT, {
         "history_category": {
             colour: Colors.categories.history
         },
+        "primitives_category": {
+            colour: Colors.categories.nodes
+        }
     },
     blockStyles: {
         "variable_blocks": {

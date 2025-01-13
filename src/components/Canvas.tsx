@@ -37,6 +37,9 @@ import { showHelp } from "@/store/help/help_emitter";
 import { useHelp } from "@/store/help/help_hooks";
 import { Tooltip } from "./common/Tooltip";
 import { getQueryGeneratorInstance } from "@/query/builder/query_generator_instance";
+import { EmptyToolbox } from "@/blocks/toolbox/empty_toolbox";
+import { ToolboxDefinition } from "blockly/core/utils/toolbox";
+import { LoadingOverlay } from "./common/LoadingOverlay";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -50,9 +53,12 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     language?: string;
     media?: string;
     helpUrl?: string;
+    toolbox?: ToolboxDefinition;
 };
 
 export function Canvas(props: CanvasProps) {
+    const { language, helpUrl, media, width, height, toolbox, ...divProps } = props;
+
     const blocklyDiv = createRef<HTMLDivElement>();
     const workspaceRef = useContext(WorkspaceContext).workspaceRef;
     const [toolboxWidth, setToolboxWidth] = useState(0);
@@ -60,13 +66,18 @@ export function Canvas(props: CanvasProps) {
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
     const { settings, set, layout } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
+    const [isLoading, setIsLoading] = useState(true);
+    const [featuresReady, setFeaturesReady] = useState<{ toolbox: boolean; workspace: boolean; variables: boolean }>({
+        toolbox: false,
+        workspace: false,
+        variables: false,
+    });
     const code = useSelector((state) => state.generatedCode.code);
     const queryJson = useSelector((state) => state.generatedCode.queryJson);
     const source = useSelector((state) => state.data.source);
     const memoizedSource = useMemo(() => DataTable.deserialize(source), [source]);
     const dispatch = useDispatch();
 
-    const { language, helpUrl, media, width, height, ...divProps } = props;
 
     useEffect(() => {
         setHelpUrl(helpUrl ?? null);
@@ -105,7 +116,19 @@ export function Canvas(props: CanvasProps) {
             }
             Blockly.Events.enable();
         }
+
+        setFeaturesReady((old) => ({ ...old, variables: true }));
     }, [memoizedSource]);
+
+    useEffect(() => {
+        workspaceRef.current?.updateToolbox(toolbox ?? EmptyToolbox);
+        workspaceRef.current?.refreshToolboxSelection();
+        setFeaturesReady((old) => ({ ...old, toolbox: true }));
+    }, [toolbox]);
+
+    useEffect(() => {
+        setIsLoading(!Object.keys(featuresReady).every((key) => featuresReady[key as keyof typeof featuresReady]));
+    }, [featuresReady]);
 
     useEffect(() => {
         const div = blocklyDiv.current;
@@ -127,11 +150,13 @@ export function Canvas(props: CanvasProps) {
                     spacing: 40,
                 },
                 trashcan: false,
-                toolbox: DefaultToolbox,
+                toolbox: toolbox ?? DefaultToolbox,
                 maxInstances: {
                     [Blocks.Names.NODE.SOURCE]: 1,
                 },
             });
+
+            setFeaturesReady((old) => ({ ...old, workspace: true }));
 
             let lastWorkspaceState: ISerializedWorkspace | undefined = undefined;
             workspaceRef.current!.addChangeListener((e) => {
@@ -241,6 +266,7 @@ export function Canvas(props: CanvasProps) {
     return (
         <>
             <div className="overflow-hidden w-fit relative">
+                <LoadingOverlay isLoading={isLoading} />
                 <div
                     {...divProps}
                     style={{ width: `${width}px`, height: `${height}px`, ...divProps.style }}

@@ -1,7 +1,6 @@
 import "@/blocks/mutators/dynamic_input_types"
 import "@/blocks/mutators/enum_select"
 import "@/blocks/mutators/column_select"
-import "@/blocks/mutators/event_select"
 import "@/blocks/mutators/variable_select"
 import "@/blocks/mutators/local_variable"
 import "@/blocks/mutators/hierarchy_select"

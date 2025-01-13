@@ -13,15 +13,16 @@ import "@/blocks/fields"
 import "@/blocks/extensions"
 import "@/blocks/mutators"
 
-import "@/blocks/definitions/math"
-import "@/blocks/definitions/enums"
-import "@/blocks/definitions/variables"
-import "@/blocks/definitions/nodes"
-import "@/blocks/definitions/comparisons"
-import "@/blocks/definitions/lists"
-import "@/blocks/definitions/structs"
-import "@/blocks/definitions/logic"
-import "@/blocks/definitions/timeline"
+import { BlockLinesDefinition, RegistrableBlock, createBlock } from "@/blocks/block_definitions"
+import * as MathBlocks from "@/blocks/definitions/math"
+import * as EnumBlocks from "@/blocks/definitions/enums"
+import * as VariableBlocks from "@/blocks/definitions/variables"
+import * as NodeBlocks from "@/blocks/definitions/nodes"
+import * as ComparisonBlocks from "@/blocks/definitions/comparisons"
+import * as ListBlocks from "@/blocks/definitions/lists"
+import * as StructBlocks from "@/blocks/definitions/structs"
+import * as LogicBlocks from "@/blocks/definitions/logic"
+import * as TimelineBlocks from "@/blocks/definitions/timeline"
 
 import "@/query/generation/comparisons"
 import "@/query/generation/variables"
@@ -53,6 +54,12 @@ import emitter, { EvaluationAction } from "./evaluation_emitter"
 import { HelpPage as HelpPageElement } from "./components/HelpPage"
 import { queryGenerator } from "@/query/query_generator"
 import { runQuery } from "@/query/query_runner"
+import { Variables } from "./blocks/toolbox/categories/variables"
+import { Nodes } from "./blocks/toolbox/categories/nodes"
+import { DefaultToolbox } from "./blocks/toolbox/default_toolbox"
+import { RegistrableExtension } from "@/blocks/block_extensions"
+import { RegistrableMutator } from "./blocks/block_mutators"
+import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox"
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `BlocklyProvider`.
@@ -151,24 +158,66 @@ const Toolbox = {
     defineToolbox,
     defineBlock,
     defineCategory,
+    Categories: {
+        Variables: Variables,
+        Nodes: Nodes
+    },
+    Defaults: {
+        Default: DefaultToolbox,
+        Complete: CompleteToolbox,
+        Empty: defineToolbox([])
+    },
     utils: {
         blockDefinitionToBlock,
         blockToBlockDefinition
     }
 }
 
-export const Evaluation = {
+const Blocks = {
+    Math: MathBlocks,
+    Enum: EnumBlocks,
+    Variable: VariableBlocks,
+    Node: NodeBlocks,
+    Comparison: ComparisonBlocks,
+    List: ListBlocks,
+    Struct: StructBlocks,
+    Logic: LogicBlocks,
+    Timeline: TimelineBlocks,
+}
+
+const Extensions = import.meta.glob("@/blocks/extensions/*.ts")
+const Mutators = import.meta.glob("@/blocks/mutators/*.ts")
+
+const Evaluation = {
     events: emitter,
     Action: EvaluationAction
 }
 
-export { Toolbox }
+// Move this to a separate file together with the block definitions
+export function getBlockDefinitionById<
+    Es extends RegistrableExtension[],
+    M extends RegistrableMutator,
+    L extends BlockLinesDefinition,
+    T extends RegistrableBlock<Es, M, L>
+>(id: T["id"] | undefined): T | undefined  {
+    if (!id) return undefined
+    return Object.entries(Blocks).flatMap(([_, category]) => Object.values(category)).find(block => block.id === id) as T | undefined
+}
+
+// Move this to a separate file together with the block definitions
+export function getBlockDefinitionNameById(id: string | undefined): string | undefined {
+    if (!id) return undefined
+    return Object.entries(Blocks).flatMap(([_, category]) => Object.entries(category)).find(([_, block]) => block.id === id)?.[0]
+}
+
+export { Toolbox, Blocks, Evaluation, Extensions, Mutators, Types, createBlock }
 
 export { DataTable, DataColumn, type DataRow, type CsvOptions, type IndexedDataRow, type ColumnType, type SerializedTable, type SerializedColumn, type TableSaveFile } from "@/data/table"
 export { type IType, type IListType, type IStructType, type IEnumType, type IEventType, type IIntervalType, type INumberType, type IStringType, type IBooleanType, type ITimestampType, type ValueOf } from "@/data/types"
-export { Types }
 export { type ISerializedWorkspace } from "./serializer"
+export { type ToolboxDefinition, type FlyoutItemInfo, type BlockInfo } from "blockly/core/utils/toolbox"
 
+// TODO: adapt this to the new query system
 export const QueryBackend = {
     generateQuery: (workspace: Blockly.Workspace) => {
         const code = queryGenerator.workspaceToCode(workspace)

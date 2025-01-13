@@ -1,5 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
-import { DataColumn, DataRow, DataTable, useQuery, Types } from "v-ice";
+import { DataColumn, DataRow, DataTable, useQuery, Types, useWorkspace } from "v-ice";
 import { faker } from "@faker-js/faker";
 
 Types.registry.registerEnum("Name", {columns: ["Name"]})
@@ -23,6 +23,8 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
     const { querySource, queryResults, setQuerySource, addTarget, removeTarget, targets } = useQuery();
     const [expandable, setExpandable] = useState(true);
     const [dataTables, setDataTables] = useState<DataTableDefinition[]>([]);
+    const { workspace } = useWorkspace();
+    const [initialized, setInitialized] = useState(false);
 
     function populateDemoData() {
         setExpandable(true);
@@ -40,6 +42,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
     }, [querySource]);
 
     useEffect(() => {
+        if (!workspace || initialized) return;
         const savedQuerySource = JSON.parse(localStorage.getItem("querySource") ?? "null");
         if (savedQuerySource) {
             setQuerySource(DataTable.fromJSON(savedQuerySource));
@@ -51,8 +54,9 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
         // FIXME: should not be needed for most basic cases, default target should automatically be added
         const baseTargetId = addTarget("Target")
         setDataTables([{ name: "Source", type: "SOURCE", immutable: true }, { name: "Target", type: "TARGET", immutable: false, uid: baseTargetId }]);
+        setInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [workspace]);
 
     function dataIsLikeDemoData(data: DataTable) {
         return data.getColumns().every((column, index) => {

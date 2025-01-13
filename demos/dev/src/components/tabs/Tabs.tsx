@@ -5,9 +5,10 @@ import DockRight from "../../assets/dock-right.svg?react";
 
 export function Tabs(props: React.HTMLProps<HTMLDivElement> & { orientation: "horizontal" | "vertical", setOrientation: (orientation: "horizontal" | "vertical") => void }) {
     const { setActiveTab, activeTab } = useContext(TabContext);
+    const { orientation, setOrientation, ...rest } = props;
 
     return (
-        <div {...props} className="flex flex-col h-full">
+        <div {...rest} className="flex flex-col h-full">
             <div>
                 <div className="flex flex-row bg-gray-100 w-full justify-between">
                     <div className="flex flex-row shrink-1 overflow-x-auto">
@@ -29,10 +30,10 @@ export function Tabs(props: React.HTMLProps<HTMLDivElement> & { orientation: "ho
                             })}
                     </div>
                     <div className="flex flex-row items-center border border-gray-200 overflow-hidden cursor-pointer text-gray-800 w-fit shrink-0">
-                        <div className={`flex items-center justify-center h-full p-0.5 px-1 ${props.orientation === "vertical" ? "bg-gray-300" : "bg-white"}`} onClick={() => props.setOrientation("vertical")}>
+                        <div className={`flex items-center justify-center h-full p-0.5 px-1 ${orientation === "vertical" ? "bg-gray-300" : "bg-white"}`} onClick={() => setOrientation("vertical")}>
                             <DockBottom className="w-4 h-4" />
                         </div>
-                        <div className={`flex items-center justify-center h-full p-0.5 px-1 ${props.orientation === "horizontal" ? "bg-gray-300" : "bg-white"}`} onClick={() => props.setOrientation("horizontal")}>
+                        <div className={`flex items-center justify-center h-full p-0.5 px-1 ${orientation === "horizontal" ? "bg-gray-300" : "bg-white"}`} onClick={() => setOrientation("horizontal")}>
                             <DockRight className="w-4 h-4" />
                         </div>
                     </div>

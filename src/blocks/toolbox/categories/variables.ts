@@ -36,7 +36,9 @@ export class Variables {
             gap: "24",
             fields: {
                 VAR: {
-                    id: variable.getId()
+                    id: variable.getId(),
+                    name: variable.name,
+                    type: variable.type
                 }
             }
         }

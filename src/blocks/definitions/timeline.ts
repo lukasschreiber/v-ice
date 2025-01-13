@@ -7,7 +7,6 @@ import { DynamicEventExtension } from "../extensions/dynamic_event";
 import { DynamicEventMatchesExtension } from "../extensions/dynamic_event_matches";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { EitherOrMutator } from "../mutators/either_or";
-import { EventSelectMutator } from "../mutators/event_select";
 import { EventDoesNotOccurForMutator } from "../mutators/event_does_not_occur_for";
 
 export const TimelineQueryBlock = createBlock({
@@ -269,27 +268,6 @@ export const TimelineDateBlock = createBlock({
     output: types.timestamp,
     color: Colors.categories.history,
     extensions: [ParentColorExtension],
-})
-
-export const TimelineEventBlock = createBlock({
-    id: Blocks.Names.TIMELINE.EVENT_PICKER,
-    lines: [
-        {
-            text: "%1",
-            args: [
-                {
-                    type: "field_event",
-                    name: "EVENT",
-                    options: [
-                        ["", ""],
-                    ],
-                }
-            ]
-        }
-    ] as const,
-    output: types.event(types.enum(types.wildcard)),
-    color: Colors.categories.history,
-    mutator: EventSelectMutator
 })
 
 export const TimelineOrBlock = createBlock({

@@ -6,6 +6,7 @@ import { Renderer } from "./renderer/renderer"
 import { BlockSvg } from "./block_svg"
 import { Block } from "./block"
 import { EvaluationAction, triggerAction } from "./evaluation_emitter"
+import { ToolboxInfo } from "blockly/core/utils/toolbox"
 
 /**
  * If a node block is removed we need to remove all connections that are connected to it
@@ -23,6 +24,24 @@ Blockly.WorkspaceSvg.prototype.removeBlockById = function (id: string) {
 
     this.getSvgGroup().querySelector(".blocklyLinkCanvas")?.querySelectorAll(`[data-id="${id}"]`).forEach((element) => element.remove())
     Blockly.Events.setGroup(false)
+}
+
+/**
+ * This is needed to make sure that the custom category is registered with the workspace if the workspace is not initialized with these categories
+ * TODO: check if isHidden needs to be checked here as well
+ */
+const updateToolbox = Blockly.WorkspaceSvg.prototype.updateToolbox
+Blockly.WorkspaceSvg.prototype.updateToolbox = function (toolboxDefinition: Blockly.utils.toolbox.ToolboxDefinition | null) {
+    if (toolboxDefinition && toolboxDefinition.hasOwnProperty("contents")) {
+        (toolboxDefinition as ToolboxInfo).contents.map((category) => {
+            if (category.hasOwnProperty("custom")) {
+                const customCategory = category as Blockly.utils.toolbox.DynamicCategoryInfo & { register?: (workspace: Blockly.WorkspaceSvg) => void }
+                customCategory.register?.call(this, this)
+            }
+            return category
+        })
+    }
+    updateToolbox.call(this, toolboxDefinition)
 }
 
 /**

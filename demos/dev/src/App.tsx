@@ -1,4 +1,4 @@
-import { Canvas, useGeneratedCode } from "v-ice";
+import { Canvas, useGeneratedCode, ToolboxDefinition, Toolbox } from "v-ice";
 import { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab } from "./components/tabs/Tabs";
 import { Code } from "./components/Code";
@@ -6,14 +6,16 @@ import { DataPanel } from "./components/tabs/DataPanel";
 import { useLocalStorage } from "v-ice-commons";
 import { MiscPanel } from "./components/tabs/MiscPanel";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
+import { ToolboxPanel } from "./components/tabs/ToolboxPanel";
 
 function App() {
     const [language] = useState(localStorage.getItem("language") ?? "en");
     const { code, json, xml, queryJson } = useGeneratedCode();
-    const [width, setWidth] = useState(document.documentElement.clientWidth - 500); // TODO: this is a hack
-    const [height, setHeight] = useState(document.documentElement.clientHeight);
+    const [width, setWidth] = useState(0);
+    const [height, setHeight] = useState(0);
     const [size, setSize] = useState(75);
     const [orientation, setOrientation] = useLocalStorage<"horizontal" | "vertical">("panel-direction", "horizontal");
+    const [toolbox, setToolbox] = useState<ToolboxDefinition>(Toolbox.Defaults.Complete);
 
     useEffect(() => {
         window.addEventListener("resize", () => {
@@ -45,7 +47,7 @@ function App() {
         <>
             <PanelGroup autoSaveId={"main-panel"} direction={orientation} className="!w-screen !h-screen">
                 <Panel defaultSize={75} onResize={(size) => handleResize(size)} className="border-r border-solid border-gray-200">
-                    <Canvas width={width} height={height} language={language} media="/media/" />
+                    <Canvas width={width} height={height} language={language} media="/media/" toolbox={toolbox} />
                 </Panel>
                 <PanelResizeHandle />
                 <Panel defaultSize={25}>
@@ -56,10 +58,13 @@ function App() {
                         <Tab label="Misc" description="Some random functions">
                             <MiscPanel />
                         </Tab>
+                        <Tab label="Toolbox" description="Toolbox configuration">
+                            <ToolboxPanel toolbox={toolbox} setToolbox={setToolbox} />
+                        </Tab>
                         <Tab label="Code" description="The generated JavaScript code">
                             <Code language="typescript" code={code === "" ? "// no code" : code.split("\n\n\n")[1]} />
                         </Tab>
-                        <Tab label="QueryJSON" description="The generated JSON reperesentation of the code">
+                        <Tab label="AST" description="The generated JSON reperesentation of the code">
                             <Code language="json" code={queryJson} />
                         </Tab>
                         <Tab label="JSON" description="The worspace as JSON">
