@@ -33,8 +33,8 @@ export const MathMinusBlock = createBlock({
             operation: "binary_math_operation",
             args: {
                 operator: {value: "SUBTRACTION"},
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B"),
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B"),
             }
         }
     }
@@ -68,8 +68,8 @@ export const MathPlusBlock = createBlock({
             operation: "binary_math_operation",
             args: {
                 operator: {value: "ADDITION"},
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B"),
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B"),
             }
         }
     }
@@ -103,8 +103,8 @@ export const MathTimesBlock = createBlock({
             operation: "binary_math_operation",
             args: {
                 operator: {value: "MULTIPLICATION"},
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B"),
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B"),
             }
         }
     }
@@ -138,8 +138,8 @@ export const MathDividedByBlock = createBlock({
             operation: "binary_math_operation",
             args: {
                 operator: {value: "DIVISION"},
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B"),
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B"),
             }
         }
     }
@@ -162,7 +162,7 @@ export const NumberBlock = createBlock({
     output: t.number,
     style: "math_blocks",
     code: (scope) => {
-        return scope.generateForField("NUM", v => parseFloat(v || "0"))
+        return scope.buildASTForField("NUM", v => parseFloat(v || "0"))
     }
 })
 
@@ -205,9 +205,9 @@ export const MathBinaryOperationBlock = createBlock({
         return {
             operation: "binary_math_operation",
             args: {
-                operator: scope.generateForField("OP"),
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B"),
+                operator: scope.buildASTForField("OP"),
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B"),
             }
         }
     }
@@ -249,8 +249,8 @@ export const MathNumberPropertyBlock = createBlock({
         return {
             operation: "number_property",
             args: {
-                property: scope.generateForField("PROPERTY"),
-                a: scope.generateForInput("NUM"),
+                property: scope.buildASTForField("PROPERTY"),
+                a: scope.buildASTForInput("NUM"),
             }
         }
     }
@@ -297,8 +297,8 @@ export const MathUnaryOperationBlock = createBlock({
         return {
             operation: "unary_math_operation",
             args: {
-                operator: scope.generateForField("OP"),
-                a: scope.generateForInput("NUM"),
+                operator: scope.buildASTForField("OP"),
+                a: scope.buildASTForInput("NUM"),
             }
         }
     }
@@ -327,7 +327,7 @@ export const MathConstantsBlock = createBlock({
     style: "math_blocks",
     helpUrl: "#math-constants",
     code: (scope) => {
-        return scope.generateForField("CONSTANT")
+        return scope.buildASTForField("CONSTANT")
     }
 })
 
@@ -363,9 +363,9 @@ export const MathConstrainBlock = createBlock({
         return {
             operation: "constrain",
             args: {
-                a: scope.generateForInput("NUM"),
-                low: scope.generateForInput("LOW"),
-                high: scope.generateForInput("HIGH"),
+                a: scope.buildASTForInput("NUM"),
+                low: scope.buildASTForInput("LOW"),
+                high: scope.buildASTForInput("HIGH"),
             }
         }
     }

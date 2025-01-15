@@ -26,7 +26,7 @@ export const HierarchySelectBlock = createBlock({
         return {
             operation: "hierarchy",
             args: {
-                name: scope.generateForField("HIERARCHY"),
+                name: scope.buildASTForField("HIERARCHY"),
             }
         }
     }

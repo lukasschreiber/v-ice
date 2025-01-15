@@ -36,10 +36,10 @@ import { ToolboxButton, ToolboxButtonStack } from "./ToolboxButton";
 import { showHelp } from "@/store/help/help_emitter";
 import { useHelp } from "@/store/help/help_hooks";
 import { Tooltip } from "./common/Tooltip";
-import { getQueryGeneratorInstance } from "@/query/builder/query_generator_instance";
 import { EmptyToolbox } from "@/blocks/toolbox/empty_toolbox";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 import { LoadingOverlay } from "./common/LoadingOverlay";
+import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -229,7 +229,7 @@ export function Canvas(props: CanvasProps) {
                 return;
 
             const query = queryGenerator.workspaceToCode(workspace!);
-            const queryJsonCode = JSON.stringify(getQueryGeneratorInstance().generateQuery(workspace!), null, 2);
+            const queryJsonCode = JSON.stringify(getASTBuilderInstance().build(workspace!), null, 2);
             if (code !== query) {
                 dispatch(setCode(query));
             }

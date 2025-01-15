@@ -1,10 +1,10 @@
-export interface QueryTree {
-    root: QueryNode
-    sets: QueryNode[]
-    targets: QueryNode[]
+export interface AST {
+    root: ASTNode
+    sets: ASTNode[]
+    targets: ASTNode[]
 } 
 
-export interface QueryNode {
+export interface ASTNode {
     id: string
     attributes: Record<string, any>
 }
@@ -15,25 +15,25 @@ export interface JSONSerializableRecord {
 }
 export type JSONSerializable = JSONSerializablePrimitive | JSONSerializableRecord | JSONSerializablePrimitive[] | JSONSerializableRecord[]
 
-export interface QueryPrimitive {
+export interface ASTPrimitive {
     value: JSONSerializable
 }
 
-export interface QueryNodeInput {
+export interface ASTNodeInput {
     node: string
     output?: string
 }
 
-export interface InputQueryNode extends QueryNode {
-    inputs: Record<string, QueryNodeInput[]>
+export interface InputASTNode extends ASTNode {
+    inputs: Record<string, ASTNodeInput[]>
 }
 
-export interface SubsetQueryNode extends InputQueryNode {
-    operations: QueryOperation[]
+export interface SubsetASTNode extends InputASTNode {
+    operations: ASTOperation[]
 }
 
-export interface QueryOperation {
+export interface ASTOperation {
     operation: string
     // maybe only support positional arguments because the names are only used internally
-    args: Record<string, QueryOperation | QueryPrimitive | QueryOperation[]>
+    args: Record<string, ASTOperation | ASTPrimitive | ASTOperation[]>
 }

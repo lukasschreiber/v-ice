@@ -25,7 +25,7 @@ export const StringBlock = createBlock({
         return {
             operation: "string",
             args: {
-                value: scope.generateForField("VALUE"),
+                value: scope.buildASTForField("VALUE"),
             }
         }
     }

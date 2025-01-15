@@ -26,7 +26,7 @@ export const EnumSelectBlock = createBlock({
         return {
             operation: "enum",
             args: {
-                name: scope.generateForField("ENUM"),
+                name: scope.buildASTForField("ENUM"),
             }
         }
     }

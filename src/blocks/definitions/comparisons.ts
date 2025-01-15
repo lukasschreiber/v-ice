@@ -37,9 +37,9 @@ export const EqualsWithinBlock = createBlock({
         return {
             operation: "equals_within",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B"),
-                delta: scope.generateForInput("DELTA")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B"),
+                delta: scope.buildASTForInput("DELTA")
             }
         }
     }
@@ -73,8 +73,8 @@ export const EqualsBlock = createBlock({
         return {
             operation: "equals",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B")
             }
         }
     }
@@ -108,8 +108,8 @@ export const MatchesBlock = createBlock({
         return {
             operation: "matches",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B")
             }
         }
     }
@@ -143,8 +143,8 @@ export const GreaterBlock = createBlock({
         return {
             operation: "greater",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B")
             }
         }
     }
@@ -178,8 +178,8 @@ export const LessBlock = createBlock({
         return {
             operation: "less",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B")
             }
         }
     }
@@ -213,8 +213,8 @@ export const LessEqualsBlock = createBlock({
         return {
             operation: "less_equals",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B")
             }
         }
     }
@@ -248,8 +248,8 @@ export const GreaterEqualsBlock = createBlock({
         return {
             operation: "greater_equals",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B")
             }
         }
     }
@@ -293,9 +293,9 @@ export const CompareNumbersBlock = createBlock({
         return {
             operation: "compare_numbers",
             args: {
-                a: scope.generateForInput("A"),
-                b: scope.generateForInput("B"),
-                operator: scope.generateForField("OP")
+                a: scope.buildASTForInput("A"),
+                b: scope.buildASTForInput("B"),
+                operator: scope.buildASTForField("OP")
             }
         }
     }
@@ -334,9 +334,9 @@ export const CompareIntervalBlock = createBlock({
         return {
             operation: "compare_interval",
             args: {
-                a: scope.generateForInput("A"),
-                min: scope.generateForInput("B"),
-                max: scope.generateForInput("C")
+                a: scope.buildASTForInput("A"),
+                min: scope.buildASTForInput("B"),
+                max: scope.buildASTForInput("C")
             }
         }
     }
@@ -364,7 +364,7 @@ export const IsNullBlock = createBlock({
         return {
             operation: "is_null",
             args: {
-                a: scope.generateForInput("A")
+                a: scope.buildASTForInput("A")
             }
         }
     }

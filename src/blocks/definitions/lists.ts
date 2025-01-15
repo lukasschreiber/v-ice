@@ -49,8 +49,8 @@ export const ListArithmeticBlock = createBlock({
         return {
             operation: "unary_list_operation",
             args: {
-                operator: scope.generateForField("OP"),
-                list: scope.generateForInput("LIST"),
+                operator: scope.buildASTForField("OP"),
+                list: scope.buildASTForInput("LIST"),
             },
         }
     }
@@ -78,7 +78,7 @@ export const ListLengthBlock = createBlock({
         return {
             operation: "list_length",
             args: {
-                list: scope.generateForInput("LIST"),
+                list: scope.buildASTForInput("LIST"),
             }
         }
     }
@@ -112,8 +112,8 @@ export const ListContainsBlock = createBlock({
         return {
             operation: "list_contains",
             args: {
-                list: scope.generateForInput("LIST"),
-                value: scope.generateForInput("VALUE"),
+                list: scope.buildASTForInput("LIST"),
+                value: scope.buildASTForInput("VALUE"),
             }
         }
     }
@@ -166,10 +166,10 @@ export const ListAnyAllBlock = createBlock({
         return {
             operation: "list_any_all",
             args: {
-                operation: scope.generateForField("OP"),
-                value: scope.generateForField("VALUE"),
-                list: scope.generateForInput("LIST"),
-                query: scope.generateForStatementInput("QUERY"),
+                operation: scope.buildASTForField("OP"),
+                value: scope.buildASTForField("VALUE"),
+                list: scope.buildASTForInput("LIST"),
+                query: scope.buildASTForStatementInput("QUERY"),
             }
         }
     }
@@ -244,9 +244,9 @@ export const ListEqualsBlock = createBlock({
         return {
             operation: "list_equals",
             args: {
-                a: scope.generateForInput("LIST1"),
-                b: scope.generateForInput("LIST2"),
-                operator: scope.generateForField("OP"),
+                a: scope.buildASTForInput("LIST1"),
+                b: scope.buildASTForInput("LIST2"),
+                operator: scope.buildASTForField("OP"),
             }
         }
     }

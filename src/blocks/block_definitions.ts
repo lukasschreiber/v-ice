@@ -2,10 +2,10 @@ import { IType } from "@/data/types"
 import * as Blockly from "blockly/core"
 import { BlockExtension, ExtensionMixins, RegistrableExtension } from "@/blocks/block_extensions"
 import { MutatorMixin, RegistrableMutator } from "./block_mutators"
-import { BlockQueryGenerator, NodeBlockQueryGenerator } from "@/query/builder/query_generator"
-import { QueryNode, QueryOperation, QueryPrimitive } from "@/query/builder/query_tree"
 import { NodeExtension, NodeBlockExtension } from "./extensions/node"
-import { getQueryGeneratorInstance } from "@/query/builder/query_generator_instance"
+import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance"
+import { ASTNode, ASTOperation, ASTPrimitive } from "@/query/builder/ast"
+import { BlockASTBuilder, NodeBlockASTBuilder } from "@/query/builder/ast_builder"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -67,9 +67,9 @@ function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], 
         // TODO this could probably have nicer types but at the moment it's not worth the effort
 
         if (extensions.includes(getExtensionInstance(NodeBlockExtension).name)) {
-            getQueryGeneratorInstance().registerNode(block.id, block, block.code as (...args: any[]) => QueryNode)
+            getASTBuilderInstance().registerNode(block.id, block, block.code as (...args: any[]) => ASTNode)
         } else {
-            getQueryGeneratorInstance().registerOperation(block.id, block, block.code as (...args: any[]) => QueryOperation)
+            getASTBuilderInstance().registerOperation(block.id, block, block.code as (...args: any[]) => ASTOperation)
         }
     }
 
@@ -158,8 +158,8 @@ export interface RegistrableBlock<
     extensions?: Es
     data?: object | string
     code?: (
-        scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockQueryGenerator<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
-    ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? QueryNode : QueryOperation | QueryPrimitive
+        scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
+    ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? ASTNode : ASTOperation | ASTPrimitive
 }
 
 export type FieldDefinition = {

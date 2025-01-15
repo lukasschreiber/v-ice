@@ -48,8 +48,8 @@ export const ProperySelectBlock = createBlock({
         return {
             operation: "get_struct_property",
             args: {
-                property: scope.generateForField("PROPERTY"),
-                struct: scope.generateForInput("STRUCT"),
+                property: scope.buildASTForField("PROPERTY"),
+                struct: scope.buildASTForInput("STRUCT"),
             }
         }
     }

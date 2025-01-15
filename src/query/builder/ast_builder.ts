@@ -1,41 +1,41 @@
 import * as Blockly from "blockly/core";
-import { QueryNode, QueryNodeInput, QueryOperation, QueryPrimitive, QueryTree } from "./query_tree";
 import { Blocks } from "@/blocks";
 import { bfsWithDependencies } from "@/utils/nodes";
 import { NodeBlock } from "@/blocks/extensions/node";
 import { AnyRegistrableBlock, BlockFieldNames, BlockInputNames, BlockLinesDefinition, ConnectionPointNames, StatementInputTypeNames } from "@/blocks/block_definitions";
+import { AST, ASTNode, ASTNodeInput, ASTOperation, ASTPrimitive } from "./ast";
 
-type GeneratorFn<B extends Blockly.Block, S extends ScopeQueryGenerator<B>, R extends QueryNode | QueryOperation | QueryPrimitive> = (scope: S) => R
+type GeneratorFn<B extends Blockly.Block, S extends ScopeASTBuilder<B>, R extends ASTNode | ASTOperation | ASTPrimitive> = (scope: S) => R
 
-export type NodeGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends QueryNode> = GeneratorFn<B, NodeBlockQueryGenerator<L, D, B>, R>
-export type OperationGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends QueryOperation | QueryPrimitive> = GeneratorFn<B, BlockQueryGenerator<L, D, B>, R>
+export type NodeGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends ASTNode> = GeneratorFn<B, NodeBlockASTBuilder<L, D, B>, R>
+export type OperationGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends ASTOperation | ASTPrimitive> = GeneratorFn<B, BlockASTBuilder<L, D, B>, R>
 
-export class QueryGenerator {
+export class ASTBuilder {
     ROOT_NODE = "root"
 
-    public registerNode<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends QueryNode>(name: string, definition: D, generator: GeneratorFn<B, NodeBlockQueryGenerator<L, D, B>, R>) {
+    public registerNode<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends ASTNode>(name: string, definition: D, generator: GeneratorFn<B, NodeBlockASTBuilder<L, D, B>, R>) {
         if (this.nodeSnippets[name]) {
             throw new Error(`Node ${name} already registered`)
         }
 
         console.log("Registering node", name)
         // TODO: Types are strange...
-        this.nodeSnippets[name] = generator as unknown as GeneratorFn<B, NodeBlockQueryGenerator<L, D, B>, R>
+        this.nodeSnippets[name] = generator as unknown as GeneratorFn<B, NodeBlockASTBuilder<L, D, B>, R>
         this.definitions[name] = definition
     }
 
-    public registerOperation<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends QueryOperation>(name: string, definition: D, generator: GeneratorFn<B, BlockQueryGenerator<L, D, B>, R>) {
+    public registerOperation<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends ASTOperation>(name: string, definition: D, generator: GeneratorFn<B, BlockASTBuilder<L, D, B>, R>) {
         if (this.operationSnippets[name]) {
             throw new Error(`Operation ${name} already registered`)
         }
-        this.operationSnippets[name] = generator as unknown as GeneratorFn<B, BlockQueryGenerator<L, D, B>, R>
+        this.operationSnippets[name] = generator as unknown as GeneratorFn<B, BlockASTBuilder<L, D, B>, R>
         this.definitions[name] = definition
     }
 
-    public generateQuery(workspace: Blockly.Workspace): QueryTree {
+    public build(workspace: Blockly.Workspace): AST {
         const root = workspace.getBlocksByType(Blocks.Names.NODE.SOURCE)?.[0]
         if (!root) {
-            return this.emptyQuery()
+            return this.emptyAST()
         }
 
         const sortedNodes = bfsWithDependencies(root as NodeBlock)
@@ -50,12 +50,12 @@ export class QueryGenerator {
                     name: this.ROOT_NODE
                 }
             },
-            sets: subsetBlocks.map(block => this.generateForNode(block)),
-            targets: targetBlocks.map(block => this.generateForNode(block))
+            sets: subsetBlocks.map(block => this.buildASTForNode(block)),
+            targets: targetBlocks.map(block => this.buildASTForNode(block))
         }
     }
 
-    public emptyQuery(): QueryTree {
+    public emptyAST(): AST {
         return {
             root: {
                 id: this.ROOT_NODE,
@@ -68,40 +68,40 @@ export class QueryGenerator {
         }
     }
 
-    public generateForNode<
+    public buildASTForNode<
         L extends BlockLinesDefinition,
         B extends NodeBlock,
-        R extends QueryNode
+        R extends ASTNode
     >(block: B) {
         const generator = this.nodeSnippets[block.type] as NodeGeneratorFn<L, AnyRegistrableBlock<L>, B, R>
-        return generator(new NodeBlockQueryGenerator(this.definitions[block.type], block, this))
+        return generator(new NodeBlockASTBuilder(this.definitions[block.type], block, this))
     }
 
-    public generateForOperationBlock<
+    public buildASTForOperationBlock<
         L extends BlockLinesDefinition,
         B extends Blockly.Block,
-        R extends QueryOperation | QueryPrimitive
+        R extends ASTOperation | ASTPrimitive
     >(block: B) {
         const generator = this.operationSnippets[block.type] as OperationGeneratorFn<L, AnyRegistrableBlock<L>, B, R>
         if (!generator) {
             throw new Error(`No generator found for block ${block.type}`)
         }
-        return generator(new BlockQueryGenerator(this.definitions[block.type], block, this))
+        return generator(new BlockASTBuilder(this.definitions[block.type], block, this))
     }
 
-    private nodeSnippets: Record<string, GeneratorFn<any, NodeBlockQueryGenerator<any[], any, any>, QueryNode>> = {}
-    private operationSnippets: Record<string, GeneratorFn<any, BlockQueryGenerator<any[], any, any>, QueryOperation | QueryPrimitive>> = {}
+    private nodeSnippets: Record<string, GeneratorFn<any, NodeBlockASTBuilder<any[], any, any>, ASTNode>> = {}
+    private operationSnippets: Record<string, GeneratorFn<any, BlockASTBuilder<any[], any, any>, ASTOperation | ASTPrimitive>> = {}
     private definitions: Record<string, AnyRegistrableBlock<any>> = {}
 }
 
-interface ScopeQueryGenerator<B extends Blockly.Block> {
+interface ScopeASTBuilder<B extends Blockly.Block> {
     block: B
 }
 
-export class BlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block> implements ScopeQueryGenerator<B> {
-    constructor(public definition: D, public block: B, public generator: QueryGenerator) { }
+export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block> implements ScopeASTBuilder<B> {
+    constructor(public definition: D, public block: B, public generator: ASTBuilder) { }
 
-    public generateForInput(name: BlockInputNames<L, D>): QueryOperation | QueryPrimitive {
+    public buildASTForInput(name: BlockInputNames<L, D>): ASTOperation | ASTPrimitive {
         const input = this.block.getInput(name);
         if (!input) {
             throw ReferenceError(`Input "${name}" doesn't exist on "${this.block.type}"`);
@@ -113,35 +113,35 @@ export class BlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRe
             return { value: this.block.getFieldValue(name) }
         }
 
-        return this.generator.generateForOperationBlock(targetBlock);
+        return this.generator.buildASTForOperationBlock(targetBlock);
     }
 
-    public generateForUnknownInput(name: BlockInputNames<L, D> | string): QueryOperation | QueryPrimitive {
-        return this.generateForInput(name as BlockInputNames<L, D>);
+    public buildASTForUnknownInput(name: BlockInputNames<L, D> | string): ASTOperation | ASTPrimitive {
+        return this.buildASTForInput(name as BlockInputNames<L, D>);
     }
 
-    public generateForField(name: BlockFieldNames<L, D>, fn: (value: string) => QueryPrimitive["value"] = (value) => value): QueryOperation | QueryPrimitive {
+    public buildASTForField(name: BlockFieldNames<L, D>, fn: (value: string) => ASTPrimitive["value"] = (value) => value): ASTOperation | ASTPrimitive {
         return { value: fn(this.block.getFieldValue(name)) }
     }
 
-    public generateForUnknownStatementInput(name: StatementInputTypeNames<L, D> | string): (QueryOperation | QueryPrimitive)[] {
-        return this.generateForStatementInput(name as StatementInputTypeNames<L, D>);
+    public buildASTForUnknownStatementInput(name: StatementInputTypeNames<L, D> | string): (ASTOperation | ASTPrimitive)[] {
+        return this.buildASTForStatementInput(name as StatementInputTypeNames<L, D>);
     }
 
-    public generateForStatementInput(name: StatementInputTypeNames<L, D>): QueryOperation[] {
+    public buildASTForStatementInput(name: StatementInputTypeNames<L, D>): ASTOperation[] {
         let targetBlock = this.block.getInputTargetBlock(name);
         if (!targetBlock && !this.block.getInput(name)) {
             throw ReferenceError(`Input "${name}" doesn't exist on "${this.block.type}"`);
         }
 
-        const segments: QueryOperation[] = []
+        const segments: ASTOperation[] = []
         while (targetBlock) {
-            const segment = this.generator.generateForOperationBlock(targetBlock);
-            if ((segment as QueryPrimitive).value) {
+            const segment = this.generator.buildASTForOperationBlock(targetBlock);
+            if ((segment as ASTPrimitive).value) {
                 throw new Error(`Unexpected primitive value in statement input ${name}`)
             }
 
-            segments.push(segment as QueryOperation);
+            segments.push(segment as ASTOperation);
             targetBlock = targetBlock.getNextBlock();
         }
 
@@ -157,9 +157,9 @@ export class BlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRe
     }
 }
 
-export class NodeBlockQueryGenerator<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock> extends BlockQueryGenerator<L, D, B> {
+export class NodeBlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock> extends BlockASTBuilder<L, D, B> {
 
-    public generateForConnectionPoint(inputName: ConnectionPointNames<L, D>): QueryNodeInput | QueryNodeInput[] {
+    public buildASTForConnectionPoint(inputName: ConnectionPointNames<L, D>): ASTNodeInput | ASTNodeInput[] {
         const connection = this.block.edgeConnections.get(inputName);
 
         const connections = connection?.connections
@@ -175,7 +175,7 @@ export class NodeBlockQueryGenerator<L extends BlockLinesDefinition, D extends A
                     }
                     : { node: targetBlock.id, output: null };
             })
-            .filter(Boolean) as QueryNodeInput[];
+            .filter(Boolean) as ASTNodeInput[];
 
         return connections?.length ? (connections.length === 1 ? connections[0] : connections) : [];
     }

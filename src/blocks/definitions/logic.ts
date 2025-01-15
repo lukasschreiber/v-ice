@@ -46,14 +46,14 @@ export const LogicOrBlock = createBlock({
 
         const additionalArgs: { [key: string]: any } = {}
         scope.block.getAdditionalOrBranchInputNames().forEach((name, i) => {
-            additionalArgs[`OR_STATEMENT_${i + 2}`] = scope.generateForUnknownStatementInput(name)
+            additionalArgs[`OR_STATEMENT_${i + 2}`] = scope.buildASTForUnknownStatementInput(name)
         })
 
         return {
             operation: "or",
             args: {
-                OR_STATEMENT_0: scope.generateForStatementInput("OR_STATEMENT_0"),
-                OR_STATEMENT_1: scope.generateForStatementInput("OR_STATEMENT_1"),
+                OR_STATEMENT_0: scope.buildASTForStatementInput("OR_STATEMENT_0"),
+                OR_STATEMENT_1: scope.buildASTForStatementInput("OR_STATEMENT_1"),
                 ...additionalArgs,
             },
         }
@@ -85,7 +85,7 @@ export const LogicNotBlock = createBlock({
         return {
             operation: "not",
             args: {
-                STATEMENTS: scope.generateForStatementInput("STATEMENTS"),
+                STATEMENTS: scope.buildASTForStatementInput("STATEMENTS"),
             }
         }
     }
