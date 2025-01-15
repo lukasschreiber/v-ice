@@ -1,6 +1,6 @@
 
-export interface QueryClientParams {
-    mode: "remote" | "local";
+export interface QueryClientParams<T extends "remote" | "local" = "remote" | "local"> {
+    mode: T;
 }
 
 export abstract class QueryClient {
@@ -10,5 +10,5 @@ export abstract class QueryClient {
         this.mode = params.mode;
     }
 
-    public abstract query(query: string): Promise<any>
+    public abstract execute(query: string): Promise<any>
 }

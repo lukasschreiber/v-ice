@@ -17,6 +17,7 @@ export type JSONSerializable = JSONSerializablePrimitive | JSONSerializableRecor
 
 export interface ASTPrimitive {
     value: JSONSerializable
+    // type: string
 }
 
 export interface ASTNodeInput {
@@ -34,6 +35,7 @@ export interface SubsetASTNode extends InputASTNode {
 
 export interface ASTOperation {
     operation: string
+    // type: string
     // maybe only support positional arguments because the names are only used internally
     args: Record<string, ASTOperation | ASTPrimitive | ASTOperation[]>
 }

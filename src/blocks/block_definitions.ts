@@ -157,7 +157,7 @@ export interface RegistrableBlock<
     mutator?: M
     extensions?: Es
     data?: object | string
-    code?: (
+    code: (
         scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
     ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? ASTNode : ASTOperation | ASTPrimitive
 }
