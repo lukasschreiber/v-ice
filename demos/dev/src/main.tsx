@@ -5,13 +5,16 @@ import { BlocklyProvider } from "@/main";
 import { TabContextProvider } from "./components/tabs/TabContext";
 import "./style.css";
 import { DataContextProvider } from "./components/DataContext";
+import { StoreWorkspaceContextProvider } from "./components/StoreWorkspaceContext";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <BlocklyProvider>
             <TabContextProvider>
                 <DataContextProvider>
-                    <App />
+                    <StoreWorkspaceContextProvider>
+                        <App />
+                    </StoreWorkspaceContextProvider>
                 </DataContextProvider>
             </TabContextProvider>
         </BlocklyProvider>

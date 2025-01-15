@@ -1,39 +1,14 @@
-import { useContext, useEffect, useRef, useState } from "react";
-import { ISerializedWorkspace, useWorkspace, WorkspacePreview } from "v-ice";
-import { Button, useLocalStorage } from "v-ice-commons";
-import { DataContext } from "../DataContext";
+import { useContext, useRef, useState } from "react";
+import { useWorkspace, WorkspacePreview } from "v-ice";
+import { Button } from "v-ice-commons";
 import { Accordion } from "../Accordion";
+import { StoreWorkspaceContext } from "../StoreWorkspaceContext";
 
 export function WorkspaceSavePanel() {
     const { workspace, load, save } = useWorkspace();
     const [workspaceNames, setWorkspaceNames] = useState<Record<number, string>>({});
     const currentWorkspaceWrapperRef = useRef<HTMLDivElement>(null);
-    const [savedCurrentWorkspace, setSavedCurrentWorkspace] = useLocalStorage<ISerializedWorkspace | null>(
-        "dev-saved-current-workspace",
-        null
-    );
-    const [initialized, setInitialized] = useState(false);
-    const { dataIsInitialized } = useContext(DataContext);
-    const [savedWorkspaces, setSavedWorkspaces] = useLocalStorage<{ name: string; worksapce: ISerializedWorkspace }[]>(
-        "dev-saved-workspaces",
-        []
-    );
-
-    useEffect(() => {
-        if (
-            workspace &&
-            savedCurrentWorkspace &&
-            workspace.getAllBlocks().length === 0 &&
-            !initialized &&
-            dataIsInitialized
-        ) {
-            load(savedCurrentWorkspace);
-            setInitialized(true);
-            workspace?.addChangeListener(() => {
-                setSavedCurrentWorkspace(save());
-            });
-        }
-    }, [workspace, dataIsInitialized]);
+    const { savedWorkspaces, setSavedWorkspaces } = useContext(StoreWorkspaceContext);
 
     return (
         <div className="text-xs p-1">
