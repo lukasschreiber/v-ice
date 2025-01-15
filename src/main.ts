@@ -108,8 +108,8 @@ export function useWorkspace() {
     const workspaceRef = useContext(WorkspaceContext).workspaceRef
     return {
         workspace: workspaceRef.current!,
-        load: (state: ISerializedWorkspace) => deserializeWorkspace(workspaceRef.current!, state),
-        save: () => serializeWorkspace(workspaceRef.current!),
+        load: (state: ISerializedWorkspace, target: Blockly.WorkspaceSvg = workspaceRef.current!) => deserializeWorkspace(target, state),
+        save: (workspace: Blockly.WorkspaceSvg = workspaceRef.current!) => serializeWorkspace(workspace),
         clear: () => clearWorkspace(workspaceRef.current!)
     }
 }
@@ -216,6 +216,8 @@ export { DataTable, DataColumn, type DataRow, type CsvOptions, type IndexedDataR
 export { type IType, type IListType, type IStructType, type IEnumType, type IEventType, type IIntervalType, type INumberType, type IStringType, type IBooleanType, type ITimestampType, type ValueOf } from "@/data/types"
 export { type ISerializedWorkspace } from "./serializer"
 export { type ToolboxDefinition, type FlyoutItemInfo, type BlockInfo } from "blockly/core/utils/toolbox"
+export { BlockPreview } from "@/components/common/BlockPreview"
+export { WorkspacePreview } from "@/components/common/WorkspacePreview"
 
 // TODO: adapt this to the new query system
 export const QueryBackend = {

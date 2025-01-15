@@ -110,7 +110,7 @@
     padding-left: 2em;
 }
 
-.markdown-body .block-preview .blocklyMainBackground {
+.block-preview .blocklyMainBackground {
     fill: transparent !important;
     stroke: transparent !important;
 }

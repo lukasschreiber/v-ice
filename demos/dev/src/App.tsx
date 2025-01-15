@@ -7,6 +7,7 @@ import { useLocalStorage } from "v-ice-commons";
 import { MiscPanel } from "./components/tabs/MiscPanel";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ToolboxPanel } from "./components/tabs/ToolboxPanel";
+import { WorkspaceSavePanel } from "./components/tabs/WorspaceSavePanel";
 
 function App() {
     const [language] = useState(localStorage.getItem("language") ?? "en");
@@ -60,6 +61,9 @@ function App() {
                         </Tab>
                         <Tab label="Toolbox" description="Toolbox configuration">
                             <ToolboxPanel toolbox={toolbox} setToolbox={setToolbox} />
+                        </Tab>
+                        <Tab label="Workspaces" description="Manage different workspace saves">
+                            <WorkspaceSavePanel />
                         </Tab>
                         <Tab label="Code" description="The generated JavaScript code">
                             <Code language="typescript" code={code === "" ? "// no code" : code.split("\n\n\n")[1]} />

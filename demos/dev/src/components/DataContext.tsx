@@ -170,6 +170,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
                 targets,
                 dataTables,
                 setDataTables,
+                dataIsInitialized: initialized,
             }}
         >
             {props.children}
@@ -193,7 +194,8 @@ export const DataContext = createContext<{
     removeTarget(id: string): void;
     targets: Record<string, string>;
     dataTables: DataTableDefinition[];
-    setDataTables: Dispatch<SetStateAction<DataTableDefinition[]>>
+    setDataTables: Dispatch<SetStateAction<DataTableDefinition[]>>;
+    dataIsInitialized: boolean;
 }>({
     source: DataTable.empty(),
     queryResults: {},
@@ -211,4 +213,5 @@ export const DataContext = createContext<{
     targets: {},
     dataTables: [],
     setDataTables: () => {},
+    dataIsInitialized: false,
 });
