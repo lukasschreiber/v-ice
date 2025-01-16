@@ -10,9 +10,13 @@ export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>
         "dev-saved-current-workspace",
         null
     );
+    const [savedCurrentDataSetName, setSavedCurrentDataSetName] = useLocalStorage<string | null>(
+        "dev-saved-current-data-set-name",
+        null
+    );
     const [initialized, setInitialized] = useState(false);
-    const { dataIsInitialized } = useContext(DataContext);
-    const [savedWorkspaces, setSavedWorkspaces] = useLocalStorage<{ name: string; worksapce: ISerializedWorkspace }[]>(
+    const { dataIsInitialized, sourceName } = useContext(DataContext);
+    const [savedWorkspaces, setSavedWorkspaces] = useLocalStorage<{ name: string; workspace: ISerializedWorkspace, datasetName: string }[]>(
         "dev-saved-workspaces",
         []
     );
@@ -29,12 +33,13 @@ export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>
             setInitialized(true);
             workspace?.addChangeListener(() => {
                 setSavedCurrentWorkspace(save());
+                setSavedCurrentDataSetName(sourceName);
             });
         }
-    }, [workspace, dataIsInitialized]);
+    }, [workspace, dataIsInitialized, sourceName]);
 
     return (
-        <StoreWorkspaceContext.Provider value={{ savedCurrentWorkspace, setSavedCurrentWorkspace, savedWorkspaces, setSavedWorkspaces }}>
+        <StoreWorkspaceContext.Provider value={{ savedCurrentWorkspace, setSavedCurrentWorkspace, savedWorkspaces, setSavedWorkspaces, savedCurrentDataSetName, setSavedCurrentDataSetName }}>
             {props.children}
         </StoreWorkspaceContext.Provider>
     );
@@ -43,11 +48,15 @@ export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>
 export const StoreWorkspaceContext = createContext<{
     savedCurrentWorkspace: ISerializedWorkspace | null;
     setSavedCurrentWorkspace: React.Dispatch<React.SetStateAction<ISerializedWorkspace | null>>;
-    savedWorkspaces: { name: string; worksapce: ISerializedWorkspace }[];
-    setSavedWorkspaces: React.Dispatch<React.SetStateAction<{ name: string; worksapce: ISerializedWorkspace }[]>>;
+    savedCurrentDataSetName: string | null;
+    setSavedCurrentDataSetName: React.Dispatch<React.SetStateAction<string | null>>;
+    savedWorkspaces: { name: string; workspace: ISerializedWorkspace, datasetName: string }[];
+    setSavedWorkspaces: React.Dispatch<React.SetStateAction<{ name: string; workspace: ISerializedWorkspace, datasetName: string }[]>>;
 }>({
     savedCurrentWorkspace: null,
     setSavedCurrentWorkspace: () => {},
+    savedCurrentDataSetName: null,
+    setSavedCurrentDataSetName: () => {},
     savedWorkspaces: [],
     setSavedWorkspaces: () => {},
 });

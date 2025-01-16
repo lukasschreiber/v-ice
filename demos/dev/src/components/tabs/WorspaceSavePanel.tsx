@@ -3,12 +3,14 @@ import { useWorkspace, WorkspacePreview } from "v-ice";
 import { Button } from "v-ice-commons";
 import { Accordion } from "../Accordion";
 import { StoreWorkspaceContext } from "../StoreWorkspaceContext";
+import { DataContext } from "../DataContext";
 
 export function WorkspaceSavePanel() {
     const { workspace, load, save } = useWorkspace();
     const [workspaceNames, setWorkspaceNames] = useState<Record<number, string>>({});
     const currentWorkspaceWrapperRef = useRef<HTMLDivElement>(null);
     const { savedWorkspaces, setSavedWorkspaces } = useContext(StoreWorkspaceContext);
+    const {sourceName} = useContext(DataContext);
 
     return (
         <div className="text-xs p-1">
@@ -36,7 +38,7 @@ export function WorkspaceSavePanel() {
                                 savedWorkspaces.find((w) => w.name === workspaceNames[0]) !== undefined
                             }
                             onClick={() => {
-                                setSavedWorkspaces((old) => [...old, { name: workspaceNames[0]!, worksapce: save() }]);
+                                setSavedWorkspaces((old) => [...old, { name: workspaceNames[0]!, workspace: save(), datasetName: sourceName }].reverse());
                                 setWorkspaceNames({});
                             }}
                         >
@@ -64,13 +66,13 @@ export function WorkspaceSavePanel() {
                 <div className="mt-4">
                     <div className="flex flex-row gap-2 flex-wrap">
                         {savedWorkspaces.map((ws, index) => (
-                            <div key={index} className="flex flex-col gap-2 max-w-80">
+                            <div key={index} className={`flex flex-col gap-2 max-w-80 ${sourceName !== ws.datasetName ? "opacity-30 pointer-events-none": ""}`}>
                                 <div className="flex flex-row gap-1 justify-between items-center">
                                     <div>{ws.name}</div>
                                     <Button
                                         className="!text-blue-600 !bg-blue-200 disabled:!bg-gray-200 disabled:!text-gray-400 h-full ml-auto"
                                         onClick={() => {
-                                            load(ws.worksapce);
+                                            load(ws.workspace);
                                         }}
                                     >
                                         Load
@@ -85,7 +87,7 @@ export function WorkspaceSavePanel() {
                                     </Button>
                                 </div>
                                 <div className="p-1 border border-gray-200 overflow-auto max-h-80 max-w-80 min-w-80">
-                                    <WorkspacePreview workspace={ws.worksapce} className="my-auto" />
+                                    <WorkspacePreview workspace={ws.workspace} className="my-auto" />
                                 </div>
                             </div>
                         ))}

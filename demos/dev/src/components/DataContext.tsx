@@ -23,6 +23,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
     const { querySource, queryResults, setQuerySource, addTarget, removeTarget, targets } = useQuery();
     const [expandable, setExpandable] = useState(true);
     const [dataTables, setDataTables] = useState<DataTableDefinition[]>([]);
+    const [sourceName, setSourceName] = useState("Source");
     const { workspace } = useWorkspace();
     const [initialized, setInitialized] = useState(false);
 
@@ -151,11 +152,17 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
         document.body.removeChild(elem);
     }
 
+    useEffect(() => {
+        setSourceName(querySource.getColumnNames().join(", "));
+    }, [querySource]);
+
     return (
         <DataContext.Provider
             value={{
                 source: querySource,
                 setSource: setQuerySource,
+                sourceName,
+                setSourceName,
                 addCol,
                 addRow,
                 reset,
@@ -180,8 +187,10 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
 
 export const DataContext = createContext<{
     source: DataTable;
+    sourceName: string
     queryResults: Record<string, DataTable>;
     setSource: (source: DataTable) => void;
+    setSourceName: (sourceName: string) => void;
     addRow(partialRow: DataRow): void;
     addCol(): void;
     reset(): void;
@@ -198,6 +207,8 @@ export const DataContext = createContext<{
     dataIsInitialized: boolean;
 }>({
     source: DataTable.empty(),
+    sourceName: "Source",
+    setSourceName: () => {},
     queryResults: {},
     setSource: () => {},
     addCol: () => {},
