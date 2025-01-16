@@ -1,6 +1,8 @@
 import { DependentDropdownOptionsChange } from '@/events/events_dependent_dropdown_options_change';
 import * as Blockly from 'blockly/core';
 import { FieldFilterableDynamicDropdown } from './field_filterable_dynamic_dropdown';
+import { TypedField } from './field';
+import types from '@/data/types';
 
 /**
  * @license
@@ -33,7 +35,7 @@ interface IDependencyData {
     derivedOptions?: Blockly.MenuOption[];
 }
 
-export class FieldDependentDropdown extends FieldFilterableDynamicDropdown {
+export class FieldDependentDropdown extends FieldFilterableDynamicDropdown implements TypedField {
     dependencyData: IDependencyData;
     private parentName: string;
     private optionMapping: IChildOptionMapping;
@@ -88,6 +90,10 @@ export class FieldDependentDropdown extends FieldFilterableDynamicDropdown {
             undefined,
             options,
         );
+    }
+
+    getOutputType() {
+        return types.string;
     }
 
     setSourceBlock(block: Blockly.Block) {

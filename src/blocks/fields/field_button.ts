@@ -1,6 +1,7 @@
 import * as Blockly from "blockly/core" 
+import { TypedField } from "./field"
 
-export class FieldButton extends Blockly.FieldLabel {
+export class FieldButton extends Blockly.FieldLabel implements TypedField {
     private svg_: SVGSVGElement
     private svgWrapper_: SVGGElement
     private svgClickReceiver_: SVGRectElement
@@ -37,6 +38,10 @@ export class FieldButton extends Blockly.FieldLabel {
         this.svgWrapper_.setAttribute("height", config.height.toString())
 
         this.centerSvg();
+    }
+
+    getOutputType() {
+        return null
     }
 
     private centerSvg() {

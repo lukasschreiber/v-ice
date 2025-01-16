@@ -22,11 +22,6 @@ export const StringBlock = createBlock({
     color: Colors.categories.comparisons,
     extensions: [ParentColorExtension],
     code: (scope) => {
-        return {
-            operation: "string",
-            args: {
-                value: scope.buildASTForField("VALUE"),
-            }
-        }
+        return scope.buildASTForField("VALUE")
     }
 })

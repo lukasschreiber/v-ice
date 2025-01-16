@@ -1,4 +1,6 @@
 import * as Blockly from 'blockly/core';
+import { TypedField } from './field';
+import types from '@/data/types';
 
 interface FieldSetSelectionFromJsonConfig extends Blockly.FieldConfig {
     selected: SetSelectionType[];
@@ -11,7 +13,7 @@ export enum SetSelectionType {
     NEITHER = "NEITHER"
 }
 
-export class FieldSetSelection extends Blockly.Field {
+export class FieldSetSelection extends Blockly.Field implements TypedField {
     override SERIALIZABLE = true;
 
     protected readonly parameters = {
@@ -78,6 +80,10 @@ export class FieldSetSelection extends Blockly.Field {
 
     getSelection() {
         return Array.from(this.selected);
+    }
+
+    getOutputType() {
+        return types.list(types.string);
     }
 
     protected createSetSelectionElement_() {

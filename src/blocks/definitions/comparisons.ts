@@ -3,6 +3,7 @@ import { ConnectionType, createBlock } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Blocks } from "@/blocks";
 import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
+import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
 
 export const EqualsWithinBlock = createBlock({
     id: Blocks.Names.COMPARISON.EQUALS_WITHIN,
@@ -34,14 +35,15 @@ export const EqualsWithinBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "equals_within",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B"),
                 delta: scope.buildASTForInput("DELTA")
             }
-        }
+        })
     }
 })
 
@@ -70,13 +72,14 @@ export const EqualsBlock = createBlock({
     helpUrl: "#equals",
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "equals",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
-        }
+        })
     }
 })
 
@@ -105,13 +108,14 @@ export const MatchesBlock = createBlock({
     helpUrl: "#matches",
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "matches",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
-        }
+        })
     }
 })
 
@@ -140,13 +144,14 @@ export const GreaterBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "greater",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
-        }
+        })
     }
 })
 
@@ -175,13 +180,14 @@ export const LessBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "less",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
-        }
+        })
     }
 })
 
@@ -210,13 +216,14 @@ export const LessEqualsBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "less_equals",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
-        }
+        })
     }
 })
 
@@ -245,13 +252,14 @@ export const GreaterEqualsBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "greater_equals",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
-        }
+        })
     }
 })
 
@@ -290,14 +298,15 @@ export const CompareNumbersBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "compare_numbers",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B"),
                 operator: scope.buildASTForField("OP")
             }
-        }
+        })
     }
 })
 
@@ -331,14 +340,15 @@ export const CompareIntervalBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "compare_interval",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A"),
                 min: scope.buildASTForInput("B"),
                 max: scope.buildASTForInput("C")
             }
-        }
+        })
     }
 })
 
@@ -361,11 +371,12 @@ export const IsNullBlock = createBlock({
     helpUrl: "#comparison-null",
     inputsInline: true,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "is_null",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A")
             }
-        }
+        })
     }
 })

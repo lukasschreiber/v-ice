@@ -1,5 +1,5 @@
 import { QueryClient, QueryClientParams } from "@/query/clients/query_client";
-import { AST, ASTNode, ASTOperation, ASTPrimitive } from "../builder/ast";
+import { AST, ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "../builder/ast";
 import { LocalQueryVerificator } from "./local_query_verificator";
 import { LocalQueryRuntime } from "./local_query_runtime";
 // import { BlockLinesDefinition, RegistrableBlock } from "@/blocks/block_definitions";
@@ -11,9 +11,9 @@ export interface LocalQueryClientParams extends QueryClientParams<"local"> {
     verificator: LocalQueryVerificator;
     runtime: LocalQueryRuntime;
     transformers: {
-        operations: Record<string, (astNode: ASTOperation) => string>;
-        primitives: Record<string, (astNode: ASTPrimitive) => string>;
-        nodes: Record<string, (astNode: ASTNode) => string>;
+        operations: Record<string, (astNode: ASTOperationNode) => string>;
+        primitives: Record<string, (astNode: ASTPrimitiveNode) => string>;
+        nodes: Record<string, (astNode: ASTSetNode) => string>;
     }
     // transformers: LocalQueryTransformer<RegistrableBlock<any, any, any>>[];
 }

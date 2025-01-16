@@ -6,6 +6,8 @@ import { LocalVariableMutator } from "../mutators/local_variable";
 import { VariableSelectMutator } from "../mutators/variable_select";
 import { ColumnSelectMutator } from "../mutators/column_select";
 import { FieldVariable } from "../fields/field_variable";
+import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
+import { FieldTypeLabel } from "../fields/field_type_label";
 
 export const ColumnSelectBlock = createBlock({
     id: Blocks.Names.VARIABLE.GET_COLUMN,
@@ -33,12 +35,13 @@ export const ColumnSelectBlock = createBlock({
     style: "variable_blocks",
     mutator: ColumnSelectMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "get_column",
+            type: scope.getField<FieldTypeLabel>("TYPE").getType() ?? null,
             args: {
-                name: {value: scope.getFieldValue("COLUMN")},
+                name: createASTNode(ASTNodeKind.Primitive, { value: scope.getFieldValue("COLUMN"), type: t.string }),
             }
-        }
+        })
     }
 })
 
@@ -66,12 +69,14 @@ export const VariableBlock = createBlock({
     helpUrl: "#variables",
     mutator: VariableSelectMutator,
     code: (scope) => {
-        return {
+        const variable = scope.getField<FieldVariable>("VAR").getVariable()
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "get_variable",
+            type: variable?.type ?? null,
             args: {
-                name: {value: scope.getField<FieldVariable>("VAR").getVariable()?.name ?? ""},
+                name: createASTNode(ASTNodeKind.Primitive, {value: variable?.name ?? "", type: t.string}),
             }
-        }
+        })
     }
 })
 
@@ -99,11 +104,12 @@ export const LocalVariableBlock = createBlock({
     extensions: [ScopedExtension],
     mutator: LocalVariableMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "get_local_variable",
+            type: scope.getField<FieldTypeLabel>("TYPE").getType() ?? null,
             args: {
-                name: {value: scope.getFieldValue("LABEL")},
+                name: createASTNode(ASTNodeKind.Primitive, { value: scope.getFieldValue("LABEL"), type: t.string }),
             }
-        }
+        })
     }
 })

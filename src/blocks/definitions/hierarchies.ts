@@ -23,11 +23,6 @@ export const HierarchySelectBlock = createBlock({
     extensions: [ParentColorExtension],
     mutator: HierarchySelectMutator,
     code: (scope) => {
-        return {
-            operation: "hierarchy",
-            args: {
-                name: scope.buildASTForField("HIERARCHY"),
-            }
-        }
+        return scope.buildASTForField("HIERARCHY", (value) => value, scope.block.variableType)
     }
 })

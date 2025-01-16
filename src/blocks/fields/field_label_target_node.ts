@@ -1,4 +1,6 @@
 import * as Blockly from "blockly/core"
+import { TypedField } from "./field"
+import types from "@/data/types"
 
 export interface FieldLabelFromJsonConfig extends Blockly.FieldLabelFromJsonConfig {
     id?: string
@@ -9,7 +11,7 @@ export interface FieldLabelTargetNodeState {
     name: string | null
 }
 
-export class FieldLabelTargetNode extends Blockly.FieldLabelSerializable {
+export class FieldLabelTargetNode extends Blockly.FieldLabelSerializable implements TypedField {
     protected id: string | undefined = undefined
     constructor(value: string, id?: string, textClass?: string, config?: Blockly.FieldLabelConfig) {
         super(value, textClass, config);
@@ -26,6 +28,10 @@ export class FieldLabelTargetNode extends Blockly.FieldLabelSerializable {
 
     setId(id: string) {
         this.id = id
+    }
+
+    getOutputType() {
+        return types.string
     }
 
     override saveState(): FieldLabelTargetNodeState {

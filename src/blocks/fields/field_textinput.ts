@@ -1,9 +1,10 @@
-import types from '@/data/types';
+import types, { IType } from '@/data/types';
 import { ConstantProvider } from '@/renderer/constants';
 import * as Blockly from 'blockly/core';
 import { FieldTextInputValidator, FieldTextInputConfig } from 'blockly/core/field_textinput'
+import { TypedField } from './field';
 
-export class FieldTextInput extends Blockly.FieldTextInput {
+export class FieldTextInput extends Blockly.FieldTextInput implements TypedField {
     constructor(value?: string, validator?: FieldTextInputValidator | null, restrictor?: RegExp, config?: FieldTextInputConfig) {
         super(value, validator, config)
         this.restrictor_ = restrictor
@@ -20,6 +21,10 @@ export class FieldTextInput extends Blockly.FieldTextInput {
 
     setRestrictor(restrictor?: RegExp) {
         this.restrictor_ = restrictor;
+    }
+
+    getOutputType(): IType {
+        return types.string;
     }
 
     protected override bindInputEvents_(htmlInput: HTMLElement): void {

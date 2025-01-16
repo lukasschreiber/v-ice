@@ -5,6 +5,7 @@ import { NodeBlockExtension } from "../extensions/node";
 import { FieldLabelTargetNode } from "../fields/field_label_target_node";
 import { FieldSetSelection } from "../fields/field_set_selection";
 import { ScopedExtension } from "../extensions/scoped";
+import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
 
 export const SourceNodeBlock = createBlock({
     id: Blocks.Names.NODE.SOURCE,
@@ -59,15 +60,15 @@ export const TargetNodeBlock = createBlock({
     helpUrl: "#target-node",
     extensions: [NodeBlockExtension],
     code: (scope) => {
-        return {
-            id: scope.block.id,
+        return createASTNode(ASTNodeKind.Set, {
             inputs: {
                 input: scope.buildASTForConnectionPoint("INPUT")
             },
             attributes: {
+                id: scope.block.id,
                 name: scope.getField<FieldLabelTargetNode>("LABEL").getName() ?? ""
             }
-        }
+        })
     }
 })
 
@@ -134,16 +135,16 @@ export const SubsetNodeBlock = createBlock({
         // const fields = generator.multilineStatementToCode(block, "FILTERS", " && ").trim()
         // return { definition: `function ${procedureName}(default) {\n  return conditionalSplit(default, p => ${fields === "" ? "false" : fields});\n}\n`, invocation: `${procedureName}(${input})` }
 
-        return {
-            id: scope.block.id,
+        return createASTNode(ASTNodeKind.Set, {
             inputs: {
                 input: scope.buildASTForConnectionPoint("INPUT")
             },
             attributes: {
+                id: scope.block.id,
                 name: scope.getFieldValue("NAME")
             },
             operations: scope.buildASTForStatementInput("FILTERS"),
-        }
+        })
     }
 })
 
@@ -193,15 +194,15 @@ export const SetArithmeticNodeBlock = createBlock({
     helpUrl: "#set-arithmetic-node",
     extensions: [NodeBlockExtension, ScopedExtension],
     code: (scope) => {
-        return {
-            id: scope.block.id,
+        return createASTNode(ASTNodeKind.Set, {
             inputs: {
                 left: scope.buildASTForConnectionPoint("LEFT"),
                 right: scope.buildASTForConnectionPoint("RIGHT")
             },
             attributes: {
+                id: scope.block.id,
                 selection: scope.getField<FieldSetSelection>("SELECTION").getSelection()
             },
-        }
+        })
     }
 })

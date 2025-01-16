@@ -1,6 +1,7 @@
 import types, { IType } from "@/data/types"
 import * as Blockly from "blockly/core"
 import { IconFactory } from "../icon_factory"
+import { TypedField } from "./field"
 
 export interface FieldTypeLabelFromJsonConfig extends Blockly.FieldLabelFromJsonConfig {
     iconType?: IType
@@ -10,7 +11,7 @@ export interface FieldTypeLabelState {
     type: string | undefined
 }
 
-export class FieldTypeLabel extends Blockly.FieldLabelSerializable {
+export class FieldTypeLabel extends Blockly.FieldLabelSerializable implements TypedField {
     protected type_: IType | undefined = undefined
     protected iconGroup_: SVGGElement | null = null
 
@@ -22,6 +23,10 @@ export class FieldTypeLabel extends Blockly.FieldLabelSerializable {
     initView(): void {
         this.createIconGroup_()
         this.updateIcon_()
+    }
+
+    getOutputType(): IType {
+        return types.string
     }
 
     getType() {

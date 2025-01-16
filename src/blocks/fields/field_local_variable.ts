@@ -4,12 +4,13 @@ import { ConstantProvider } from "@/renderer/constants";
 import * as Blockly from "blockly/core"
 import { FieldTypeLabel } from "./field_type_label";
 import { Renderer } from "@/renderer/renderer";
+import { TypedField } from "./field";
 
 export interface FieldLocalVariableFromJsonConfig extends Blockly.FieldLabelFromJsonConfig {
     shapeType: IType
 }
 
-export class FieldLocalVariable extends Blockly.FieldLabelSerializable {
+export class FieldLocalVariable extends Blockly.FieldLabelSerializable implements TypedField {
     protected shapeType_: IType | undefined = undefined
     protected blockPreview_: SVGGElement | undefined = undefined
     protected blockPreviewTarget_: Blockly.BlockSvg | undefined = undefined
@@ -27,6 +28,10 @@ export class FieldLocalVariable extends Blockly.FieldLabelSerializable {
         this.shapeType_ = type;
         this.createBlockPreview_();
         this.forceRerender();
+    }
+
+    getOutputType(): IType {
+        return this.shapeType_!;
     }
 
     override initView(): void {

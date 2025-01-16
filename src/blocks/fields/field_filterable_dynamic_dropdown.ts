@@ -1,7 +1,9 @@
 import * as Blockly from 'blockly/core';
 import { FieldDynamicDropdown } from './field_dynamic_dropdown';
+import { TypedField } from './field';
+import types from '@/data/types';
 
-export class FieldFilterableDynamicDropdown extends FieldDynamicDropdown {
+export class FieldFilterableDynamicDropdown extends FieldDynamicDropdown implements TypedField {
     protected workspace_: Blockly.WorkspaceSvg | null = null;
 
     protected searchDiv_: HTMLDivElement | null = null;
@@ -37,6 +39,10 @@ export class FieldFilterableDynamicDropdown extends FieldDynamicDropdown {
         const div = Blockly.DropDownDiv.getContentDiv()
         div.insertBefore( this.searchDiv_!, div.firstChild)
 
+    }
+
+    getOutputType() {
+        return types.string
     }
 
     override applyColour() {

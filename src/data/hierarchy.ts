@@ -20,10 +20,16 @@ export class Hierarchy {
     protected hierarchy: IHierarchy;
     protected topLevelSort: string[];
     protected index: Map<string, string[]> = new Map();
+    protected name: string;
 
-    constructor(definition: IHierarchyDefinition) {
+    constructor(definition: IHierarchyDefinition, type: string) {
         this.hierarchy = definition.hierarchy;
         this.topLevelSort = definition.meta.topLevelSort;
+        this.name = type;
+    }
+
+    public getName(): string {
+        return this.name;
     }
 
     public getHierarchy(): IHierarchy {

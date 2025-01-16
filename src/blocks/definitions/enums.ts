@@ -23,11 +23,6 @@ export const EnumSelectBlock = createBlock({
     extensions: [ParentColorExtension],
     mutator: EnumSelectMutator,
     code: (scope) => {
-        return {
-            operation: "enum",
-            args: {
-                name: scope.buildASTForField("ENUM"),
-            }
-        }
+        return scope.buildASTForField("ENUM", (value) => value, scope.block.variableType)
     }
 })

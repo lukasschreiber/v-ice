@@ -1,8 +1,10 @@
 import * as Blockly from "blockly/core";
 import { FieldTextInput } from "./field_textinput";
 import { FieldTextInputValidator, FieldTextInputConfig } from 'blockly/core/field_textinput'
+import { TypedField } from "./field";
+import types from "@/data/types";
 
-export class FieldAutocompleteText extends FieldTextInput {
+export class FieldAutocompleteText extends FieldTextInput implements TypedField {
     private boundEvents: Blockly.browserEvents.Data[] = [];
 
     protected autoCompleteOptions_: string[] = [];
@@ -50,6 +52,10 @@ export class FieldAutocompleteText extends FieldTextInput {
         super.showEditor_(e, noFocus);
 
         this.dropdownShow(this.getValue() || "");
+    }
+
+    getOutputType() {
+        return types.string
     }
 
     setValue(newValue: string | undefined, fireChangeEvent?: boolean | undefined): void {

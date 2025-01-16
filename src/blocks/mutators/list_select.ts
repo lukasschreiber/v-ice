@@ -5,9 +5,12 @@ import { ShadowFactory } from '../shadow_factory';
 import { FieldButton } from '../fields/field_button';
 import { IconFactory } from '../icon_factory';
 import { BlockMutator } from '../block_mutators';
+import { TypeConverter } from '@/data/type_converter';
+import { JSONSerializablePrimitive } from '@/query/builder/ast';
 
 export interface ListSelectBlock {
     variableType: string,
+    getList(): JSONSerializablePrimitive[],
     updateOutputType_(): void,
     addListElementInput_(id?: string): Blockly.Input | null,
     getListElementInputCount_(): number,
@@ -97,6 +100,15 @@ export class ListSelectMutator extends BlockMutator<Blockly.BlockSvg & ListSelec
         })
     }
 
+    @BlockMutator.mixin
+    getList(this: Blockly.BlockSvg & ListSelectBlock) {
+        return TypeConverter.toType(this.getListElementInputs_().map(input => {
+            const targetBlock = input.connection?.targetBlock()
+            if (!targetBlock) return null
+            // find the first field in the block and get its value
+            return targetBlock.inputList.find(input => input.fieldRow.length > 0)?.fieldRow[0]?.getValue()
+        }), types.utils.fromString(this.variableType))
+    }
 
     public saveExtraState(this: Blockly.BlockSvg & ListSelectBlock): ListSelectState {
         return {

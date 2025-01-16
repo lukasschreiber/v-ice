@@ -4,6 +4,7 @@ import t from "@/data/types"
 import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { EitherOrMutator } from "../mutators/either_or";
+import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
 
 export const LogicOrBlock = createBlock({
     id: Blocks.Names.LOGIC.OR,
@@ -49,14 +50,15 @@ export const LogicOrBlock = createBlock({
             additionalArgs[`OR_STATEMENT_${i + 2}`] = scope.buildASTForUnknownStatementInput(name)
         })
 
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "or",
+            type: t.boolean,
             args: {
                 OR_STATEMENT_0: scope.buildASTForStatementInput("OR_STATEMENT_0"),
                 OR_STATEMENT_1: scope.buildASTForStatementInput("OR_STATEMENT_1"),
                 ...additionalArgs,
             },
-        }
+        })
     }
 })
 
@@ -82,12 +84,13 @@ export const LogicNotBlock = createBlock({
     style: "logic_blocks",
     helpUrl: "#logic-not",
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "not",
+            type: t.boolean,
             args: {
                 STATEMENTS: scope.buildASTForStatementInput("STATEMENTS"),
             }
-        }
+        })
     }
 })
 
@@ -112,6 +115,6 @@ export const BooleanBlock = createBlock({
     extensions: [ParentColorExtension],
     color: Colors.categories.comparisons,
     code: (scope) => {
-        return { value: scope.getFieldValue("BOOL") === "TRUE" }
+        return createASTNode(ASTNodeKind.Primitive, { value: scope.getFieldValue("BOOL") === "TRUE", type: t.boolean })
     }
 })

@@ -10,7 +10,7 @@ export class TypeRegistry {
 
     public registerHierarchy(type: string, hierarchy: IHierarchyDefinition) {
         console.log(`TypeRegistry.registerHierarchy: ${type}`);
-        this.hierarchies.set(type, new Hierarchy(hierarchy));
+        this.hierarchies.set(type, new Hierarchy(hierarchy, type));
     }
 
     public getHierarchy(type: string): Hierarchy | null {

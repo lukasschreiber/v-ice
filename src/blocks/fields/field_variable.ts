@@ -1,4 +1,6 @@
 import * as Blockly from "blockly/core"
+import { TypedField } from "./field"
+import types from "@/data/types"
 
 class ValueUpdateEvent extends Blockly.Events.Abstract {
     override isBlank: boolean = false
@@ -10,7 +12,7 @@ class ValueUpdateEvent extends Blockly.Events.Abstract {
     }
 }
 
-export class FieldVariable extends Blockly.FieldVariable {
+export class FieldVariable extends Blockly.FieldVariable implements TypedField {
     override EDITABLE: boolean = false
 
     protected override render_(): void {
@@ -23,6 +25,12 @@ export class FieldVariable extends Blockly.FieldVariable {
         if (this.onvaluechange) {
             this.onvaluechange(new ValueUpdateEvent(newId))
         }
+    }
+
+    public getOutputType() {
+        const type = this.getVariable()?.type
+        if (!type) throw new Error("Variable type is not set")
+        return types.utils.fromString(type)
     }
 
     private onvaluechange: ((event: ValueUpdateEvent) => void) | null = null

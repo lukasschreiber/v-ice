@@ -4,8 +4,10 @@ import { FieldTextInputValidator, FieldTextInputConfig } from 'blockly/core/fiel
 import { DateTime } from "luxon";
 import { IconFactory } from "../icon_factory";
 import { DateTimeGranularity, DateTimeGranularityFormat, DateTimeGranularityFormats, DateTimeGranularityLabels, maskFormatString, parseDate } from "@/utils/datetime";
+import { TypedField } from "./field";
+import types from "@/data/types";
 
-export class FieldDateTime extends FieldTextInput {
+export class FieldDateTime extends FieldTextInput implements TypedField {
     protected dateTime_: DateTime | null = null;
 
     protected format_: DateTimeGranularityFormat | null = null;
@@ -55,6 +57,10 @@ export class FieldDateTime extends FieldTextInput {
         this.maskedEntries_ = config.maskedEntries ?? [];
         this.formatGranularity_ = config.formatGranularity ?? null;
         this.maxGranularity_ = config.maxGranularity ?? DateTimeGranularity.SECOND;
+    }
+
+    getOutputType() {
+        return types.timestamp;
     }
 
     protected override showEditor_(e?: Event) {

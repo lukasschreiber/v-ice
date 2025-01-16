@@ -5,6 +5,7 @@ import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { StructPropertySelectMutator } from "../mutators/struct_property_select";
 import { StructSelectMutator } from "../mutators/struct_select";
+import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
 
 export const StructBlock = createBlock({
     id: Blocks.Names.STRUCTS.IMMEDIATE,
@@ -15,9 +16,10 @@ export const StructBlock = createBlock({
     extensions: [ParentColorExtension],
     mutator: StructSelectMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Primitive, {
             value: scope.block.getStruct(),
-        }
+            type: scope.block.variableType
+        })
     }
 })
 
@@ -45,12 +47,13 @@ export const ProperySelectBlock = createBlock({
     helpUrl: "#struct-get",
     mutator: StructPropertySelectMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "get_struct_property",
+            type: scope.block.variableType,
             args: {
                 property: scope.buildASTForField("PROPERTY"),
                 struct: scope.buildASTForInput("STRUCT"),
             }
-        }
+        })
     }
 })

@@ -1,24 +1,24 @@
+import { ASTOperationNode } from "@/query/builder/ast";
 import { createQueryClient } from "../query_client_build";
-import { ASTOperation } from "@/query/builder/ast";
 
 export const jsQueryClient = createQueryClient({
     mode: "local",
     verificator: {
-        verify(query: string): boolean {
+        verify(_query: string): boolean {
             return true;
         }
     },
     runtime: {
-        execute(query: string): any {
+        execute(_query: string): any {
             return "Local query result"
         }
     },
     transformers: {
         operations: {
-            "equals": (astNode: ASTOperation) => {
+            "equals": (astNode: ASTOperationNode) => {
                 return `(${astNode.args.a} === ${astNode.args.b})`
             },
-            "matches": (astNode: ASTOperation) => {
+            "matches": (astNode: ASTOperationNode) => {
                 return `(${astNode.args.a} === ${astNode.args.b})`
             }
         },

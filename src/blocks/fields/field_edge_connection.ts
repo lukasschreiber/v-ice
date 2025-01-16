@@ -1,4 +1,5 @@
 import * as Blockly from "blockly/core"
+import { TypedField } from "./field"
 
 export enum NodeConnectionType { INPUT, OUTPUT, POSITIVE, NEGATIVE }
 
@@ -7,7 +8,7 @@ interface FieldEdgeConnectionConfig extends Blockly.FieldConfig {
     connectionType: NodeConnectionType
 }
 
-export class FieldEdgeConnection extends Blockly.Field {
+export class FieldEdgeConnection extends Blockly.Field implements TypedField {
     protected options_: FieldEdgeConnectionConfig
     protected connectionDotElement_: SVGElement | null = null
 
@@ -36,6 +37,10 @@ export class FieldEdgeConnection extends Blockly.Field {
 
     getConnectionType(): NodeConnectionType {
         return this.options_.connectionType
+    }
+
+    getOutputType() {
+        return null
     }
 
     /**

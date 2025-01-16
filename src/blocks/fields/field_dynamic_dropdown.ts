@@ -1,7 +1,9 @@
 import { Blocks } from '@/blocks';
 import * as Blockly from 'blockly/core';
+import { TypedField } from './field';
+import types from '@/data/types';
 
-export class FieldDynamicDropdown extends Blockly.FieldDropdown {
+export class FieldDynamicDropdown extends Blockly.FieldDropdown implements TypedField {
     private editorOpen: boolean = false
 
     updateOptions(menuGenerator: Blockly.MenuGenerator) {
@@ -19,6 +21,10 @@ export class FieldDynamicDropdown extends Blockly.FieldDropdown {
             this.dropdownDispose_()
             this.showEditor_()
         }
+    }
+
+    getOutputType() {
+        return types.string
     }
 
     protected shouldAddBorderRect_(): boolean {

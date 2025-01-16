@@ -7,6 +7,7 @@ import { FlattenListExtension } from "../extensions/flatten_list";
 import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
 import { ListAnyAllMutator } from "../mutators/list_any_all";
 import { ListSelectMutator } from "../mutators/list_select";
+import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
 
 export const ListArithmeticBlock = createBlock({
     id: Blocks.Names.LIST.MATH,
@@ -46,13 +47,14 @@ export const ListArithmeticBlock = createBlock({
     style: "list_blocks",
     inputsInline: true,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "unary_list_operation",
+            type: t.number,
             args: {
                 operator: scope.buildASTForField("OP"),
                 list: scope.buildASTForInput("LIST"),
             },
-        }
+        })
     }
 })
 
@@ -75,12 +77,13 @@ export const ListLengthBlock = createBlock({
     style: "list_blocks",
     inputsInline: true,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "list_length",
+            type: t.number,
             args: {
                 list: scope.buildASTForInput("LIST"),
             }
-        }
+        })
     }
 })
 
@@ -109,13 +112,14 @@ export const ListContainsBlock = createBlock({
     helpUrl: "#list-contains",
     connectionType: ConnectionType.BOOLEAN,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "list_contains",
+            type: t.boolean,
             args: {
                 list: scope.buildASTForInput("LIST"),
                 value: scope.buildASTForInput("VALUE"),
             }
-        }
+        })
     }
 })
 
@@ -163,15 +167,16 @@ export const ListAnyAllBlock = createBlock({
     helpUrl: "#list-any-all",
     mutator: ListAnyAllMutator,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "list_any_all",
+            type: t.boolean,
             args: {
                 operation: scope.buildASTForField("OP"),
                 value: scope.buildASTForField("VALUE"),
                 list: scope.buildASTForInput("LIST"),
                 query: scope.buildASTForStatementInput("QUERY"),
             }
-        }
+        })
     }
 })
 
@@ -182,7 +187,13 @@ export const ListImmediateBlock = createBlock({
     color: Colors.categories.comparisons,
     inputsInline: true,
     extensions: [ParentColorExtension],
-    mutator: ListSelectMutator
+    mutator: ListSelectMutator,
+    code: (scope) => {
+        return createASTNode(ASTNodeKind.Primitive, {
+            value: scope.block.getList(),
+            type: scope.block.variableType
+        })
+    }
 })
 
 export const ListFlattenBlock = createBlock({
@@ -202,7 +213,16 @@ export const ListFlattenBlock = createBlock({
     output: t.list(t.nullable(t.wildcard)),
     style: "list_blocks",
     helpUrl: "#list-flatten",
-    extensions: [FlattenListExtension]
+    extensions: [FlattenListExtension],
+    code: (scope) => {
+        return createASTNode(ASTNodeKind.Operation, {
+            operation: "flatten_list",
+            type: scope.block.variableType,
+            args: {
+                list: scope.buildASTForInput("LIST"),
+            }
+        })
+    }
 })
 
 export const ListEqualsBlock = createBlock({
@@ -241,13 +261,14 @@ export const ListEqualsBlock = createBlock({
     helpUrl: "#list-equals",
     connectionType: ConnectionType.BOOLEAN,
     code: (scope) => {
-        return {
+        return createASTNode(ASTNodeKind.Operation, {
             operation: "list_equals",
+            type: t.boolean,
             args: {
                 a: scope.buildASTForInput("LIST1"),
                 b: scope.buildASTForInput("LIST2"),
                 operator: scope.buildASTForField("OP"),
             }
-        }
+        })
     }
 })

@@ -1,6 +1,8 @@
 import * as Blockly from 'blockly/core';
 import { FieldTextInput } from '@/blocks/fields/field_textinput';
 import { FieldTextInputValidator } from 'blockly/core/field_textinput'
+import { TypedField } from './field';
+import types from '@/data/types';
 
 export interface FieldNumberFromJsonConfig extends Blockly.FieldTextInputFromJsonConfig {
     min?: number,
@@ -9,7 +11,7 @@ export interface FieldNumberFromJsonConfig extends Blockly.FieldTextInputFromJso
     value?: number
 }
 
-export class FieldNumber extends FieldTextInput {
+export class FieldNumber extends FieldTextInput implements TypedField {
 
     constructor(value?: number | string, min?: number, max?: number, precision?: number, validator?: FieldTextInputValidator) {
         super((value && isNaN(value as unknown as number)) ? String(value) : "0", validator)
@@ -68,6 +70,10 @@ export class FieldNumber extends FieldTextInput {
 
             return num.toString()
         }
+    }
+
+    getOutputType() {
+        return types.number
     }
 
     protected getNumRestrictor(min?: number, max?: number, precision?: number): RegExp {

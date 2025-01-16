@@ -4,8 +4,8 @@ import { BlockExtension, ExtensionMixins, RegistrableExtension } from "@/blocks/
 import { MutatorMixin, RegistrableMutator } from "./block_mutators"
 import { NodeExtension, NodeBlockExtension } from "./extensions/node"
 import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance"
-import { ASTNode, ASTOperation, ASTPrimitive } from "@/query/builder/ast"
 import { BlockASTBuilder, NodeBlockASTBuilder } from "@/query/builder/ast_builder"
+import { ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "@/query/builder/ast"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -67,9 +67,9 @@ function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], 
         // TODO this could probably have nicer types but at the moment it's not worth the effort
 
         if (extensions.includes(getExtensionInstance(NodeBlockExtension).name)) {
-            getASTBuilderInstance().registerNode(block.id, block, block.code as (...args: any[]) => ASTNode)
+            getASTBuilderInstance().registerNode(block.id, block, block.code as (...args: any[]) => ASTSetNode)
         } else {
-            getASTBuilderInstance().registerOperation(block.id, block, block.code as (...args: any[]) => ASTOperation)
+            getASTBuilderInstance().registerOperation(block.id, block, block.code as (...args: any[]) => ASTOperationNode | ASTPrimitiveNode)
         }
     }
 
@@ -157,9 +157,9 @@ export interface RegistrableBlock<
     mutator?: M
     extensions?: Es
     data?: object | string
-    code: (
+    code?: (
         scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
-    ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? ASTNode : ASTOperation | ASTPrimitive
+    ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? ASTSetNode : ASTOperationNode | ASTPrimitiveNode
 }
 
 export type FieldDefinition = {

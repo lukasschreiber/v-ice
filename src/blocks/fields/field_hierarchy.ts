@@ -3,8 +3,10 @@ import { FieldTextInput } from "./field_textinput";
 import { FieldTextInputValidator, FieldTextInputConfig } from 'blockly/core/field_textinput'
 import { Hierarchy, IHierarchyEntry } from "@/data/hierarchy";
 import { IconFactory } from "../icon_factory";
+import { TypedField } from "./field";
+import types from "@/data/types";
 
-export class FieldHierarchy extends FieldTextInput {
+export class FieldHierarchy extends FieldTextInput implements TypedField {
     protected hierarchy_: Hierarchy | null = null;
     protected dropdownContainer_: HTMLDivElement | null = null;
     private boundEvents: Blockly.browserEvents.Data[] = [];
@@ -41,6 +43,10 @@ export class FieldHierarchy extends FieldTextInput {
         super.configure_(config);
 
         this.hierarchy_ = config.hierarchy || null;
+    }
+
+    getOutputType() {
+        return types.hierarchy(this.hierarchy_?.getName() || "unknown");
     }
 
     protected override showEditor_(e?: Event) {

@@ -3,32 +3,34 @@ import { Blocks } from "@/blocks";
 import { bfsWithDependencies } from "@/utils/nodes";
 import { NodeBlock } from "@/blocks/extensions/node";
 import { AnyRegistrableBlock, BlockFieldNames, BlockInputNames, BlockLinesDefinition, ConnectionPointNames, StatementInputTypeNames } from "@/blocks/block_definitions";
-import { AST, ASTNode, ASTNodeInput, ASTOperation, ASTPrimitive } from "./ast";
+import { AST, ASTNodeKind, ASTOperationNode, ASTPrimitiveNode, ASTSetNode, ASTSetNodeInput, createASTNode } from "./ast";
+import types, { IType } from "@/data/types";
+import { isTypedField } from "@/blocks/fields/field";
 
-type GeneratorFn<B extends Blockly.Block, S extends ScopeASTBuilder<B>, R extends ASTNode | ASTOperation | ASTPrimitive> = (scope: S) => R
+type BuildFn<B extends Blockly.Block, S extends ScopeASTBuilder<B>, R extends ASTSetNode | ASTOperationNode | ASTPrimitiveNode> = (scope: S) => R
 
-export type NodeGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends ASTNode> = GeneratorFn<B, NodeBlockASTBuilder<L, D, B>, R>
-export type OperationGeneratorFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends ASTOperation | ASTPrimitive> = GeneratorFn<B, BlockASTBuilder<L, D, B>, R>
+export type NodeBuildFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends ASTSetNode> = BuildFn<B, NodeBlockASTBuilder<L, D, B>, R>
+export type OperationBuildFn<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends ASTOperationNode | ASTPrimitiveNode> = BuildFn<B, BlockASTBuilder<L, D, B>, R>
 
 export class ASTBuilder {
     ROOT_NODE = "root"
 
-    public registerNode<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends ASTNode>(name: string, definition: D, generator: GeneratorFn<B, NodeBlockASTBuilder<L, D, B>, R>) {
+    public registerNode<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock, R extends ASTSetNode>(name: string, definition: D, builder: BuildFn<B, NodeBlockASTBuilder<L, D, B>, R>) {
         if (this.nodeSnippets[name]) {
             throw new Error(`Node ${name} already registered`)
         }
 
         console.log("Registering node", name)
         // TODO: Types are strange...
-        this.nodeSnippets[name] = generator as unknown as GeneratorFn<B, NodeBlockASTBuilder<L, D, B>, R>
+        this.nodeSnippets[name] = builder as unknown as BuildFn<B, NodeBlockASTBuilder<L, D, B>, R>
         this.definitions[name] = definition
     }
 
-    public registerOperation<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends ASTOperation>(name: string, definition: D, generator: GeneratorFn<B, BlockASTBuilder<L, D, B>, R>) {
+    public registerOperation<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block, R extends ASTOperationNode | ASTPrimitiveNode>(name: string, definition: D, builder: BuildFn<B, BlockASTBuilder<L, D, B>, R>) {
         if (this.operationSnippets[name]) {
             throw new Error(`Operation ${name} already registered`)
         }
-        this.operationSnippets[name] = generator as unknown as GeneratorFn<B, BlockASTBuilder<L, D, B>, R>
+        this.operationSnippets[name] = builder as unknown as BuildFn<B, BlockASTBuilder<L, D, B>, R>
         this.definitions[name] = definition
     }
 
@@ -45,8 +47,9 @@ export class ASTBuilder {
 
         return {
             root: {
-                id: root.id,
+                kind: ASTNodeKind.Set,
                 attributes: {
+                    id: root.id,
                     name: this.ROOT_NODE
                 }
             },
@@ -58,8 +61,9 @@ export class ASTBuilder {
     public emptyAST(): AST {
         return {
             root: {
-                id: this.ROOT_NODE,
+                kind: ASTNodeKind.Set,
                 attributes: {
+                    id: this.ROOT_NODE,
                     name: this.ROOT_NODE
                 }
             },
@@ -71,26 +75,26 @@ export class ASTBuilder {
     public buildASTForNode<
         L extends BlockLinesDefinition,
         B extends NodeBlock,
-        R extends ASTNode
+        R extends ASTSetNode
     >(block: B) {
-        const generator = this.nodeSnippets[block.type] as NodeGeneratorFn<L, AnyRegistrableBlock<L>, B, R>
-        return generator(new NodeBlockASTBuilder(this.definitions[block.type], block, this))
+        const builder = this.nodeSnippets[block.type] as NodeBuildFn<L, AnyRegistrableBlock<L>, B, R>
+        return builder(new NodeBlockASTBuilder(this.definitions[block.type], block, this))
     }
 
     public buildASTForOperationBlock<
         L extends BlockLinesDefinition,
         B extends Blockly.Block,
-        R extends ASTOperation | ASTPrimitive
+        R extends ASTOperationNode | ASTPrimitiveNode
     >(block: B) {
-        const generator = this.operationSnippets[block.type] as OperationGeneratorFn<L, AnyRegistrableBlock<L>, B, R>
-        if (!generator) {
-            throw new Error(`No generator found for block ${block.type}`)
+        const builder = this.operationSnippets[block.type] as OperationBuildFn<L, AnyRegistrableBlock<L>, B, R>
+        if (!builder) {
+            throw new Error(`No builder found for block ${block.type}`)
         }
-        return generator(new BlockASTBuilder(this.definitions[block.type], block, this))
+        return builder(new BlockASTBuilder(this.definitions[block.type], block, this))
     }
 
-    private nodeSnippets: Record<string, GeneratorFn<any, NodeBlockASTBuilder<any[], any, any>, ASTNode>> = {}
-    private operationSnippets: Record<string, GeneratorFn<any, BlockASTBuilder<any[], any, any>, ASTOperation | ASTPrimitive>> = {}
+    private nodeSnippets: Record<string, BuildFn<any, NodeBlockASTBuilder<any[], any, any>, ASTSetNode>> = {}
+    private operationSnippets: Record<string, BuildFn<any, BlockASTBuilder<any[], any, any>, ASTOperationNode | ASTPrimitiveNode>> = {}
     private definitions: Record<string, AnyRegistrableBlock<any>> = {}
 }
 
@@ -99,9 +103,9 @@ interface ScopeASTBuilder<B extends Blockly.Block> {
 }
 
 export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends Blockly.Block> implements ScopeASTBuilder<B> {
-    constructor(public definition: D, public block: B, public generator: ASTBuilder) { }
+    constructor(public definition: D, public block: B, public builder: ASTBuilder) { }
 
-    public buildASTForInput(name: BlockInputNames<L, D>): ASTOperation | ASTPrimitive {
+    public buildASTForInput(name: BlockInputNames<L, D>): ASTOperationNode | ASTPrimitiveNode {
         const input = this.block.getInput(name);
         if (!input) {
             throw ReferenceError(`Input "${name}" doesn't exist on "${this.block.type}"`);
@@ -110,38 +114,49 @@ export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegist
         const targetBlock = input.connection?.targetBlock();
 
         if (!targetBlock) {
-            return { value: this.block.getFieldValue(name) }
+            return createASTNode(ASTNodeKind.Primitive, { value: this.block.getFieldValue(name), type: null })
         }
 
-        return this.generator.buildASTForOperationBlock(targetBlock);
+        return this.builder.buildASTForOperationBlock(targetBlock);
     }
 
-    public buildASTForUnknownInput(name: BlockInputNames<L, D> | string): ASTOperation | ASTPrimitive {
+    public buildASTForUnknownInput(name: BlockInputNames<L, D> | string): ASTOperationNode | ASTPrimitiveNode {
         return this.buildASTForInput(name as BlockInputNames<L, D>);
     }
 
-    public buildASTForField(name: BlockFieldNames<L, D>, fn: (value: string) => ASTPrimitive["value"] = (value) => value): ASTOperation | ASTPrimitive {
-        return { value: fn(this.block.getFieldValue(name)) }
+    public buildASTForField(name: BlockFieldNames<L, D>, fn: (value: string) => ASTPrimitiveNode["value"] = (value) => value, overrideType: IType | string | undefined = undefined): ASTOperationNode | ASTPrimitiveNode {
+        const field = this.block.getField(name);
+        if (!field) {
+            throw ReferenceError(`Field "${name}" doesn't exist on "${this.block.type}"`);
+        }
+
+        let type = isTypedField(field) ? field.getOutputType() : null
+        
+        if (overrideType) {
+            type = types.utils.isType(overrideType) ? overrideType : types.utils.fromString(overrideType)
+        }
+
+        return createASTNode(ASTNodeKind.Primitive, { value: fn(this.block.getFieldValue(name)), type: type })
     }
 
-    public buildASTForUnknownStatementInput(name: StatementInputTypeNames<L, D> | string): (ASTOperation | ASTPrimitive)[] {
+    public buildASTForUnknownStatementInput(name: StatementInputTypeNames<L, D> | string): (ASTOperationNode | ASTPrimitiveNode)[] {
         return this.buildASTForStatementInput(name as StatementInputTypeNames<L, D>);
     }
 
-    public buildASTForStatementInput(name: StatementInputTypeNames<L, D>): ASTOperation[] {
+    public buildASTForStatementInput(name: StatementInputTypeNames<L, D>): ASTOperationNode[] {
         let targetBlock = this.block.getInputTargetBlock(name);
         if (!targetBlock && !this.block.getInput(name)) {
             throw ReferenceError(`Input "${name}" doesn't exist on "${this.block.type}"`);
         }
 
-        const segments: ASTOperation[] = []
+        const segments: ASTOperationNode[] = []
         while (targetBlock) {
-            const segment = this.generator.buildASTForOperationBlock(targetBlock);
-            if ((segment as ASTPrimitive).value) {
+            const segment = this.builder.buildASTForOperationBlock(targetBlock);
+            if ((segment as ASTPrimitiveNode).value) {
                 throw new Error(`Unexpected primitive value in statement input ${name}`)
             }
 
-            segments.push(segment as ASTOperation);
+            segments.push(segment as ASTOperationNode);
             targetBlock = targetBlock.getNextBlock();
         }
 
@@ -159,7 +174,7 @@ export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegist
 
 export class NodeBlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegistrableBlock<L>, B extends NodeBlock> extends BlockASTBuilder<L, D, B> {
 
-    public buildASTForConnectionPoint(inputName: ConnectionPointNames<L, D>): ASTNodeInput | ASTNodeInput[] {
+    public buildASTForConnectionPoint(inputName: ConnectionPointNames<L, D>): ASTSetNodeInput[] {
         const connection = this.block.edgeConnections.get(inputName);
 
         const connections = connection?.connections
@@ -170,13 +185,13 @@ export class NodeBlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRe
 
                 return targetBlock.type === Blocks.Names.NODE.SUBSET
                     ? {
-                        node: targetBlock.id,
-                        output: targetBlock.edgeConnections.get("POSITIVE")?.connections.includes(conn.targetConnection!) ? "positive" : "negative"
+                        connectedSetId: targetBlock.id,
+                        connectionPoint: targetBlock.edgeConnections.get("POSITIVE")?.connections.includes(conn.targetConnection!) ? "positive" : "negative"
                     }
-                    : { node: targetBlock.id, output: null };
+                    : { connectedSetId: targetBlock.id, connectionPoint: null };
             })
-            .filter(Boolean) as ASTNodeInput[];
+            .filter(Boolean) as ASTSetNodeInput[];
 
-        return connections?.length ? (connections.length === 1 ? connections[0] : connections) : [];
+        return connections || [];
     }
 }
