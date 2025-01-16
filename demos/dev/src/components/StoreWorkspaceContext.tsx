@@ -29,8 +29,12 @@ export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>
             !initialized &&
             dataIsInitialized
         ) {
-            load(savedCurrentWorkspace);
+            if (savedCurrentDataSetName === sourceName) {
+                load(savedCurrentWorkspace);
+            }
+
             setInitialized(true);
+            
             workspace?.addChangeListener(() => {
                 setSavedCurrentWorkspace(save());
                 setSavedCurrentDataSetName(sourceName);
