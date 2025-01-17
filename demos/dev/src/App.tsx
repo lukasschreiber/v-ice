@@ -1,9 +1,9 @@
-import { Canvas, useGeneratedCode, ToolboxDefinition, Toolbox, Themes } from "v-ice";
+import { Canvas, useGeneratedCode, ToolboxDefinition, Toolbox, Themes, Clients } from "v-ice";
 import { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab } from "./components/tabs/Tabs";
 import { Code } from "./components/Code";
 import { DataPanel } from "./components/tabs/DataPanel";
-import { useLocalStorage } from "v-ice-commons";
+import { Button, useLocalStorage } from "v-ice-commons";
 import { MiscPanel } from "./components/tabs/MiscPanel";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ToolboxPanel } from "./components/tabs/ToolboxPanel";
@@ -11,6 +11,7 @@ import { WorkspaceSavePanel } from "./components/tabs/WorspaceSavePanel";
 
 function App() {
     const [language] = useState(localStorage.getItem("language") ?? "en");
+    const [queryClient, setQueryClient] = useState("js");
     const { code, json, xml, queryJson } = useGeneratedCode();
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
@@ -23,33 +24,47 @@ function App() {
         window.addEventListener("resize", () => {
             if (orientation === "horizontal") {
                 setHeight(document.documentElement.clientHeight);
-                setWidth(document.documentElement.clientWidth * size / 100);
+                setWidth((document.documentElement.clientWidth * size) / 100);
             } else {
-                setHeight(document.documentElement.clientHeight * size / 100);
+                setHeight((document.documentElement.clientHeight * size) / 100);
                 setWidth(document.documentElement.clientWidth);
             }
         });
     }, [size, orientation]);
 
-    const handleResize = useCallback((size: number) => {
-        setSize(size);
-    }, [orientation]);
+    const handleResize = useCallback(
+        (size: number) => {
+            setSize(size);
+        },
+        [orientation]
+    );
 
     useEffect(() => {
         if (orientation === "horizontal") {
             setHeight(document.documentElement.clientHeight);
-            setWidth(document.documentElement.clientWidth * size / 100);
+            setWidth((document.documentElement.clientWidth * size) / 100);
         } else {
-            setHeight(document.documentElement.clientHeight * size / 100);
+            setHeight((document.documentElement.clientHeight * size) / 100);
             setWidth(document.documentElement.clientWidth);
         }
-    }, [orientation, size])
+    }, [orientation, size]);
 
     return (
         <>
             <PanelGroup autoSaveId={"main-panel"} direction={orientation} className="!w-screen !h-screen">
-                <Panel defaultSize={75} onResize={(size) => handleResize(size)} className="border-r border-solid border-gray-200">
-                    <Canvas width={width} height={height} language={language} media="/media/" toolbox={toolbox} theme={theme} />
+                <Panel
+                    defaultSize={75}
+                    onResize={(size) => handleResize(size)}
+                    className="border-r border-solid border-gray-200"
+                >
+                    <Canvas
+                        width={width}
+                        height={height}
+                        language={language}
+                        media="/media/"
+                        toolbox={toolbox}
+                        theme={theme}
+                    />
                 </Panel>
                 <PanelResizeHandle />
                 <Panel defaultSize={25}>
@@ -67,6 +82,29 @@ function App() {
                             <WorkspaceSavePanel />
                         </Tab>
                         <Tab label="Code" description="The generated JavaScript code">
+                            <div className="p-1 flex flex-row gap-2">
+                            <select
+                                className="bg-white rounded-sm border-slate-300 border border-solid"
+                                value={queryClient}
+                                onChange={(e) => {
+                                    setQueryClient(e.target.value);
+                                }}
+                            >
+                                {Object.keys(Clients).map((key) => (
+                                    <option key={key} value={key}>
+                                        {key}
+                                    </option>
+                                ))}
+                            </select>
+                            <Button
+                                onClick={() => {
+                                    Clients[queryClient as keyof typeof Clients].astToQueryCode(JSON.parse(queryJson));
+                                }}
+                            >
+                                Run
+                            </Button>
+                            </div>
+                           
                             <Code language="typescript" code={code === "" ? "// no code" : code.split("\n\n\n")[1]} />
                         </Tab>
                         <Tab label="AST" description="The generated JSON reperesentation of the code">

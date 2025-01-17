@@ -41,3 +41,43 @@ function traverseOperationNode(node: ASTOperationNode, visitor: ASTVisitor): voi
         }
     })
 }
+
+export function traverseASTReverse(ast: AST, visitor: ASTVisitor): void {
+    ast.sets.forEach(set => traverseSetNodeReverse(set, visitor))
+    ast.targets.forEach(target => traverseSetNodeReverse(target, visitor))
+    visitor.visit(ast.root)
+}
+
+function traverseSetNodeReverse(node: ASTSetNode, visitor: ASTVisitor): void {
+    if (node.operations) {
+        node.operations.forEach(operation => traverseOperationNodeReverse(operation, visitor))
+    }
+    visitor.visit(node)
+}
+
+function traverseOperationNodeReverse(node: ASTOperationNode, visitor: ASTVisitor): void {
+    Object.values(node.args).forEach(arg => {
+        if (Array.isArray(arg)) {
+            arg.forEach(subNode => {
+                if (isASTNode(subNode)) {
+                    traverseASTReversePartial(subNode, visitor)
+                }
+            })
+        } else {
+            if (isASTNode(arg)) {
+                traverseASTReversePartial(arg, visitor)
+            }
+        }
+    })
+    visitor.visit(node)
+}
+
+function traverseASTReversePartial<K extends ASTNodeKind, T extends ASTNode<K>>(ast: T, visitor: ASTVisitor): void {
+    if (isSetNode(ast)) {
+        traverseSetNodeReverse(ast, visitor)
+    } else if (isOperationNode(ast)) {
+        traverseOperationNodeReverse(ast, visitor)
+    } else if (isPrimitiveNode(ast)) {
+        visitor.visit(ast)
+    }
+}

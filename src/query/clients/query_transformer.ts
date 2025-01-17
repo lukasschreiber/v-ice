@@ -22,6 +22,7 @@ export interface PrimitiveNodeQueryTransformerDefinition<T extends IType> extend
 
 export interface SetNodeQueryTransformerDefinition extends IQueryTransformerDefinition {
     kind: ASTNodeKind.Set
+    blockName: string
     transformer: QueryTransformerForSetNode
 }
 
@@ -44,4 +45,10 @@ export function createPrimitiveTransformer<T extends IType>(
     definition: Omit<PrimitiveNodeQueryTransformerDefinition<T>, "kind">
 ): PrimitiveNodeQueryTransformerDefinition<T> {
     return { ...definition, kind: ASTNodeKind.Primitive } as PrimitiveNodeQueryTransformerDefinition<T>
+}
+
+export function createSetTransformer(
+    definition: Omit<SetNodeQueryTransformerDefinition, "kind">
+): SetNodeQueryTransformerDefinition {
+    return { ...definition, kind: ASTNodeKind.Set } as SetNodeQueryTransformerDefinition
 }

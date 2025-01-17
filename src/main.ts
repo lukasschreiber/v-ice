@@ -95,6 +95,7 @@ import { DefaultToolbox } from "./blocks/toolbox/default_toolbox"
 import { RegistrableExtension } from "@/blocks/block_extensions"
 import { RegistrableMutator } from "./blocks/block_mutators"
 import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox"
+import { jsQueryClient } from "./query/clients/javascript/js_query_client"
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `BlocklyProvider`.
@@ -231,6 +232,10 @@ const Evaluation = {
 export const Themes = {
     LightTheme, 
     DarkTheme
+}
+
+export const Clients = {
+    js: jsQueryClient
 }
 
 // Move this to a separate file together with the block definitions

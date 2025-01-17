@@ -3,6 +3,7 @@ import { AST } from "../builder/ast";
 import { LocalQueryVerificator } from "./local_query_verificator";
 import { LocalQueryRuntime } from "./local_query_runtime";
 import { QueryTransformerDefinition } from "./query_transformer";
+import { traverseASTReverse } from "../builder/ast_traverser";
 
 export interface LocalQueryClientParams extends QueryClientParams<"local"> {
     mode: "local";
@@ -30,7 +31,12 @@ export class LocalQueryClient extends QueryClient {
     }
 
     public astToQueryCode(ast: AST): string {
-        console.log("Local query client converting AST to query code: ", ast);
+        traverseASTReverse(ast, {
+            visit(node) {
+                console.log("Visiting node: ", node);
+            }
+        })
+
         return "Local query code"
     }
 }

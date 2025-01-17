@@ -149,5 +149,6 @@ export const jsQueryClient = createQueryClient({
             type: t.nullable(t.struct(t.wildcard)),
             transformer: (astNode) => `${astNode.value === null ? "null" : JSON.stringify(astNode.value)}`
         }),
+
     ]
 })
