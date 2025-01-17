@@ -1,6 +1,6 @@
 {
     "colors": {
-        "background": "#ffffff",
+        "background": "#1f1f1f",
         "secondary": "#4C97FF",
         "primary": {
             "50": "#E9FCF7",
@@ -17,20 +17,20 @@
         },
         "menu": {
             "bg": {
-                "default": "#ffffff",
-                "hover": "#ffffff",
-                "selected": "#e9eef2"
+                "default": "#181818",
+                "hover": "#2d2d2d",
+                "selected": "#37373d"
             },
             "text": {
-                "default": "#333333",
-                "hover": "#4C97FF",
-                "selected": "#4C97FF"
+                "default": "#868686",
+                "hover": "#d7d7d7",
+                "selected": "#d7d7d7"
             },
-            "border": "#e9eef2"
+            "border": "#37373d"
         },
         "toolbox": {
-            "bg": "#ffffff",
-            "text": "#333333"
+            "bg": "#181818",
+            "text": "#d7d7d7"
         },
         "categories": {
             "comparisons": "#4C97FF",

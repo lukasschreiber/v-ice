@@ -1,9 +1,9 @@
 import { GenericBlockDefinition, blockDefinitionToBlock } from "@/blocks/toolbox/toolbox_definition";
 import { useEffect, useRef } from "react";
 import * as Blockly from "blockly/core";
-import light_theme from "@/themes/light_theme";
 import { Renderer } from "@/renderer/renderer";
 import { Blocks } from "@/blocks";
+import { LightTheme } from "@/themes/themes";
 
 export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadParentRef?: React.RefObject<HTMLElement> }) {
     const div = useRef<HTMLDivElement>(null);
@@ -20,7 +20,7 @@ export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadPar
             if (!workspaceRef.current) {
                 workspaceRef.current = Blockly.inject(div.current, {
                     readOnly: true,
-                    theme: light_theme,
+                    theme: LightTheme,
                     renderer: Renderer.name,
                 });
             } else {

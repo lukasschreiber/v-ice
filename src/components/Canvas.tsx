@@ -1,7 +1,7 @@
 import React, { createRef, useContext, useEffect, useMemo, useState } from "react";
 import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
-import LightTheme from "@/themes/light_theme";
+import { LightTheme } from "@/themes/themes";
 import { queryGenerator } from "@/main";
 import { ContinuousMetrics } from "@/toolbox/metrics";
 import { ContinuousFlyout } from "@/toolbox/flyout";
@@ -40,6 +40,7 @@ import { EmptyToolbox } from "@/blocks/toolbox/empty_toolbox";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 import { LoadingOverlay } from "./common/LoadingOverlay";
 import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance";
+import { setTheme } from "@/themes/colors";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -54,6 +55,7 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     media?: string;
     helpUrl?: string;
     toolbox?: ToolboxDefinition;
+    theme?: Blockly.Theme;
 };
 
 export function Canvas(props: CanvasProps) {
@@ -77,7 +79,6 @@ export function Canvas(props: CanvasProps) {
     const source = useSelector((state) => state.data.source);
     const memoizedSource = useMemo(() => DataTable.deserialize(source), [source]);
     const dispatch = useDispatch();
-
 
     useEffect(() => {
         setHelpUrl(helpUrl ?? null);
@@ -144,7 +145,7 @@ export function Canvas(props: CanvasProps) {
                     blockDragger: BlockDragger,
                 },
                 media: media || "https://blockly-demo.appspot.com/static/media/",
-                theme: LightTheme,
+                theme: props.theme ?? LightTheme,
                 renderer: Renderer.name,
                 grid: {
                     spacing: 40,
@@ -260,6 +261,12 @@ export function Canvas(props: CanvasProps) {
 
         return () => div?.removeEventListener("resize", handleToolboxResize);
     }, [blocklyDiv]);
+
+    useEffect(() => {
+        if (workspaceRef.current) {
+            setTheme(workspaceRef.current, props.theme ?? LightTheme);
+        }
+    }, [props.theme, workspaceRef.current]);
 
     useSettingsHandlers(workspaceRef, settings);
 

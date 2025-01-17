@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import * as Blockly from "blockly/core";
-import light_theme from "@/themes/light_theme";
+import {LightTheme} from "@/themes/themes";
 import { Renderer } from "@/renderer/renderer";
 import { ISerializedWorkspace } from "v-ice";
 import { deserializeWorkspace } from "@/serializer";
@@ -24,7 +24,7 @@ export function WorkspaceImage(props: React.HTMLProps<HTMLDivElement> & { state:
             if (!workspaceRef.current) {
                 workspaceRef.current = Blockly.inject(div.current, {
                     readOnly: true,
-                    theme: light_theme,
+                    theme: LightTheme,
                     renderer: Renderer.name,
                     zoom: {
                         startScale: props.scale ?? 0.3,

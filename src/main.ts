@@ -27,7 +27,6 @@ import "@/blocks/fields/field_button"
 
 import "@/blocks/extensions/scoped"
 import "@/blocks/extensions/parent_color"
-import "@/blocks/extensions/nullable_variable"
 import "@/blocks/extensions/dynamic_event"
 import "@/blocks/extensions/dynamic_event_matches"
 import "@/blocks/extensions/node"
@@ -57,6 +56,8 @@ import * as ListBlocks from "@/blocks/definitions/lists"
 import * as StructBlocks from "@/blocks/definitions/structs"
 import * as LogicBlocks from "@/blocks/definitions/logic"
 import * as TimelineBlocks from "@/blocks/definitions/timeline"
+
+import { LightTheme, DarkTheme } from "./themes/themes"
 
 import "@/query/generation/comparisons"
 import "@/query/generation/variables"
@@ -225,6 +226,11 @@ const Mutators = import.meta.glob("@/blocks/mutators/*.ts")
 const Evaluation = {
     events: emitter,
     Action: EvaluationAction
+}
+
+export const Themes = {
+    LightTheme, 
+    DarkTheme
 }
 
 // Move this to a separate file together with the block definitions

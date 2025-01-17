@@ -1,7 +1,6 @@
 import { Blocks } from "@/blocks";
 import { createBlock } from "@/blocks/block_definitions";
 import t from "@/data/types"
-import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 
 export const StringBlock = createBlock({
@@ -19,7 +18,7 @@ export const StringBlock = createBlock({
         }
     ],
     output: t.string,
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     extensions: [ParentColorExtension],
     code: (scope) => {
         return scope.buildASTForField("VALUE")

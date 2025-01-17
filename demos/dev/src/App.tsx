@@ -1,4 +1,4 @@
-import { Canvas, useGeneratedCode, ToolboxDefinition, Toolbox } from "v-ice";
+import { Canvas, useGeneratedCode, ToolboxDefinition, Toolbox, Themes } from "v-ice";
 import { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab } from "./components/tabs/Tabs";
 import { Code } from "./components/Code";
@@ -14,6 +14,7 @@ function App() {
     const { code, json, xml, queryJson } = useGeneratedCode();
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
+    const [theme, setTheme] = useState(Themes.LightTheme);
     const [size, setSize] = useState(75);
     const [orientation, setOrientation] = useLocalStorage<"horizontal" | "vertical">("panel-direction", "horizontal");
     const [toolbox, setToolbox] = useState<ToolboxDefinition>(Toolbox.Defaults.Complete);
@@ -48,7 +49,7 @@ function App() {
         <>
             <PanelGroup autoSaveId={"main-panel"} direction={orientation} className="!w-screen !h-screen">
                 <Panel defaultSize={75} onResize={(size) => handleResize(size)} className="border-r border-solid border-gray-200">
-                    <Canvas width={width} height={height} language={language} media="/media/" toolbox={toolbox} />
+                    <Canvas width={width} height={height} language={language} media="/media/" toolbox={toolbox} theme={theme} />
                 </Panel>
                 <PanelResizeHandle />
                 <Panel defaultSize={25}>
@@ -57,7 +58,7 @@ function App() {
                             <DataPanel />
                         </Tab>
                         <Tab label="Misc" description="Some random functions">
-                            <MiscPanel />
+                            <MiscPanel theme={theme} setTheme={setTheme} />
                         </Tab>
                         <Tab label="Toolbox" description="Toolbox configuration">
                             <ToolboxPanel toolbox={toolbox} setToolbox={setToolbox} />

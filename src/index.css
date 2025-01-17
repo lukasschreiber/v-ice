@@ -22,7 +22,7 @@
 
 
 /* The blockly input field should have the correct size but due to aliasing it needs to be just a nudge smaller to not cover up parts of the border */
-.renderer-renderer.light-theme.blocklyWidgetDiv:has(.blocklyHtmlInput) {
+.renderer-renderer.blocklyWidgetDiv:has(.blocklyHtmlInput) {
     transform: scale(0.98) translateX(0.5px) translateY(-0.5px);
 }
 
@@ -33,6 +33,10 @@
     color: white;
     outline: none;
     width: 100%;
+}
+
+.blocklySvg {
+    @apply bg-background;
 }
 
 .blocklyDropDownContent:has(.blocklyMenu) {

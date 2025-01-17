@@ -1,7 +1,6 @@
 import { Blocks } from "@/blocks";
 import { createBlock } from "@/blocks/block_definitions";
 import t from "@/data/types"
-import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { StructPropertySelectMutator } from "../mutators/struct_property_select";
 import { StructSelectMutator } from "../mutators/struct_select";
@@ -11,7 +10,7 @@ export const StructBlock = createBlock({
     id: Blocks.Names.STRUCTS.IMMEDIATE,
     lines: [] as const,
     output: t.struct(t.wildcard),
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     extensions: [ParentColorExtension],
     mutator: StructSelectMutator,

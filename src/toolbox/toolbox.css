@@ -7,11 +7,19 @@
 }
 
 .blocklyTreeRow.blocklyTreeSelected .blocklyTreeLabel {
-  @apply text-[unset]
+  @apply text-menu-text-selected;
+}
+
+.blocklyTreeRow:not(.blocklyTreeSelected) .blocklyTreeLabel {
+  @apply text-menu-text;
 }
 
 .blocklyTreeRow:hover .blocklyTreeLabel {
-  @apply text-secondary;
+  @apply text-menu-text-hover;
+}
+
+.blocklyTreeRow:hover {
+  @apply !bg-menu-bg-hover;
 }
 
 .blocklyTreeRowContentContainer {
@@ -23,10 +31,10 @@
 }
 
 .blocklyToolboxDiv {
-  @apply min-w-[65px] border-r-[1px] border-slate-200 border-solid border-0 p-0;
+  @apply min-w-[65px] border-r-[1px] border-menu-border border-solid border-0 p-0;
   /* This magic number works well with the length of "Comparisons" the sidebar should not get too big and should not change if the language is switched */
 }
 
 .blocklyFlyoutLabelText {
-  @apply !font-bold;
+  @apply !font-bold !fill-toolbox-text;
 }

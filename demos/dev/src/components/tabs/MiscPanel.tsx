@@ -1,4 +1,4 @@
-import { DataColumn, DataTable, IType, QueryBackend, ValueOf, useQuery, useSettings } from "v-ice";
+import { DataColumn, DataTable, IType, QueryBackend, Themes, ValueOf, useQuery, useSettings } from "v-ice";
 import { useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";
@@ -9,7 +9,7 @@ import { TypeIconPreview } from "@/components/common/TypeIconPreview";
 import { faker } from "@faker-js/faker";
 import { Accordion } from "../Accordion";
 
-export function MiscPanel() {
+export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], setTheme: (theme: typeof Themes[keyof typeof Themes]) => void }) {
     const { settings, set } = useSettings();
     const { workspace, save, load } = useWorkspace();
     const [language, setLanguage] = useState(localStorage.getItem("language") ?? "en");
@@ -131,6 +131,23 @@ export function MiscPanel() {
                     >
                         Save Language and Reload
                     </Button>
+                </div>
+            </Accordion>
+            <Accordion title="Themes" defaultOpen={true}>
+                <div className="flex flex-row gap-2 py-2">
+                    <select
+                        value={Object.keys(Themes).find((key) => Themes[key as keyof typeof Themes] === props.theme)}
+                        onChange={(e) => props.setTheme(Themes[e.target.value as keyof typeof Themes])}
+                        className="bg-white rounded-sm border-slate-300 border border-solid"
+                    >
+                        {Object.keys(Themes).map((name) => {
+                            return (
+                                <option key={name} value={name}>
+                                    {name}
+                                </option>
+                            );
+                        })}
+                    </select>
                 </div>
             </Accordion>
             <Accordion title="Export Block Images" defaultOpen={true}>

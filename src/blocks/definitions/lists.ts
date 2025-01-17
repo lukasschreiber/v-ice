@@ -1,7 +1,6 @@
 import { Blocks } from "@/blocks";
 import { ConnectionType, createBlock } from "../block_definitions";
 import t from "@/data/types";
-import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { FlattenListExtension } from "../extensions/flatten_list";
 import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
@@ -184,7 +183,7 @@ export const ListImmediateBlock = createBlock({
     id: Blocks.Names.LIST.IMMEDIATE,
     lines: [] as const,
     output: t.list(t.wildcard),
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     extensions: [ParentColorExtension],
     mutator: ListSelectMutator,

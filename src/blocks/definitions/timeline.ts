@@ -1,6 +1,5 @@
 import { ConnectionType, createBlock } from "../block_definitions";
 import types from "@/data/types";
-import { Colors } from "@/themes/colors";
 import { Blocks } from "@/blocks";
 import { EventOp, SkipOp, TimeUnit } from "@/query/generation/timeline_templates";
 import { DynamicEventExtension } from "../extensions/dynamic_event";
@@ -35,7 +34,7 @@ export const TimelineQueryBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
     helpUrl: "#timeline-match",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })
 
 export const TimelineEventOccursBlock = createBlock({
@@ -59,7 +58,7 @@ export const TimelineEventOccursBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
-    color: Colors.categories.history,
+    style: "timeline_blocks",
     helpUrl: "#timeline-event",
     extensions: [DynamicEventExtension],
     mutator: EventDoesNotOccurForMutator
@@ -112,7 +111,7 @@ export const TimelineEventOccursMatchBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
     extensions: [DynamicEventMatchesExtension],
-    color: Colors.categories.history,
+    style: "timeline_blocks",
     helpUrl: "#timeline-event-query",
     mutator: EventDoesNotOccurForMutator
 })
@@ -133,7 +132,7 @@ export const TimelineStartOfIntervalBlock = createBlock({
     ] as const,
     output: types.event(types.enum(types.wildcard)),
     helpUrl: "#timeline-interval",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })
 
 export const TimelineEndOfIntervalBlock = createBlock({
@@ -152,7 +151,7 @@ export const TimelineEndOfIntervalBlock = createBlock({
     ] as const,
     output: types.event(types.enum(types.wildcard)),
     helpUrl: "#timeline-interval",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })
 
 export const TimelineAfterBlock = createBlock({
@@ -193,7 +192,7 @@ export const TimelineAfterBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
     helpUrl: "#timeline-after",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })
 
 export const TimelineAfterIntervalBlock = createBlock({
@@ -230,7 +229,7 @@ export const TimelineAfterIntervalBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
     helpUrl: "#timeline-after-interval",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })
 
 export const TimestampBlock = createBlock({
@@ -249,7 +248,7 @@ export const TimestampBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
     helpUrl: "#timeline-timestamp",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })
 
 export const TimelineDateBlock = createBlock({
@@ -266,7 +265,7 @@ export const TimelineDateBlock = createBlock({
         }
     ] as const,
     output: types.timestamp,
-    color: Colors.categories.history,
+    style: "timeline_blocks",
     extensions: [ParentColorExtension],
 })
 
@@ -303,7 +302,7 @@ export const TimelineOrBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
-    color: Colors.categories.history,
+    style: "timeline_blocks",
     helpUrl: "#timeline-or",
     mutator: EitherOrMutator,
 })
@@ -335,7 +334,7 @@ export const TimelineUntilBlock = createBlock({
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
     extensions: [DynamicEventExtension],
     helpUrl: "#timeline-repeat-until",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })
 
 export const TimelineRepeatBlock = createBlock({
@@ -364,5 +363,5 @@ export const TimelineRepeatBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.TIMELINE_PROTOTYPE,
     helpUrl: "#timeline-repeat",
-    color: Colors.categories.history,
+    style: "timeline_blocks",
 })

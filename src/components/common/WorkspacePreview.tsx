@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 import * as Blockly from "blockly/core";
-import light_theme from "@/themes/light_theme";
 import { Renderer } from "@/renderer/renderer";
 import { ISerializedWorkspace } from "@/serializer";
+import { LightTheme } from "@/themes/themes";
 
 export function WorkspacePreview(props: { workspace: ISerializedWorkspace, lazyLoadParentRef?: React.RefObject<HTMLElement> } & React.HTMLProps<HTMLDivElement>) {
     const div = useRef<HTMLDivElement>(null);
@@ -20,7 +20,7 @@ export function WorkspacePreview(props: { workspace: ISerializedWorkspace, lazyL
             if (!workspaceRef.current) {
                 workspaceRef.current = Blockly.inject(div.current, {
                     readOnly: true,
-                    theme: light_theme,
+                    theme: LightTheme,
                     renderer: Renderer.name,
                 });
             } else {

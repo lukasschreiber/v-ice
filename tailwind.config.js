@@ -31,8 +31,21 @@ export default {
         },
         secondary: "rgb(var(--color-secondary) / <alpha-value>)",
         menu: {
-          background: "rgb(var(--color-menu-background) / <alpha-value>)",
-          text: "rgb(var(--color-menu-selected) / <alpha-value>)",
+          bg: {
+            DEFAULT: "rgb(var(--color-menu-bg-default) / <alpha-value>)",
+            hover: "rgb(var(--color-menu-bg-hover) / <alpha-value>)",
+            selected: "rgb(var(--color-menu-bg-selected) / <alpha-value>)",
+          },
+          text: {
+            DEFAULT: "rgb(var(--color-menu-text-default) / <alpha-value>)",
+            hover: "rgb(var(--color-menu-text-hover) / <alpha-value>)",
+            selected: "rgb(var(--color-menu-text-selected) / <alpha-value>)",
+          },
+          border: "rgb(var(--color-menu-border) / <alpha-value>)",
+        },
+        toolbox: {
+          bg: "rgb(var(--color-toolbox-bg) / <alpha-value>)",
+          text: "rgb(var(--color-toolbox-text) / <alpha-value>)",
         },
         categories: {
           comparisons: "rgb(var(--color-categories-comparisons) / <alpha-value>)",

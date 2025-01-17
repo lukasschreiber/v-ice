@@ -1,4 +1,3 @@
-import { Colors } from "@/themes/colors";
 import { ConnectionType, createBlock } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { Blocks } from "@/blocks";
@@ -32,7 +31,7 @@ export const EqualsWithinBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
     helpUrl: "#equals-within",
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
@@ -68,7 +67,7 @@ export const EqualsBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     helpUrl: "#equals",
     mutator: DynamicInputTypesMutator,
@@ -104,7 +103,7 @@ export const MatchesBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     helpUrl: "#matches",
     mutator: DynamicInputTypesMutator,
@@ -140,7 +139,7 @@ export const GreaterBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     helpUrl: "#comparison-numbers",
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
@@ -181,7 +180,7 @@ export const LessBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
     helpUrl: "#comparison-numbers",
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
@@ -221,7 +220,7 @@ export const LessEqualsBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
     helpUrl: "#comparison-numbers",
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
@@ -261,7 +260,7 @@ export const GreaterEqualsBlock = createBlock({
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
     helpUrl: "#comparison-numbers",
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
@@ -310,7 +309,7 @@ export const CompareNumbersBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     helpUrl: "#comparison-numbers",
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
@@ -352,7 +351,7 @@ export const CompareIntervalBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     helpUrl: "#comparison-interval",
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
@@ -384,7 +383,7 @@ export const IsNullBlock = createBlock({
         }
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     helpUrl: "#comparison-null",
     inputsInline: true,
     code: (scope) => {

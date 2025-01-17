@@ -1,7 +1,6 @@
 import { Blocks } from "@/blocks";
 import { ConnectionType, createBlock } from "@/blocks/block_definitions";
 import t from "@/data/types"
-import { Colors } from "@/themes/colors";
 import { ParentColorExtension } from "../extensions/parent_color";
 import { EitherOrMutator } from "../mutators/either_or";
 import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
@@ -113,7 +112,7 @@ export const BooleanBlock = createBlock({
     ] as const,
     output: t.boolean,
     extensions: [ParentColorExtension],
-    color: Colors.categories.comparisons,
+    style: "comparisons_blocks",
     code: (scope) => {
         return createASTNode(ASTNodeKind.Primitive, { value: scope.getFieldValue("BOOL") === "TRUE", type: t.boolean })
     }
