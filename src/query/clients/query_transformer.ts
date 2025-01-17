@@ -47,8 +47,8 @@ export function createPrimitiveTransformer<T extends IType>(
     return { ...definition, kind: ASTNodeKind.Primitive } as PrimitiveNodeQueryTransformerDefinition<T>
 }
 
-export function createSetTransformer(
-    definition: Omit<SetNodeQueryTransformerDefinition, "kind">
+export function createSubsetTransformer(
+    definition: Omit<SetNodeQueryTransformerDefinition, "kind" | "blockName">
 ): SetNodeQueryTransformerDefinition {
-    return { ...definition, kind: ASTNodeKind.Set } as SetNodeQueryTransformerDefinition
+    return { ...definition, kind: ASTNodeKind.Set, blockName: "subset_node" } as SetNodeQueryTransformerDefinition
 }

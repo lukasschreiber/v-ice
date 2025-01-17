@@ -48,7 +48,7 @@ export function Tabs(props: React.HTMLProps<HTMLDivElement> & { orientation: "ho
 
 export function Tab(props: React.HTMLProps<HTMLDivElement> & { label: string; description: string }) {
     return (
-        <div {...props} className="h-full flex flex-col">
+        <div {...props} className="h-full flex flex-col relative">
             <div className="text-xs p-1 border-b border-solid border-gray-200">{props.description}</div>
             <div className="overflow-x-auto overflow-y-auto h-full box-border grow">{props.children}</div>
         </div>

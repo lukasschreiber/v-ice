@@ -82,29 +82,31 @@ function App() {
                             <WorkspaceSavePanel />
                         </Tab>
                         <Tab label="Code" description="The generated JavaScript code">
-                            <div className="p-1 flex flex-row gap-2">
-                            <select
-                                className="bg-white rounded-sm border-slate-300 border border-solid"
-                                value={queryClient}
-                                onChange={(e) => {
-                                    setQueryClient(e.target.value);
-                                }}
-                            >
-                                {Object.keys(Clients).map((key) => (
-                                    <option key={key} value={key}>
-                                        {key}
-                                    </option>
-                                ))}
-                            </select>
-                            <Button
-                                onClick={() => {
-                                    Clients[queryClient as keyof typeof Clients].astToQueryCode(JSON.parse(queryJson));
-                                }}
-                            >
-                                Run
-                            </Button>
+                            <div className="absolute bottom-2 left-2 p-2 flex flex-row gap-2 text-xs shadow-lg border-gray-200 rounded-md border z-[1000]">
+                                <select
+                                    className="bg-white rounded-sm border-slate-300 border border-solid"
+                                    value={queryClient}
+                                    onChange={(e) => {
+                                        setQueryClient(e.target.value);
+                                    }}
+                                >
+                                    {Object.keys(Clients).map((key) => (
+                                        <option key={key} value={key}>
+                                            {key}
+                                        </option>
+                                    ))}
+                                </select>
+                                <Button
+                                    onClick={() => {
+                                        console.log(Clients[queryClient as keyof typeof Clients].astToQueryCode(
+                                            JSON.parse(queryJson)
+                                        ));
+                                    }}
+                                >
+                                    Run
+                                </Button>
                             </div>
-                           
+
                             <Code language="typescript" code={code === "" ? "// no code" : code.split("\n\n\n")[1]} />
                         </Tab>
                         <Tab label="AST" description="The generated JSON reperesentation of the code">

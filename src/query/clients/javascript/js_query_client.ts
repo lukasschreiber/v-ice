@@ -1,5 +1,5 @@
 import { createQueryClient } from "../query_client_build";
-import { createOperationTransformer, createPrimitiveTransformer } from "../query_transformer";
+import { createOperationTransformer, createPrimitiveTransformer, createSubsetTransformer } from "../query_transformer";
 import t from "@/data/types"
 
 export const jsQueryClient = createQueryClient({
@@ -148,6 +148,14 @@ export const jsQueryClient = createQueryClient({
         createPrimitiveTransformer({
             type: t.nullable(t.struct(t.wildcard)),
             transformer: (astNode) => `${astNode.value === null ? "null" : JSON.stringify(astNode.value)}`
+        }),
+
+        createSubsetTransformer({
+            transformer: (astNode) => {
+                return `function ${astNode.attributes.name}(default) {
+                    return conditionalSplit(default, p => ${astNode.operations?.join(" && ") || "false"});
+                }`
+            }
         }),
 
     ]
