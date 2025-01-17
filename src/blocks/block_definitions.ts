@@ -6,6 +6,7 @@ import { NodeExtension, NodeBlockExtension } from "./extensions/node"
 import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance"
 import { BlockASTBuilder, NodeBlockASTBuilder } from "@/query/builder/ast_builder"
 import { ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "@/query/builder/ast"
+import { BlocklyTranslationKeys } from "@/i18n"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -109,7 +110,11 @@ function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], 
     if (block.lines) {
         for (let i = 0; i < block.lines.length; i++) {
             const line = block.lines[i]
-            result[`message${i}`] = line.text
+            if (typeof line.text === "function") {
+                result[`message${i}`] = line.text((key: string) => `%${line.args.findIndex(p => p.name === key) + 1}`, (key: string) => `%{BKY_${key}}`)
+            } else {
+                result[`message${i}`] = line.text
+            }
             result[`args${i}`] = line.args
             if (line.align) result[`implicitAlign${i}`] = line.align
         }
@@ -164,10 +169,13 @@ type BlocklyJsonBlockDefinition = {
  * @param align The alignment of the block line, note the british spelling which is taken from Blockly
  */
 export interface BlockLineDefinition {
-    text: string
+    text: string | BlockLineDefinitionTextFn
     args: (FieldDefinition | InputDefinition)[]
     align?: "RIGHT" | "CENTRE" | "LEFT"
 }
+
+// TODO: This is not currently used but could be useful in the future
+export type BlockLineDefinitionTextFn = (args: (arg: string) => string, t: (key: BlocklyTranslationKeys) => string) => string
 
 /**
  * A list of block line definitions
@@ -221,10 +229,33 @@ export interface RegistrableBlock<
     // Additional optional data that can be attached to the block
     data?: object | string
     // A function that converts the block to an AST node
-    code?: (
-        scope: MatchAny<Es, typeof NodeBlockExtension> extends true ? NodeBlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
-    ) => MatchAny<Es, typeof NodeBlockExtension> extends true ? ASTSetNode : ASTOperationNode | ASTPrimitiveNode
+    code?: (scope: CodeCreationFnScope<Es, M, L>) => CodeCreationFnReturnType<Es>
 }
+
+/**
+ * The type of a block code creation scope
+ * The scope is the AST builder instance that is used to create the AST node
+ * For node blocks this is a NodeBlockASTBuilder, for normal blocks this is a BlockASTBuilder
+ * 
+ * Note the usage of NodeExtension here to convince typescript that the extension is a node extension (even though ExtensionMixins does guarantee that with the `MatchAny<Es, typeof NodeBlockExtension>`)
+ */
+export type CodeCreationFnScope<
+    Es extends RegistrableExtension[],
+    M extends RegistrableMutator,
+    L extends BlockLinesDefinition,
+> = MatchAny<Es, typeof NodeBlockExtension> extends true
+    ? NodeBlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension>
+    : BlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>
+
+/**
+ * The return type of a block code creation function
+ * This is either an ASTSetNode for node blocks or an ASTOperationNode or ASTPrimitiveNode for normal blocks
+ */
+export type CodeCreationFnReturnType<
+    Es extends RegistrableExtension[],
+> = MatchAny<Es, typeof NodeBlockExtension> extends true
+    ? ASTSetNode
+    : ASTOperationNode | ASTPrimitiveNode
 
 /**
  * A field definition

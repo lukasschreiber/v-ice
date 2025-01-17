@@ -9,6 +9,9 @@ import * as Blockly from "blockly/core"
 import * as de from "blockly/msg/de"
 import * as en from "blockly/msg/en"
 
+// use en as default language for typings
+import customEnglishTranslations from "@/assets/translations/strings.en.json"
+
 const blocklyResources: {[key: string]: Record<string, string>} = {
     "de": de as unknown as Record<string, string>,
     "en": en as unknown as Record<string, string>
@@ -95,3 +98,5 @@ export function getHelpMarkdown(language: string) {
 }
 
 export default i18n
+
+export type BlocklyTranslationKeys = Uppercase<keyof typeof customEnglishTranslations["blockly"]> | Uppercase<keyof typeof en>

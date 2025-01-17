@@ -9,6 +9,7 @@ export const EqualsWithinBlock = createBlock({
     id: Blocks.Names.COMPARISON.EQUALS_WITHIN,
     lines: [
         {
+            // text: (args, t) => `${args("A")} = ${args("B")} ${t("WITHIN")} ${args("DELTA")}`,
             text: "%1 = %2 %{BKY_WITHIN} %3",
             args: [
                 {
