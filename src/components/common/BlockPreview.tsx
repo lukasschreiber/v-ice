@@ -4,6 +4,7 @@ import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
 import { Blocks } from "@/blocks";
 import { LightTheme } from "@/themes/themes";
+import types from "@/data/types";
 
 export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadParentRef?: React.RefObject<HTMLElement> }) {
     const div = useRef<HTMLDivElement>(null);
@@ -32,6 +33,14 @@ export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadPar
             workspace.setScale(0.9);
 
             const blockState = blockDefinitionToBlock(props.block);
+
+            const enumNames = Array.from(new Set([...JSON.stringify(props.block).matchAll(/Enum<.*?>/g)].map(match => match[0].replace("Enum<", "").replace(">", ""))));
+            enumNames.forEach(enumName => {
+                if (!types.registry.getEnum(enumName)) {
+                    // TODO: This is a hack just for now, values must be inferred from the block definition
+                    types.registry.registerEnum(enumName, ["Augsburg"]);
+                }
+            });
 
             const createUsedVariables = (block: Blockly.serialization.blocks.State) => {
                 if (block.type === Blocks.Names.VARIABLE.GET) {

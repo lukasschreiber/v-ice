@@ -1,0 +1,10 @@
+{
+    "order": [
+        "texts",
+        "numbers",
+        "lists",
+        "structs",
+        "hierarchies",
+        "timestamps"
+    ]
+}

@@ -1,11 +1,12 @@
 import { useHelp } from "@/store/help/help_hooks";
 import { InvariantMarkdownView } from "./common/MarkdownView";
-import { getHelpMarkdown } from "@/i18n";
+// import { getHelpMarkdown } from "@/i18n";
 import { useTranslation } from "react-i18next";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
 import { showHelp } from "@/store/help/help_emitter";
 import ChevronRightIcon from "@/assets/ChevronRightIcon.svg?react";
 import { createPortal } from "react-dom";
+import { getManualMarkdown } from "@/store/help/help_loader";
 
 interface BreadCrumb {
     text: string;
@@ -20,7 +21,7 @@ export function HelpPage() {
     const breadCrumbContainerRef = useRef<HTMLDivElement>(null);
     const [breadCrumbs, setBreadCrumbs] = useState<BreadCrumb[]>([]);
     
-    const helpMarkdown = useMemo(() => getHelpMarkdown(i18n.language), [i18n.language]);
+    const helpMarkdown = useMemo(() => getManualMarkdown(i18n.language), [i18n.language]);
 
     useEffect(() => {
         if (activePage) {

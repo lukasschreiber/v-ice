@@ -85,18 +85,6 @@ export function setBlocklyLocale(language: string) {
     }
 }
 
-const helpMarkdownFiles: Record<string, object> = import.meta.glob('@/assets/help/*.md', { eager: true, import: 'default', query: '?raw' })
-const helpResources = Object.entries(helpMarkdownFiles).map(([filename, markdown]) => {
-    const countryCode = filename.match(/help\.(.+)\.md/)![1]
-    return {
-        [countryCode]: String(markdown)
-    }
-}).reduce((acc, val) => ({ ...acc, ...val }), {})
-
-export function getHelpMarkdown(language: string) {
-    return helpResources[language] ?? helpResources[DEFAULT_LOCALE]
-}
-
 export default i18n
 
 export type BlocklyTranslationKeys = Uppercase<keyof typeof customEnglishTranslations["blockly"]> | Uppercase<keyof typeof en>

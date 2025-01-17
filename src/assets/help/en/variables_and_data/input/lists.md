@@ -1,0 +1,9 @@
+#### Eingabe von Listen
+Listen können beliebig viele Werte eines bestimmten Typs enthalten.
+
+::block-preview{block="{'type':'comparison_equals','inputs':{'A':{'shadow':{'type':'list_immediate','inputs':{'VALUE_hn`kA6=k9l0Lwvt:3Tmk':{'shadow':{'type':'math_number','fields':{'NUM':{'value':'20'}}}},'VALUE_gl#V(yo38s{-4KzA]]mL':{'shadow':{'type':'math_number','fields':{'NUM':{'value':'30'}}}},'VALUE_oNb#Yb;vIC?45!@Ba@qr':{'shadow':{'type':'math_number','fields':{'NUM':{'value':'40'}}}}},'extraState':{'variableType':'List<Number>?','inputs':[{'name':'VALUE_hn`kA6=k9l0Lwvt:3Tmk','shadow':{'type':'math_number','id':'4xGyK8m!29Ps6/u-/6X!','fields':{'NUM':'20'}}},{'name':'VALUE_gl#V(yo38s{-4KzA]]mL','shadow':{'type':'math_number','id':'s[LTQ4;uH_x#1al$M,w*','fields':{'NUM':'30'}}},{'name':'VALUE_oNb#Yb;vIC?45!@Ba@qr','shadow':{'type':'math_number','id':'k|0DbFX]+E0C2Kn(0MM4','fields':{'NUM':'40'}}}]}}},'B':{'shadow':{'type':'list_immediate','inputs':{'VALUE_8iWqj4tP|s,+q[2^Hs^H':{'shadow':{'type':'math_number','fields':{'NUM':{'value':''}}}}},'extraState':{'variableType':'List<Number>?','inputs':[{'name':'VALUE_8iWqj4tP|s,+q[2^Hs^H','shadow':{'type':'math_number','id':',L6(?(Tw]v[$Y*D8groD','fields':{'NUM':''}}}]}}}},'extraState':{'inputTypes':{'A':'*?','B':'*?'},'originalTypes':{'A':'*?','B':'*?','DELTA':'Number?','C':'Union<Number | Timestamp>?','LIST':'List<*?>','VALUE':'*?','LIST1':'List<*?>','LIST2':'List<*?>'}}}"}
+
+Im Beispiel oben wurde eine Liste mit den Werten 20, 30 und 40 erstellt. Ein neues Element kann hinzugefügt werden, indem das `+` Symbol am Ende der Liste angeklickt wird. Werte können durch anklicken des Wertes und anschließendes klicken des `-` Symbols entfernt werden. Alternativ kann man diese Funktionen auch durch betätigen der `Backspace` bzw. `Tab` Taste ausführen.
+Mit den Pfeiltasten kann man sich durch die Liste bewegen.
+
+Eine Liste beinhaltet immer mindestens ein Element.
