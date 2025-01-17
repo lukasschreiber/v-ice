@@ -12,6 +12,14 @@ import { ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "@/query/builder/
 // All functions of Block need to be called with ! because they always exist although typescript does not know that
 export type BlocklyBlockDefinition = { [Property in keyof Blockly.Block]?: Blockly.Block[Property] } & { [key: string]: unknown }
 
+/**
+ * Registers a block in Blockly using the jsonInit method
+ * All mutators and extensions are registered if they are not already
+ * 
+ * This should not be called manually but instead through the createBlock function
+ * 
+ * @param block the block to register
+ */
 export function registerBlock<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): void {
     const definition = convertBlockDefinitionToBlocklyJson<Es, M, L, T>(block)
     if (definition.output && typeof definition.output !== "string") definition.output = definition.output.name
@@ -37,11 +45,21 @@ export function registerBlock<Es extends RegistrableExtension[], M extends Regis
     Blockly.Blocks[definition.id] = blockDefinition
 }
 
+/**
+ * A connection type for a block
+ * This is used for the notch type of the block
+ */
 export enum ConnectionType {
     BOOLEAN = "Boolean",
     TIMELINE_PROTOTYPE = "TimelinePrototype",
 }
 
+/**
+ * Converts a block definition to the plain Blockly JSON format
+ * 
+ * @param block The block definition 
+ * @returns The plain Blockly JSON format
+ */
 function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): BlocklyJsonBlockDefinition {
 
     const extensions: string[] = []
@@ -102,6 +120,12 @@ function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], 
 
 const extensionInstances: Record<string, BlockExtension<any>> = {}
 
+/**
+ * Creates a new instance of an extension if it does not exist yet
+ * 
+ * @param extension The extension class
+ * @returns The extension instance
+ */
 function getExtensionInstance<T extends BlockExtension<any>>(extension: new (...args: any[]) => T): T {
     const constructorName = extension.name
     if (!extensionInstances[constructorName]) {
@@ -110,6 +134,9 @@ function getExtensionInstance<T extends BlockExtension<any>>(extension: new (...
     return extensionInstances[constructorName] as T
 }
 
+/**
+ * A block definition in the Blockly JSON format (Blockly currently lacks types for this)
+ */
 type BlocklyJsonBlockDefinition = {
     [key: `message${number}`]: string
     [key: `args${number}`]: (FieldDefinition | InputDefinition)[]
@@ -128,52 +155,102 @@ type BlocklyJsonBlockDefinition = {
     data?: object | string
 }
 
+/**
+ * A block line definition
+ * This is the equivalent of a message${number} and args${number} in the Blockly JSON format
+ * 
+ * @param text The text of the block line
+ * @param args The arguments of the block line
+ * @param align The alignment of the block line, note the british spelling which is taken from Blockly
+ */
 export interface BlockLineDefinition {
     text: string
     args: (FieldDefinition | InputDefinition)[]
     align?: "RIGHT" | "CENTRE" | "LEFT"
 }
 
+/**
+ * A list of block line definitions
+ */
 export type BlockLinesDefinition = BlockLineDefinition[]
 
-// TODO: I think that the code function triggers some weird typescript bug.
-// It works most of the time but if I edit something in query_generator.ts it sometimes stops working.
+/**
+ * A block that can be registered in Blockly
+ * Note: this definition must first be converted to the plain Blockly JSON format before it can be registered
+ * 
+ * TODO: I think that the code function triggers some weird typescript bug.
+ * It works most of the time but if I edit something in query_generator.ts it sometimes stops working.
+ * 
+ * @param Es The extensions that can be applied to the block
+ * @param M The mutator that can be applied to the block
+ * @param L The lines of the block
+ * 
+ * @returns The block definition
+ */
 export interface RegistrableBlock<
     Es extends RegistrableExtension[],
     M extends RegistrableMutator,
     L extends BlockLinesDefinition,
 > {
+    // The unique id of the block, for example "math_number"
     id: string
+    // The color of the block, for example "#ff0000"
     color?: number | string
+    // A url to the help page of the block, starting with "#"
     helpUrl?: string
+    // The lines of the block
     lines: L
+    // The type of the bottom connection, this determines the type of notch that is rendered
     nextStatement?: null | string | string[]
+    // The type of the top connection, this determines the type of notch that is rendered
     previousStatement?: null | string | string[]
+    // The type of connection type, this sets both the top and bottom connection type
     connectionType?: string
+    // The output type of the block, only used if a block returns a value other than boolean, therefore this is mutually exclusive with nextStatement and previousStatement (or connectionType)
     output?: IType | string
+    // Whether the inputs should be inline
     inputsInline?: boolean
+    // The tooltip of the block
     tooltip?: string
+    // The style of the block
     style?: string
+    // A mutator class that can be used to modify the block
     mutator?: M
+    // A list of extension classes to be applied
     extensions?: Es
+    // Additional optional data that can be attached to the block
     data?: object | string
+    // A function that converts the block to an AST node
     code?: (
-        scope: NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? NodeBlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
-    ) => NotNever<MatchAny<Es, typeof NodeBlockExtension>> extends true ? ASTSetNode : ASTOperationNode | ASTPrimitiveNode
+        scope: MatchAny<Es, typeof NodeBlockExtension> extends true ? NodeBlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M> & NodeExtension> : BlockASTBuilder<L, AnyRegistrableBlock<L>, Blockly.BlockSvg & ExtensionMixins<Es> & MutatorMixin<M>>,
+    ) => MatchAny<Es, typeof NodeBlockExtension> extends true ? ASTSetNode : ASTOperationNode | ASTPrimitiveNode
 }
 
+/**
+ * A field definition
+ */
 export type FieldDefinition = {
     type: `field_${string}`
     name: string
     [key: string]: unknown
 }
 
+/**
+ * An input definition
+ */
 export type InputDefinition = {
     type: `input_${string}`
     name: string
     check?: IType | string
 }
 
+/**
+ * Creates a new block from a block definition
+ * The new block is immediately registered in Blockly
+ * 
+ * @param definition The block definition
+ * @returns The block definition again to be used e.g. in a toolbox
+ */
 export function createBlock<
     Es extends RegistrableExtension[] = never[],
     M extends RegistrableMutator = never,
@@ -183,13 +260,52 @@ export function createBlock<
     return definition
 }
 
+/**
+ * A utility type to check if a type U is a valid array element of T
+ * This does sometimes result in `boolean` or `never`, see `ReduceToTrue` and `NotNever` and `MatchAny` for a better type
+ * 
+ * @param T The array type
+ * @param U The type to check
+ */
 type Match<T, U> = T extends (infer R)[] ? R extends U ? true : false : false
+/**
+ * A utility type to reduce a boolean to true
+ * If a type is `true` the result is `true`, if a type is `false` the result is `false`, if a type is `true | false`, or a `boolean` the result is `true`, otherwise the result is the type itself
+ * 
+ * @param T The type to reduce
+ */
 type ReduceToTrue<T> = [T] extends [true] ? true : [T] extends [false] ? false : [T] extends [true | false] ? true : T;
+/**
+ * A utility type to check if a type is not `never`
+ * This return the type itself if it is not `never`, otherwise it returns `false`
+ * 
+ * @param T The type to check
+ */
 type NotNever<T> = [T] extends [never] ? false : T;
+/**
+ * A utility type to check if a type U is a valid array element of T
+ * 
+ * @param T The type to check
+ */
 type MatchAny<T, U> = ReduceToTrue<NotNever<Match<T, U>>>;
 
+/**
+ * A type representing any block that can be registered
+ * This is a union of all possible combination of any and never for the extensions and mutator
+ * 
+ * While the extensions and mutators are not relevant in many cases, the lines are, so this type only keeps the lines as a generic parameter
+ * 
+ * @param L The lines of the block
+ */
 export type AnyRegistrableBlock<L extends BlockLinesDefinition> = RegistrableBlock<any[], any, L> | RegistrableBlock<never[], never, L> | RegistrableBlock<any[], never, L> | RegistrableBlock<never[], any, L>
 
+/**
+ * A union of all field names of a block
+ * This relies on the `field` prefix of the field type (which is standard in Blockly)
+ * 
+ * @param L The lines of the block
+ * @param T The block type
+ */
 export type BlockFieldNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> =
     T["lines"] extends Array<{ args: Array<infer U> }>
     ? U extends { type: `field_${string}`, name: string }
@@ -197,6 +313,13 @@ export type BlockFieldNames<L extends BlockLinesDefinition, T extends AnyRegistr
     : never
     : never;
 
+/**
+ * A union of all input names of a block
+ * This relies on the `input` prefix of the input type (which is standard in Blockly)
+ * 
+ * @param L The lines of the block
+ * @param T The block type
+ */
 export type BlockInputNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> =
     T["lines"] extends Array<{ args: Array<infer U> }>
     ? U extends { type: `input_${string}`, name: string }
@@ -204,6 +327,13 @@ export type BlockInputNames<L extends BlockLinesDefinition, T extends AnyRegistr
     : never
     : never;
 
+/**
+ * A union of all field or input names of a block that have a specific type
+ * 
+ * @param L The lines of the block
+ * @param T The block type
+ * @param FieldType The specific type to filter
+ */
 export type BlockFieldByType<
     L extends BlockLinesDefinition,
     T extends AnyRegistrableBlock<L>,
@@ -214,5 +344,18 @@ export type BlockFieldByType<
     : never
     : never;
 
+/**
+ * A union of all connection point names of a block
+ * 
+ * @param L The lines of the block
+ * @param T The block type
+ */
 export type ConnectionPointNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> = BlockFieldByType<L, T, "field_edge_connection">
+
+/**
+ * A union of all statement input names of a block
+ * 
+ * @param L The lines of the block
+ * @param T The block type
+ */
 export type StatementInputTypeNames<L extends BlockLinesDefinition, T extends AnyRegistrableBlock<L>> = BlockFieldByType<L, T, "input_statement">

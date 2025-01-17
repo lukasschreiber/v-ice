@@ -54,6 +54,18 @@ export const jsQueryClient = createQueryClient({
             // TODO allow the use of different operation handlers e.g. the handler for equals
             transformer: (astNode) => `(${astNode.args.a} === ${astNode.args.b})`
         }),
+
+        createOperationTransformer({
+            operation: "fib",
+            args: { n: t.number },
+            transformer: (astNode) => {
+                return `function fib(n) {
+                    if (n <= 1) return n;
+                    return fib(n - 1) + fib(n - 2);
+                }
+                fib(${astNode.args.n})`
+            }
+        }),
         
         // Equals Within Operation
         createOperationTransformer({

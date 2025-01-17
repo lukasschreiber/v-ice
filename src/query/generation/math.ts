@@ -8,6 +8,11 @@ function binaryMathImpl(block: Blockly.Block, generator: QueryGenerator, impl: (
     return [impl(a, b), Order.ATOMIC]
 }
 
+queryGenerator.registerBlock(Blocks.Names.MATH.FIB, (block) => {
+    const n = block.getFieldValue("NUM")
+    return [`fib(${n})`, Order.ATOMIC]
+})
+
 queryGenerator.registerBlock(Blocks.Names.MATH.NUMBER, (block) => {
     return [`${block.getFieldValue("NUM")}`, Order.ATOMIC]
 })

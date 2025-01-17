@@ -22,6 +22,7 @@ const MATH = {
     NUMBER_PROPERTY: "math_number_property",
     CONSTANTS: "math_constants",
     CONSTRAIN: "math_constrain",
+    FIB: "math_fib",
 } as const;
 
 const LIST = {

@@ -339,6 +339,34 @@ export const MathConstantsBlock = createBlock({
     }
 })
 
+export const FibBlock = createBlock({
+    id: Blocks.Names.MATH.FIB,
+    lines: [
+        {
+            text: "Fibonacci Number %1",
+            args: [
+                {
+                    type: "input_value",
+                    name: "NUM",
+                    check: t.number
+                }
+            ]
+        }
+    ] as const,
+    output: t.number,
+    style: "math_blocks",
+    inputsInline: true,
+    code: (scope) => {
+        return createASTNode(ASTNodeKind.Operation, {
+            operation: "fib",
+            type: t.number,
+            args: {
+                n: scope.buildASTForInput("NUM"),
+            }
+        })
+    }
+})
+
 export const MathConstrainBlock = createBlock({
     id: Blocks.Names.MATH.CONSTRAIN,
     lines: [

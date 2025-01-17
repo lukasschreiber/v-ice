@@ -4,7 +4,7 @@ import { Nodes } from "./categories/nodes";
 import { DateTime } from "luxon";
 import { defineBlock, defineCategory, defineToolbox } from "./toolbox_definition";
 import types from "@/data/types";
-import { MathBinaryOperationBlock, MathConstantsBlock, MathConstrainBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock, NumberBlock } from "../definitions/math";
+import { FibBlock, MathBinaryOperationBlock, MathConstantsBlock, MathConstrainBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock, NumberBlock } from "../definitions/math";
 import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "../definitions/comparisons";
 import { ListAnyAllBlock, ListArithmeticBlock, ListContainsBlock, ListEqualsBlock, ListFlattenBlock, ListImmediateBlock, ListLengthBlock } from "../definitions/lists";
 import { ProperySelectBlock, StructBlock } from "../definitions/structs";
@@ -150,6 +150,11 @@ export const CompleteToolbox = defineToolbox([
                 shadow: mathNumberNull
             },
             HIGH: {
+                shadow: mathNumberNull
+            }
+        }),
+        defineBlock(FibBlock).withInputs({
+            NUM: {
                 shadow: mathNumberNull
             }
         }),

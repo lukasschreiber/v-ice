@@ -27,7 +27,7 @@ export const EqualsWithinBlock = createBlock({
                     check: t.nullable(t.number)
                 },
             ]
-        }
+        },
     ] as const,
     connectionType: ConnectionType.BOOLEAN,
     helpUrl: "#equals-within",
