@@ -145,9 +145,13 @@ export const GreaterBlock = createBlock({
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
         return createASTNode(ASTNodeKind.Operation, {
-            operation: "greater",
+            operation: "compare_numbers",
             type: t.boolean,
             args: {
+                operator: createASTNode(ASTNodeKind.Primitive, {
+                    value: "GREATER",
+                    type: t.string
+                }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
@@ -181,9 +185,13 @@ export const LessBlock = createBlock({
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
         return createASTNode(ASTNodeKind.Operation, {
-            operation: "less",
+            operation: "compare_numbers",
             type: t.boolean,
             args: {
+                operator: createASTNode(ASTNodeKind.Primitive, {
+                    value: "LESS",
+                    type: t.string
+                }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
@@ -217,9 +225,13 @@ export const LessEqualsBlock = createBlock({
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
         return createASTNode(ASTNodeKind.Operation, {
-            operation: "less_equals",
+            operation: "compare_numbers",
             type: t.boolean,
             args: {
+                operator: createASTNode(ASTNodeKind.Primitive, {
+                    value: "LEQ",
+                    type: t.string
+                }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
@@ -253,9 +265,13 @@ export const GreaterEqualsBlock = createBlock({
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
         return createASTNode(ASTNodeKind.Operation, {
-            operation: "greater_equals",
+            operation: "compare_numbers",
             type: t.boolean,
             args: {
+                operator: createASTNode(ASTNodeKind.Primitive, {
+                    value: "GEQ",
+                    type: t.string
+                }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B")
             }
@@ -304,7 +320,7 @@ export const CompareNumbersBlock = createBlock({
             args: {
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B"),
-                operator: scope.buildASTForField("OP")
+                operator: scope.buildASTForField("OP", value => value, t.string)
             }
         })
     }

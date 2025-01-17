@@ -14,10 +14,10 @@ export interface OperationNodeQueryTransformerDefinition<A extends {[key: string
     transformer: QueryTransformerForOperationNode<A>
 }
 
-export interface PrimitiveNodeQueryTransformerDefinition extends IQueryTransformerDefinition {
+export interface PrimitiveNodeQueryTransformerDefinition<T extends IType> extends IQueryTransformerDefinition {
     kind: ASTNodeKind.Primitive
-    type: IType
-    transformer: QueryTransformerForPrimitiveNode
+    type: T
+    transformer: QueryTransformerForPrimitiveNode<T>
 }
 
 export interface SetNodeQueryTransformerDefinition extends IQueryTransformerDefinition {
@@ -25,12 +25,12 @@ export interface SetNodeQueryTransformerDefinition extends IQueryTransformerDefi
     transformer: QueryTransformerForSetNode
 }
 
-export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition | SetNodeQueryTransformerDefinition
+export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition<any> | SetNodeQueryTransformerDefinition
 
 export type QueryTransformerForOperationNode<A extends {[key: string]: IType}> = (astNode: ASTOperationNode & {
     args: { [K in keyof A]: ValueOf<A[K]> }
 }) => string
-export type QueryTransformerForPrimitiveNode = (astNode: ASTPrimitiveNode) => string
+export type QueryTransformerForPrimitiveNode<T extends IType> = (astNode: ASTPrimitiveNode & {value: ValueOf<T>}) => string
 export type QueryTransformerForSetNode = (astNode: ASTSetNode) => string
 export type QueryTransformerForNode = (astNode: any) => string
 
@@ -38,4 +38,10 @@ export function createOperationTransformer<A extends {[key: string]: IType}>(
     definition: Omit<OperationNodeQueryTransformerDefinition<A>, "kind">
 ): OperationNodeQueryTransformerDefinition<A> {
     return { ...definition, kind: ASTNodeKind.Operation } as OperationNodeQueryTransformerDefinition<A>
+}
+
+export function createPrimitiveTransformer<T extends IType>(
+    definition: Omit<PrimitiveNodeQueryTransformerDefinition<T>, "kind">
+): PrimitiveNodeQueryTransformerDefinition<T> {
+    return { ...definition, kind: ASTNodeKind.Primitive } as PrimitiveNodeQueryTransformerDefinition<T>
 }

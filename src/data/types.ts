@@ -6,6 +6,7 @@ import * as utils from './type_utils';
  * All types in the type system should have a corresponding value type.
  */
 export type ValueOf<T extends IType> =
+    T extends INullableType<infer U> ? ValueOf<U> | null :
     T extends INumberType ? number :
     T extends IBooleanType ? boolean :
     T extends ITimestampType ? string :
