@@ -1,45 +1,15 @@
 import { QueryClient, QueryClientParams } from "@/query/clients/query_client";
-import { AST, ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "../builder/ast";
+import { AST } from "../builder/ast";
 import { LocalQueryVerificator } from "./local_query_verificator";
 import { LocalQueryRuntime } from "./local_query_runtime";
-// import { BlockLinesDefinition, RegistrableBlock } from "@/blocks/block_definitions";
-// import { RegistrableExtension } from "@/blocks/block_extensions";
-// import { RegistrableMutator } from "@/blocks/block_mutators";
+import { QueryTransformerDefinition } from "./query_transformer";
 
 export interface LocalQueryClientParams extends QueryClientParams<"local"> {
     mode: "local";
     verificator: LocalQueryVerificator;
     runtime: LocalQueryRuntime;
-    transformers: {
-        operations: Record<string, (astNode: ASTOperationNode) => string>;
-        primitives: Record<string, (astNode: ASTPrimitiveNode) => string>;
-        nodes: Record<string, (astNode: ASTSetNode) => string>;
-    }
-    // transformers: LocalQueryTransformer<RegistrableBlock<any, any, any>>[];
+    transformers: QueryTransformerDefinition[];
 }
-
-// export interface LocalQueryTransformer<T extends RegistrableBlock<any, any, any>> {
-//     block: T;
-//     transformer: {
-//         transform(astNode: ReturnType<T["code"]>, block: T): string;
-//     }
-// }
-
-// export function createTransformer<
-//     Es extends RegistrableExtension[] = never[],
-//     M extends RegistrableMutator = never,
-//     L extends BlockLinesDefinition = never
-// >(
-//     block: RegistrableBlock<Es, M, L>,
-//     transform: (astNode: ReturnType<RegistrableBlock<Es, M, L>["code"]> , block: RegistrableBlock<Es, M, L>) => string
-// ): LocalQueryTransformer<RegistrableBlock<Es, M, L>> {
-//     return {
-//         block,
-//         transformer: {
-//             transform: transform
-//         }
-//     }
-// }
 
 export class LocalQueryClient extends QueryClient {
     protected verificator: LocalQueryVerificator;

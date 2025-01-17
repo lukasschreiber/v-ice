@@ -11,12 +11,13 @@ export type ValueOf<T extends IType> =
     T extends ITimestampType ? string :
     T extends IStringType ? string :
     T extends IEnumType ? string :
+    T extends IWildcardType ? any :
     T extends IHierarchyType ? string :
     T extends INullableType<infer U> ? ValueOf<U> | null :
     T extends IListType<infer U> ? ValueOf<U>[] :
     T extends IUnionType<infer U> ? ValueOf<U[number]> :
     T extends IStructType<infer U> ? {
-        [K in keyof U]: ValueOf<U[K]>;
+        [K in keyof U]: ValueOf<U[K]> extends never ? any : ValueOf<U[K]>;
     } : never;
 
 /**
