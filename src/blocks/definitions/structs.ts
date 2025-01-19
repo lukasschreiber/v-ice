@@ -15,7 +15,7 @@ export const StructBlock = createBlock({
     extensions: [ParentColorExtension],
     mutator: StructSelectMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Primitive, {
+        return createASTNode(ASTNodeKind.Primitive, null, {
             value: scope.block.getStruct(),
             type: scope.block.variableType
         })
@@ -46,7 +46,7 @@ export const ProperySelectBlock = createBlock({
     helpUrl: "#struct-get",
     mutator: StructPropertySelectMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "get_struct_property",
             type: scope.block.variableType,
             args: {

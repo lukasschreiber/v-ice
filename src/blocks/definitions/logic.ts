@@ -49,7 +49,7 @@ export const LogicOrBlock = createBlock({
             additionalArgs[`OR_STATEMENT_${i + 2}`] = scope.buildASTForUnknownStatementInput(name)
         })
 
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "or",
             type: t.boolean,
             args: {
@@ -83,7 +83,7 @@ export const LogicNotBlock = createBlock({
     style: "logic_blocks",
     helpUrl: "#logic-not",
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "not",
             type: t.boolean,
             args: {
@@ -114,6 +114,6 @@ export const BooleanBlock = createBlock({
     extensions: [ParentColorExtension],
     style: "comparisons_blocks",
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Primitive, { value: scope.getFieldValue("BOOL") === "TRUE", type: t.boolean })
+        return createASTNode(ASTNodeKind.Primitive, scope.definition, { value: scope.getFieldValue("BOOL") === "TRUE", type: t.boolean })
     }
 })

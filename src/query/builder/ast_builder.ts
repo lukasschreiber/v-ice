@@ -21,8 +21,7 @@ export class ASTBuilder {
         }
 
         console.log("Registering node", name)
-        // TODO: Types are strange...
-        this.nodeSnippets[name] = builder as unknown as BuildFn<B, NodeBlockASTBuilder<L, D, B>, R>
+        this.nodeSnippets[name] = builder
         this.definitions[name] = definition
     }
 
@@ -30,7 +29,7 @@ export class ASTBuilder {
         if (this.operationSnippets[name]) {
             throw new Error(`Operation ${name} already registered`)
         }
-        this.operationSnippets[name] = builder as unknown as BuildFn<B, BlockASTBuilder<L, D, B>, R>
+        this.operationSnippets[name] = builder
         this.definitions[name] = definition
     }
 
@@ -114,7 +113,7 @@ export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegist
         const targetBlock = input.connection?.targetBlock();
 
         if (!targetBlock) {
-            return createASTNode(ASTNodeKind.Primitive, { value: this.block.getFieldValue(name), type: null })
+            return createASTNode(ASTNodeKind.Primitive, null, { value: this.block.getFieldValue(name), type: null })
         }
 
         return this.builder.buildASTForOperationBlock(targetBlock);
@@ -136,7 +135,7 @@ export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegist
             type = types.utils.isType(overrideType) ? overrideType : types.utils.fromString(overrideType)
         }
 
-        return createASTNode(ASTNodeKind.Primitive, { value: fn(this.block.getFieldValue(name)), type: type })
+        return createASTNode(ASTNodeKind.Primitive, null, { value: fn(this.block.getFieldValue(name)), type: type })
     }
 
     public buildASTForUnknownStatementInput(name: StatementInputTypeNames<L, D> | string): (ASTOperationNode | ASTPrimitiveNode)[] {

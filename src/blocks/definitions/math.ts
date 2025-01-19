@@ -30,11 +30,11 @@ export const MathMinusBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "binary_math_operation",
             type: t.number,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, { value: "SUBTRACTION", type: t.string }),
+                operator: createASTNode(ASTNodeKind.Primitive, null, { value: "SUBTRACTION", type: t.string }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B"),
             }
@@ -66,11 +66,11 @@ export const MathPlusBlock = createBlock({
     helpUrl: "#math-operations",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "binary_math_operation",
             type: t.number,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, { value: "ADDITION", type: t.string }),
+                operator: createASTNode(ASTNodeKind.Primitive, null, { value: "ADDITION", type: t.string }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B"),
             }
@@ -102,11 +102,11 @@ export const MathTimesBlock = createBlock({
     helpUrl: "#math-operations",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation,  scope.definition, {
             operation: "binary_math_operation",
             type: t.number,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, { value: "MULTIPLICATION", type: t.string }),
+                operator: createASTNode(ASTNodeKind.Primitive, null, { value: "MULTIPLICATION", type: t.string }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B"),
             }
@@ -138,11 +138,11 @@ export const MathDividedByBlock = createBlock({
     helpUrl: "#math-operations",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "binary_math_operation",
             type: t.number,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, { value: "DIVISION", type: t.string }),
+                operator: createASTNode(ASTNodeKind.Primitive, null, { value: "DIVISION", type: t.string }),
                 a: scope.buildASTForInput("A"),
                 b: scope.buildASTForInput("B"),
             }
@@ -207,7 +207,7 @@ export const MathBinaryOperationBlock = createBlock({
     style: "math_blocks",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "binary_math_operation",
             type: t.number,
             args: {
@@ -252,7 +252,7 @@ export const MathNumberPropertyBlock = createBlock({
     helpUrl: "#math-properties",
     mutator: DivisiblebyMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "number_property",
             type: t.boolean,
             args: {
@@ -301,7 +301,7 @@ export const MathUnaryOperationBlock = createBlock({
     style: "math_blocks",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "unary_math_operation",
             type: t.number,
             args: {
@@ -357,7 +357,7 @@ export const FibBlock = createBlock({
     style: "math_blocks",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "fib",
             type: t.number,
             args: {
@@ -396,7 +396,7 @@ export const MathConstrainBlock = createBlock({
     helpUrl: "#math-constrain",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "constrain",
             type: t.number,
             args: {

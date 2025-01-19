@@ -51,6 +51,11 @@ export default {
           comparisons: "rgb(var(--color-categories-comparisons) / <alpha-value>)",
           test: "rgb(var(--color-categories-test) / <alpha-value>)",
           nodes: "rgb(var(--color-categories-nodes) / <alpha-value>)"
+        },
+        workspace: {
+          connectionpoint: {
+            hover: "rgb(var(--color-workspace-connectionpoint-hover) / <alpha-value>)",
+          }
         }
       }
     },

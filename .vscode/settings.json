@@ -6,5 +6,13 @@
         "**/bower_components": true,
         "**/*.code-search": true,
         "**/dist/**": true
-    }
+    },
+    "json.schemas": [
+        {
+            "fileMatch": [
+                "/src/assets/help/**/*.json"
+            ],
+            "url": "./src/assets/schemas/manual_section_settings.schema.json"
+        }
+    ]
 }

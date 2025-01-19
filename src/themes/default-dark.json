@@ -32,13 +32,47 @@
             "bg": "#181818",
             "text": "#d7d7d7"
         },
+        "workspace": {
+            "connectionpoint": {
+                "hover": "#4C97FF"
+            }
+        },
         "categories": {
-            "comparisons": "#4C97FF",
-            "variables": "#FF8C1A",
-            "nodes": "#fafafa",
-            "logic": "#ffab19",
-            "logic_dark": "#cc8813",
-            "timeline": "#cf63cf"
+            "comparisons": {
+                "bg": "#4C97FF",
+                "text": "#ffffff",
+                "border": "#3971bf"
+            },
+            "variables": {
+                "bg": "#FF8C1A",
+                "text": "#ffffff",
+                "border": "#db6e00"
+            },
+            "nodes": {
+                "bg": "#fafafa",
+                "text": "#333333",
+                "border": "#bcbcbc"
+            },
+            "logic": {
+                "bg": "#ffab19",
+                "text": "#ffffff",
+                "border": "#cc8813"
+            },
+            "timeline": {
+                "bg": "#cf63cf",
+                "text": "#ffffff",
+                "border": "#9b4a9b"
+            },
+            "lists": {
+                "bg": "#9966ff",
+                "text": "#ffffff",
+                "border": "#774dcb"
+            },
+            "math": {
+                "bg": "#59c059",
+                "text": "#ffffff",
+                "border": "#389438"
+            }
         }
     }
 }

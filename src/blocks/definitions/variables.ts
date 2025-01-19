@@ -35,11 +35,11 @@ export const ColumnSelectBlock = createBlock({
     style: "variable_blocks",
     mutator: ColumnSelectMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "get_column",
             type: scope.getField<FieldTypeLabel>("TYPE").getType() ?? null,
             args: {
-                name: createASTNode(ASTNodeKind.Primitive, { value: scope.getFieldValue("COLUMN"), type: t.string }),
+                name: createASTNode(ASTNodeKind.Primitive, null, { value: scope.getFieldValue("COLUMN"), type: t.string }),
             }
         })
     }
@@ -70,11 +70,11 @@ export const VariableBlock = createBlock({
     mutator: VariableSelectMutator,
     code: (scope) => {
         const variable = scope.getField<FieldVariable>("VAR").getVariable()
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "get_variable",
             type: variable?.type ?? null,
             args: {
-                name: createASTNode(ASTNodeKind.Primitive, {value: variable?.name ?? "", type: t.string}),
+                name: createASTNode(ASTNodeKind.Primitive, null, {value: variable?.name ?? "", type: t.string}),
             }
         })
     }
@@ -104,11 +104,11 @@ export const LocalVariableBlock = createBlock({
     extensions: [ScopedExtension],
     mutator: LocalVariableMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "get_local_variable",
             type: scope.getField<FieldTypeLabel>("TYPE").getType() ?? null,
             args: {
-                name: createASTNode(ASTNodeKind.Primitive, { value: scope.getFieldValue("LABEL"), type: t.string }),
+                name: createASTNode(ASTNodeKind.Primitive, null, { value: scope.getFieldValue("LABEL"), type: t.string }),
             }
         })
     }

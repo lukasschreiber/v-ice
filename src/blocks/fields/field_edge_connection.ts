@@ -102,7 +102,7 @@ export class FieldEdgeConnection extends Blockly.Field implements TypedField {
         this.textElement_ = Blockly.utils.dom.createSvgElement(
             Blockly.utils.Svg.TEXT,
             {
-                class: 'blocklyText group-hover:!fill-rose-500 !cursor-pointer',
+                class: 'blocklyText group-hover:!fill-workspace-connectionpoint-hover !cursor-pointer',
             },
             this.fieldGroup_,
         )

@@ -35,7 +35,7 @@ export const EqualsWithinBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "equals_within",
             type: t.boolean,
             args: {
@@ -72,7 +72,7 @@ export const EqualsBlock = createBlock({
     helpUrl: "#equals",
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "equals",
             type: t.boolean,
             args: {
@@ -108,7 +108,7 @@ export const MatchesBlock = createBlock({
     helpUrl: "#matches",
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "matches",
             type: t.boolean,
             args: {
@@ -144,11 +144,11 @@ export const GreaterBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "compare_numbers",
             type: t.boolean,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, {
+                operator: createASTNode(ASTNodeKind.Primitive, null, {
                     value: "GREATER",
                     type: t.string
                 }),
@@ -184,11 +184,11 @@ export const LessBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "compare_numbers",
             type: t.boolean,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, {
+                operator: createASTNode(ASTNodeKind.Primitive, null, {
                     value: "LESS",
                     type: t.string
                 }),
@@ -224,11 +224,11 @@ export const LessEqualsBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "compare_numbers",
             type: t.boolean,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, {
+                operator: createASTNode(ASTNodeKind.Primitive, null, {
                     value: "LEQ",
                     type: t.string
                 }),
@@ -264,11 +264,11 @@ export const GreaterEqualsBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "compare_numbers",
             type: t.boolean,
             args: {
-                operator: createASTNode(ASTNodeKind.Primitive, {
+                operator: createASTNode(ASTNodeKind.Primitive, null, {
                     value: "GEQ",
                     type: t.string
                 }),
@@ -314,7 +314,7 @@ export const CompareNumbersBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "compare_numbers",
             type: t.boolean,
             args: {
@@ -356,7 +356,7 @@ export const CompareIntervalBlock = createBlock({
     inputsInline: true,
     mutator: DynamicInputTypesMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "compare_interval",
             type: t.boolean,
             args: {
@@ -387,7 +387,7 @@ export const IsNullBlock = createBlock({
     helpUrl: "#comparison-null",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "is_null",
             type: t.boolean,
             args: {

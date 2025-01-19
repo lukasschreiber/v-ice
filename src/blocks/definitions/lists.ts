@@ -46,7 +46,7 @@ export const ListArithmeticBlock = createBlock({
     style: "list_blocks",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "unary_list_operation",
             type: t.number,
             args: {
@@ -76,7 +76,7 @@ export const ListLengthBlock = createBlock({
     style: "list_blocks",
     inputsInline: true,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "list_length",
             type: t.number,
             args: {
@@ -111,7 +111,7 @@ export const ListContainsBlock = createBlock({
     helpUrl: "#list-contains",
     connectionType: ConnectionType.BOOLEAN,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "list_contains",
             type: t.boolean,
             args: {
@@ -166,7 +166,7 @@ export const ListAnyAllBlock = createBlock({
     helpUrl: "#list-any-all",
     mutator: ListAnyAllMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "list_any_all",
             type: t.boolean,
             args: {
@@ -188,7 +188,7 @@ export const ListImmediateBlock = createBlock({
     extensions: [ParentColorExtension],
     mutator: ListSelectMutator,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Primitive, {
+        return createASTNode(ASTNodeKind.Primitive, scope.definition, {
             value: scope.block.getList(),
             type: scope.block.variableType
         })
@@ -214,7 +214,7 @@ export const ListFlattenBlock = createBlock({
     helpUrl: "#list-flatten",
     extensions: [FlattenListExtension],
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "flatten_list",
             type: scope.block.variableType,
             args: {
@@ -260,7 +260,7 @@ export const ListEqualsBlock = createBlock({
     helpUrl: "#list-equals",
     connectionType: ConnectionType.BOOLEAN,
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Operation, {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
             operation: "list_equals",
             type: t.boolean,
             args: {

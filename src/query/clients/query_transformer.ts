@@ -29,7 +29,7 @@ export interface SetNodeQueryTransformerDefinition extends IQueryTransformerDefi
 export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition<any> | SetNodeQueryTransformerDefinition
 
 export type QueryTransformerForOperationNode<A extends {[key: string]: IType}> = (astNode: ASTOperationNode & {
-    args: { [K in keyof A]: ValueOf<A[K]> }
+    args: { [K in keyof A]: string }
 }) => string
 export type QueryTransformerForPrimitiveNode<T extends IType> = (astNode: ASTPrimitiveNode & {value: ValueOf<T>}) => string
 export type QueryTransformerForSetNode = (astNode: ASTSetNode) => string

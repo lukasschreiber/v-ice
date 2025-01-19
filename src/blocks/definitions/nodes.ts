@@ -60,7 +60,7 @@ export const TargetNodeBlock = createBlock({
     helpUrl: "#target-node",
     extensions: [NodeBlockExtension],
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Set, {
+        return createASTNode(ASTNodeKind.Set, scope.definition, {
             inputs: {
                 input: scope.buildASTForConnectionPoint("INPUT")
             },
@@ -135,7 +135,7 @@ export const SubsetNodeBlock = createBlock({
         // const fields = generator.multilineStatementToCode(block, "FILTERS", " && ").trim()
         // return { definition: `function ${procedureName}(default) {\n  return conditionalSplit(default, p => ${fields === "" ? "false" : fields});\n}\n`, invocation: `${procedureName}(${input})` }
 
-        return createASTNode(ASTNodeKind.Set, {
+        return createASTNode(ASTNodeKind.Set, scope.definition, {
             inputs: {
                 input: scope.buildASTForConnectionPoint("INPUT")
             },
@@ -194,7 +194,7 @@ export const SetArithmeticNodeBlock = createBlock({
     helpUrl: "#set-arithmetic-node",
     extensions: [NodeBlockExtension, ScopedExtension],
     code: (scope) => {
-        return createASTNode(ASTNodeKind.Set, {
+        return createASTNode(ASTNodeKind.Set, scope.definition, {
             inputs: {
                 left: scope.buildASTForConnectionPoint("LEFT"),
                 right: scope.buildASTForConnectionPoint("RIGHT")

@@ -348,9 +348,9 @@ export class ConstantProvider extends Blockly.zelos.ConstantProvider {
             `}`,
 
             // Dropdown field.
-            `${selector} .blocklyDropdownText {`,
-            `fill: #fff !important;`,
-            `}`,
+            // `${selector} .blocklyDropdownText {`,
+            // `fill: #fff !important;`,
+            // `}`,
 
             // Widget and Dropdown Div
             `${selector}.blocklyWidgetDiv .goog-menuitem,`,

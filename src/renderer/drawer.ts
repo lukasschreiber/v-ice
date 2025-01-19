@@ -1,9 +1,9 @@
 import * as Blockly from "blockly/core";
-import { Blocks } from "@/blocks";
 import { Shape } from "blockly/core/renderers/common/constants";
 import { PathObject } from "./path_object";
 import types from "@/data/types";
 import { IconFactory } from "@/blocks/icon_factory";
+import { getColorsForBlockStyle } from "@/themes/colors";
 
 // FIXME: move to another file
 export function isDynamicShape(shape: Shape): shape is Blockly.blockRendering.DynamicShape {
@@ -17,13 +17,14 @@ export class Drawer extends Blockly.zelos.Drawer {
     }
 
     protected override layoutField_(fieldInfo: Blockly.blockRendering.Icon | Blockly.blockRendering.Field): void {
-        // FIXME: this should be realized through the style/this is not compatible with high contrast themes
-        if (Blocks.Types.isNodeBlock(this.block_) && Blockly.blockRendering.Types.isField(fieldInfo)) {
-            const svgText = (fieldInfo as Blockly.blockRendering.Field).field.getSvgRoot()?.querySelector("text");
+        if (Blockly.blockRendering.Types.isField(fieldInfo)) {
+            const svgText = (fieldInfo as Blockly.blockRendering.Field).field.getSvgRoot()?.querySelector(".blocklyText") as SVGTextElement | undefined;
             if (svgText) {
-                svgText.style.fill = "#000"
+                const style = this.block_.getStyleName();
+                svgText.style.fill = getColorsForBlockStyle(style).text
             }
         }
+
         if ((fieldInfo as Blockly.blockRendering.Field).field.getSvgRoot()) {
             super.layoutField_(fieldInfo)
         }
