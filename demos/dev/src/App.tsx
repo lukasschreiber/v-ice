@@ -98,7 +98,7 @@ function App() {
                                 </select>
                                 <Button
                                     onClick={() => {
-                                        console.log(Clients[queryClient as keyof typeof Clients].astToQueryCode(
+                                        console.log(Clients[queryClient as keyof typeof Clients].generateCode(
                                             JSON.parse(queryJson)
                                         ));
                                     }}

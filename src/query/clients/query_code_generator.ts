@@ -2,6 +2,7 @@ import { AST, ASTNodeKind, ASTNode, isOperationNode, isPrimitiveNode, isSetNode 
 import { TypeChecker } from "@/data/type_checker";
 import { OperationNodeQueryTransformerDefinition, PrimitiveNodeQueryTransformerDefinition, QueryTransformerDefinition, QueryTransformerForNode, SetNodeQueryTransformerDefinition } from "./query_transformer";
 import types from "@/data/types";
+import { traverseASTReverse } from "../builder/ast_traverser";
 
 export interface QueryGeneratorParams {
     transformers: QueryTransformerDefinition[];
@@ -9,13 +10,35 @@ export interface QueryGeneratorParams {
 
 export abstract class QueryCodeGenerator {
     protected transformers: TransformerIndex;
+    protected generatedCodeMap: Map<string, string> = new Map()
 
     constructor(protected params: QueryGeneratorParams) {
         this.transformers = this.buildTransformerIndex(params.transformers);
     }
 
     public generateCode(ast: AST): string {
-        return "Query code"
+        traverseASTReverse(ast, {
+            visit: (node) => {
+                const transformer = this.getTransformerForNode(node)
+                if (isOperationNode(node)) {
+                    for (const [name, arg] of Object.entries(node.args)) {
+                        // TODO this is really bad
+                        // @ts-ignore
+                        node.args[name] = this.generatedCodeMap.get(this.getNodeHash(arg))
+                    }
+                }
+
+                if (isSetNode(node) && node.operations) {
+                    // @ts-ignore
+                    node.operations = node.operations.map(op => {
+                        return this.generatedCodeMap.get(this.getNodeHash(op)) || ""
+                    })
+                }
+
+                this.generatedCodeMap.set(this.getNodeHash(node), transformer(node))
+            }
+        })
+        return this.generatedCodeMap.get(this.getNodeHash(ast.sets[0])) || ""
     }
 
     private buildTransformerIndex(transformers: QueryTransformerDefinition[]): TransformerIndex {
@@ -50,7 +73,7 @@ export abstract class QueryCodeGenerator {
         if (isOperationNode(node)) {
             const operation = node.operation
             transformer = this.transformers[ASTNodeKind.Operation][operation]?.find(def => {
-                return Object.entries(node.args).every(([name, type]) => {
+                return Object.entries(node.args).every(([name, _type]) => {
                     // TODO: check type compatibility
                     return name in def.args
                 })
@@ -74,6 +97,17 @@ export abstract class QueryCodeGenerator {
         }
 
         return transformer
+    }
+
+    protected getNodeHash(node: ASTNode<ASTNodeKind>): string {
+        const string = JSON.stringify(node)
+        let hash = 0;
+        for (var i = 0; i < string.length; i++) {
+            let code = string.charCodeAt(i);
+            hash = ((hash<<5)-hash)+code;
+            hash = hash & hash;
+        }
+        return `ASTNode<${hash}>`;
     }
 }
 

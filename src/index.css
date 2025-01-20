@@ -94,8 +94,8 @@
     min-width: 60px;
 }
 
-.blocklyDraggable .blocklyPath:has(+ .blocklyEditableText.blocklyEditableInputText) {
-    @apply fill-workspace-inputs-bg
+.blocklyDraggable .blocklyPath:has(+ .blocklyEditableInputText) {
+    @apply fill-workspace-inputs-bg text-workspace-inputs-text;
 }
 
 .blocklyHtmlInput {

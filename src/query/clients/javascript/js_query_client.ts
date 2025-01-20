@@ -87,13 +87,14 @@ export const jsQueryClient = createQueryClient({
                 args: { a: t.number, b: t.number, operator: t.string },
                 transformer: (astNode) => {
                     const operators = {
-                        "GREATER": ">",
-                        "LESS": "<",
-                        "LEQ": "<=",
-                        "GEQ": ">="
+                        GREATER: ">",
+                        LESS: "<",
+                        LEQ: "<=",
+                        GEQ: ">="
                     }
 
-                    if (astNode.args.operator! in operators) {
+                    console.log(astNode.args.operator, Object.keys(operators))
+                    if (!(astNode.args.operator in operators)) {
                         throw new Error(`Unknown operator: ${astNode.args.operator}`)
                     }
 
@@ -105,13 +106,13 @@ export const jsQueryClient = createQueryClient({
                 args: { a: t.timestamp, b: t.timestamp, operator: t.string },
                 transformer: (astNode) => {
                     const operators = {
-                        "GREATER": "after",
-                        "LESS": "before",
-                        "LEQ": "before_or_equals",
-                        "GEQ": "after_or_equals"
+                        GREATER: "after",
+                        LESS: "before",
+                        LEQ: "before_or_equals",
+                        GEQ: "after_or_equals"
                     }
 
-                    if (astNode.args.operator! in operators) {
+                    if (!(astNode.args.operator in operators)) {
                         throw new Error(`Unknown operator: ${astNode.args.operator}`)
                     }
 
