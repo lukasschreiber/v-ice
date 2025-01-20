@@ -55,6 +55,10 @@ export default {
         workspace: {
           connectionpoint: {
             hover: "rgb(var(--color-workspace-connectionpoint-hover) / <alpha-value>)",
+          },
+          inputs: {
+            bg: "rgb(var(--color-workspace-inputs-bg) / <alpha-value>)",
+            text: "rgb(var(--color-workspace-inputs-text) / <alpha-value>)",
           }
         }
       }

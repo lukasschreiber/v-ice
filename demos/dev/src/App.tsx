@@ -15,7 +15,7 @@ function App() {
     const { code, json, xml, queryJson } = useGeneratedCode();
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
-    const [theme, setTheme] = useState(Themes.LightTheme);
+    const [themeName, setThemeName] = useLocalStorage("theme", "light");
     const [size, setSize] = useState(75);
     const [orientation, setOrientation] = useLocalStorage<"horizontal" | "vertical">("panel-direction", "horizontal");
     const [toolbox, setToolbox] = useState<ToolboxDefinition>(Toolbox.Defaults.Complete);
@@ -63,7 +63,7 @@ function App() {
                         language={language}
                         media="/media/"
                         toolbox={toolbox}
-                        theme={theme}
+                        theme={themeName === "light" ? Themes.LightTheme : Themes.DarkTheme}
                     />
                 </Panel>
                 <PanelResizeHandle />
@@ -73,7 +73,7 @@ function App() {
                             <DataPanel />
                         </Tab>
                         <Tab label="Misc" description="Some random functions">
-                            <MiscPanel theme={theme} setTheme={setTheme} />
+                            <MiscPanel theme={themeName === "light" ? Themes.LightTheme : Themes.DarkTheme} setTheme={(theme) => setThemeName(theme.name)} />
                         </Tab>
                         <Tab label="Toolbox" description="Toolbox configuration">
                             <ToolboxPanel toolbox={toolbox} setToolbox={setToolbox} />

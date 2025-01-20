@@ -3,7 +3,7 @@ import { Shape } from "blockly/core/renderers/common/constants";
 import { PathObject } from "./path_object";
 import types from "@/data/types";
 import { IconFactory } from "@/blocks/icon_factory";
-import { getColorsForBlockStyle } from "@/themes/colors";
+import { getColor, getColorsForBlockStyle } from "@/themes/colors";
 
 // FIXME: move to another file
 export function isDynamicShape(shape: Shape): shape is Blockly.blockRendering.DynamicShape {
@@ -18,10 +18,15 @@ export class Drawer extends Blockly.zelos.Drawer {
 
     protected override layoutField_(fieldInfo: Blockly.blockRendering.Icon | Blockly.blockRendering.Field): void {
         if (Blockly.blockRendering.Types.isField(fieldInfo)) {
-            const svgText = (fieldInfo as Blockly.blockRendering.Field).field.getSvgRoot()?.querySelector(".blocklyText") as SVGTextElement | undefined;
-            if (svgText) {
-                const style = this.block_.getStyleName();
-                svgText.style.fill = getColorsForBlockStyle(style).text
+            const svgRoot = (fieldInfo as Blockly.blockRendering.Field).field.getSvgRoot()
+            if (svgRoot) {
+                const svgText = svgRoot.querySelector(".blocklyText") as SVGTextElement | undefined;
+                if (svgText && (!svgRoot.classList.contains("blocklyEditableText") || svgText.classList.contains("blocklyDropdownText"))) {
+                    const style = this.block_.getStyleName();
+                    svgText.style.fill = getColorsForBlockStyle(style).text
+                } else if (svgText && svgRoot.classList.contains("blocklyEditableText")) {
+                    svgText.style.fill = getColor("workspace-inputs-text")
+                }
             }
         }
 
@@ -53,7 +58,7 @@ export class Drawer extends Blockly.zelos.Drawer {
         if (typeString) {
 
             // hover effect on the inline input if it's not connected
-            pathObject.svgRoot.classList.add("cursor-pointer")
+            // pathObject.svgRoot.classList.add("cursor-pointer")
             // pathObject.svgRoot.addEventListener("click", () => {
             //     showNotification("Yay! " + typeString)
             // })

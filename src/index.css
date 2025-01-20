@@ -94,6 +94,18 @@
     min-width: 60px;
 }
 
+.blocklyDraggable .blocklyPath:has(+ .blocklyEditableText.blocklyEditableInputText) {
+    @apply fill-workspace-inputs-bg
+}
+
+.blocklyHtmlInput {
+    @apply bg-workspace-inputs-bg text-workspace-inputs-text;
+}
+
+.blocklyEditableInputText .blocklyFieldRect {
+    @apply !fill-workspace-inputs-bg;
+}
+
 .markdown-body ol {
     list-style: decimal;
     padding-left: 2em;

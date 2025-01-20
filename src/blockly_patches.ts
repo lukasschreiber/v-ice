@@ -140,6 +140,23 @@ Blockly.Events.BlockMove.prototype.run = function (forward: boolean) {
     }
 }
 
+const updateFieldEditable = Blockly.Field.prototype.updateEditable
+Blockly.Field.prototype.updateEditable = function (this: Blockly.Field) {
+    updateFieldEditable.call(this)
+    const group = this.fieldGroup_
+    if (!group) return
+    if (this.hasOwnProperty("menuGenerator_")) {
+        Blockly.utils.dom.addClass(group, "blocklyEditableDropdownText")
+    } else {
+        Blockly.utils.dom.removeClass(group, "blocklyEditableDropdownText")
+    }
+    if (this.hasOwnProperty("htmlInput_")) {
+        Blockly.utils.dom.addClass(group, "blocklyEditableInputText")
+    } else {
+        Blockly.utils.dom.removeClass(group, "blocklyEditableInputText")
+    }
+}
+
 Blockly.WorkspaceSvg.prototype.newBlock = function (type: string, id?: string) {
     return new BlockSvg(this, type, id)
 }

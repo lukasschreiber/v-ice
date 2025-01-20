@@ -15,7 +15,7 @@ export interface LayoutSettings {
 }
 
 export function getSettingsDefinition() {
-    const t = i18next.t
+    const { t } = i18next
     return defineSettings([
         {
             name: t("Blockly"),

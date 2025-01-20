@@ -33,8 +33,14 @@
             "text": "#333333"
         },
         "workspace": {
+            "bg": "#ffffff",
+            "grid": "#dddddd",
             "connectionpoint": {
                 "hover": "#4C97FF"
+            },
+            "inputs": {
+                "bg": "#ffffff",
+                "text": "#333333"
             }
         },
         "categories": {
