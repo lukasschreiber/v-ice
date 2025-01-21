@@ -12,7 +12,8 @@ import { WorkspaceSavePanel } from "./components/tabs/WorspaceSavePanel";
 function App() {
     const [language] = useState(localStorage.getItem("language") ?? "en");
     const [queryClient, setQueryClient] = useState("js");
-    const { code, json, xml, queryJson } = useGeneratedCode();
+    const { json, xml, queryJson } = useGeneratedCode();
+    const [code, setCode] = useState("");
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [themeName, setThemeName] = useLocalStorage("theme", "light");
@@ -73,7 +74,10 @@ function App() {
                             <DataPanel />
                         </Tab>
                         <Tab label="Misc" description="Some random functions">
-                            <MiscPanel theme={themeName === "light" ? Themes.LightTheme : Themes.DarkTheme} setTheme={(theme) => setThemeName(theme.name)} />
+                            <MiscPanel
+                                theme={themeName === "light" ? Themes.LightTheme : Themes.DarkTheme}
+                                setTheme={(theme) => setThemeName(theme.name)}
+                            />
                         </Tab>
                         <Tab label="Toolbox" description="Toolbox configuration">
                             <ToolboxPanel toolbox={toolbox} setToolbox={setToolbox} />
@@ -98,16 +102,27 @@ function App() {
                                 </select>
                                 <Button
                                     onClick={() => {
-                                        console.log(Clients[queryClient as keyof typeof Clients].generateCode(
-                                            JSON.parse(queryJson)
-                                        ));
+                                        const client = Clients[queryClient as keyof typeof Clients];
+                                        client
+                                            .generateCode(JSON.parse(queryJson))
+                                            .then((code) => client.optimizeCode(code))
+                                            .then((code) => client.formatCode(code))
+                                            .then((code) => setCode(code));
                                     }}
                                 >
                                     Run
                                 </Button>
                             </div>
 
-                            <Code language="typescript" code={code === "" ? "// no code" : code.split("\n\n\n")[1]} />
+                            <Code
+                                language="javascript"
+                                code={code === "" ? "// no code" : code}
+                                decorations={[
+                                    { regex: /(?<=function\s+)(query_\w*)/g, className: "bg-orange-200" },
+                                    { regex: /(?<=function\s+)(set_\w*)/g, className: "bg-purple-200" },
+                                    { regex: /"[a-zA-Z0-9,=()@|/{}\$~\*!:\+\-`^%\[\]\._]{20}"/g, className: "bg-green-50 text-green-300" },
+                                ]}
+                            />
                         </Tab>
                         <Tab label="AST" description="The generated JSON reperesentation of the code">
                             <Code language="json" code={queryJson} />

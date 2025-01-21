@@ -1,21 +1,50 @@
 import { createQueryClient } from "../query_client_build";
-import { createOperationTransformer, createPrimitiveTransformer, createSubsetTransformer } from "../query_transformer";
+import { createOperationTransformer, createPrimitiveTransformer, createQueryFunctionTransformer, createSubsetTransformer } from "../query_transformer";
 import t from "@/data/types"
-import { JSQueryGenerator } from "./js_query_generator";
+import prettier from "prettier";
+import babelParser from "prettier/plugins/babel"
+import estree from "prettier/plugins/estree"
+import { QueryCodeGenerator } from "../query_code_generator";
+import { minify } from "terser";
+import * as ambient from "@/query/ambient_functions"
+import { ASTSetNodeInput } from "@/query/builder/ast";
+import { DataRow, DataTable } from "@/data/table";
+import { QueryFnReturnType } from "../local_query_runtime";
+import { typeRegistry } from "@/data/type_registry";
 
 export const jsQueryClient = createQueryClient({
     mode: "local",
-    verificator: {
-        verify(_query: string): boolean {
-            return true;
-        }
-    },
     runtime: {
-        execute(_query: string): any {
-            return "Local query result"
+        execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>> {
+            return new Promise((resolve) => {
+                if (source.getColumnCount() === 0 || source.getRowCount() === 0 || query === "") {
+                    resolve({ targets: {}, edgeCounts: {} });
+                    return;
+                }
+                if (!window.Blockly.typeRegistry) window.Blockly.typeRegistry = typeRegistry
+                const rows = source.getRows()
+                
+                try {
+                    // we assume that only one source with the name root is present
+                    const queryFunction = new Function("init", `${query};return query_root(init);`)
+                    const result: QueryFnReturnType<DataRow[]> = queryFunction(rows)
+                    const tables: Record<string, DataTable> = {}
+                    for (const [id, rows] of Object.entries(result.targets)) {
+                        tables[id] = DataTable.fromRows(rows, source.getColumnTypes(), source.getColumnNames())
+                    }
+
+                    resolve({ targets: tables, edgeCounts: {} })
+                    // resolve({ targets: tables, edgeCounts: result.edgeCounts })
+                    return;
+                } catch (e) {
+                    console.warn(e)
+                    resolve({ targets: {}, edgeCounts: {} });
+                    return;
+                }
+            })
         }
     },
-    generator: new JSQueryGenerator({
+    generator: new QueryCodeGenerator({
         transformers: [
             // Equals Operation
             createOperationTransformer({
@@ -61,11 +90,7 @@ export const jsQueryClient = createQueryClient({
                 operation: "fib",
                 args: { n: t.number },
                 transformer: (astNode) => {
-                    return `function fib(n) {
-                    if (n <= 1) return n;
-                    return fib(n - 1) + fib(n - 2);
-                }
-                fib(${astNode.args.n})`
+                    return `fib(${astNode.args.n})`
                 }
             }),
 
@@ -93,7 +118,6 @@ export const jsQueryClient = createQueryClient({
                         GEQ: ">="
                     }
 
-                    console.log(astNode.args.operator, Object.keys(operators))
                     if (!(astNode.args.operator in operators)) {
                         throw new Error(`Unknown operator: ${astNode.args.operator}`)
                     }
@@ -153,14 +177,74 @@ export const jsQueryClient = createQueryClient({
                 transformer: (astNode) => `${astNode.value === null ? "null" : JSON.stringify(astNode.value)}`
             }),
 
+            createOperationTransformer({
+                operation: "get_variable",
+                args: { name: t.string },
+                transformer: (astNode) => `p["${astNode.args.name}"]`
+            }),
+
             createSubsetTransformer({
                 transformer: (astNode) => {
-                    return `function ${astNode.attributes.name}(default) {
-                    return conditionalSplit(default, p => ${astNode.operations?.join(" && ") || "false"});
+                    return `function set_${astNode.attributes.name}(source) {
+                    return conditionalSplit(source, p => ${astNode.operations?.join(" && ") || "false"});
                 }`
                 }
             }),
 
-        ]
+            createQueryFunctionTransformer({
+                transformer: (source, sets, targets) => {
+                    function processInputs(inputs: ASTSetNodeInput[] | undefined): string {
+                        if (inputs === undefined || inputs?.length === 0) return ""
+                        if (inputs.length === 1) return `sets["${inputs[0].connectedSetId}"]${inputs[0].connectionPoint && inputs[0].connectionPoint in ["positive", "negative"] ? `["${inputs[0].connectionPoint}"]` : ""}`
+                        return `merge(${inputs.map(input => `sets["${input.connectedSetId}"]${input.connectionPoint && input.connectionPoint in ["positive", "negative"] ? `["${input.connectionPoint}"]` : ""}`).join(", ")})`
+                    }
+
+                    return `function query_${source.attributes.name}(source) {
+                        const sets = {
+                            "${source.attributes.id}": source,
+                            ${sets.map(set => `"${set.attributes.id}": set_${set.attributes.name}(${processInputs(set.inputs?.["input"])})`).join(", ")}
+                        }
+                        return {
+                            targets: {${targets.map(target => `"${target.attributes.id}": ${processInputs(target.inputs?.["input"])}`).join(", ")}}
+                        }
+                    }`
+                }
+            }),
+
+        ],
+        formatCode: (code) => prettier.format(code, { parser: "babel", plugins: [babelParser, estree], tabWidth: 4 }),
+        optimizeCode: async (code) => {
+            const result = await minify(code, {
+                compress: {
+                    booleans_as_integers: false,
+                    booleans: false,
+                    comparisons: true,
+                    evaluate: true,
+                    keep_fargs: false,
+                    keep_infinity: true,
+                    unsafe: false,
+                    conditionals: false,
+                    sequences: false,
+                    unused: true,
+                    toplevel: true,
+                    inline: false,
+                    join_vars: false,
+                    reduce_vars: false,
+                    reduce_funcs: false,
+                    top_retain: /^query_/,
+                },
+                mangle: false,
+                output: {
+                    braces: true,
+                    beautify: true,
+                    comments: false,
+                }
+            });
+            if (result.code === undefined) {
+                throw new Error(`Error while optimizing code`);
+            }
+            return result.code;
+        },
+        ambientFunctions: Object.values(ambient).map((fn) => fn.toString())
     })
 })

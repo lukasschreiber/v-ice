@@ -1,10 +1,13 @@
 import { ASTNodeKind, ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "../builder/ast"
 import { IType, ValueOf } from "@/data/types"
 
+export enum TransformerKind {
+    QueryFunction = "query_function",
+}
 
 export interface IQueryTransformerDefinition {
-    kind: ASTNodeKind
-    transformer: QueryTransformerForNode
+    kind: ASTNodeKind | TransformerKind
+    transformer: QueryTransformerForNode | QueryFunctionTransformer
 }
 
 export interface OperationNodeQueryTransformerDefinition<A extends {[key: string]: IType}> extends IQueryTransformerDefinition {
@@ -26,7 +29,12 @@ export interface SetNodeQueryTransformerDefinition extends IQueryTransformerDefi
     transformer: QueryTransformerForSetNode
 }
 
-export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition<any> | SetNodeQueryTransformerDefinition
+export interface QueryFunctionTransformerDefinition extends IQueryTransformerDefinition {
+    kind: TransformerKind.QueryFunction
+    transformer: QueryFunctionTransformer
+}
+
+export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition<any> | SetNodeQueryTransformerDefinition | QueryFunctionTransformerDefinition
 
 export type QueryTransformerForOperationNode<A extends {[key: string]: IType}> = (astNode: ASTOperationNode & {
     args: { [K in keyof A]: string }
@@ -34,6 +42,7 @@ export type QueryTransformerForOperationNode<A extends {[key: string]: IType}> =
 export type QueryTransformerForPrimitiveNode<T extends IType> = (astNode: ASTPrimitiveNode & {value: ValueOf<T>}) => string
 export type QueryTransformerForSetNode = (astNode: ASTSetNode) => string
 export type QueryTransformerForNode = (astNode: any) => string
+export type QueryFunctionTransformer = (source: ASTSetNode, sets: ASTSetNode[], targets: ASTSetNode[]) => string
 
 export function createOperationTransformer<A extends {[key: string]: IType}>(
     definition: Omit<OperationNodeQueryTransformerDefinition<A>, "kind">
@@ -51,4 +60,10 @@ export function createSubsetTransformer(
     definition: Omit<SetNodeQueryTransformerDefinition, "kind" | "blockName">
 ): SetNodeQueryTransformerDefinition {
     return { ...definition, kind: ASTNodeKind.Set, blockName: "subset_node" } as SetNodeQueryTransformerDefinition
+}
+
+export function createQueryFunctionTransformer(
+    definition: Omit<QueryFunctionTransformerDefinition, "kind">
+): QueryFunctionTransformerDefinition {
+    return { ...definition, kind: TransformerKind.QueryFunction } as QueryFunctionTransformerDefinition
 }

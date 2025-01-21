@@ -1,7 +1,7 @@
 import { type DataRow, type IndexedDataRow } from "@/data/table";
 import { DateTimeGranularityType } from "@/utils/datetime";
 
-export function conditionalSplit(dataset: DataRow[], filterFn: (row: DataRow) => boolean): {positive: DataRow[], negative: DataRow[]} {
+export function conditionalSplit(dataset: DataRow[], filterFn: (row: DataRow) => boolean): { positive: DataRow[], negative: DataRow[] } {
     const positive: DataRow[] = []
     const negative: DataRow[] = []
 
@@ -13,8 +13,13 @@ export function conditionalSplit(dataset: DataRow[], filterFn: (row: DataRow) =>
         }
     }
 
-    return {positive, negative}
+    return { positive, negative }
 
+}
+
+export function fib(n: number): number {
+    if (n <= 1) return n;
+    return fib(n - 1) + fib(n - 2);
 }
 
 export function merge(...args: IndexedDataRow[][]): IndexedDataRow[] {
@@ -187,15 +192,15 @@ export function maskDate(date: string, maskedComponents: DateTimeGranularityType
     // the date string is in ISO format, so it is: yyyy-MM-ddThh:mm:ss.sssZ
     let dateTime = window.luxon.DateTime.fromISO(date)
     for (const component of maskedComponents) {
-        dateTime = dateTime.set({[component]: component === "month" || component === "day" ? 1 : 0})
+        dateTime = dateTime.set({ [component]: component === "month" || component === "day" ? 1 : 0 })
     }
     return dateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss")
 }
 
-export function compareDates(op: "equals" | "after" | "before" | "after_or_equals" | "before_or_equals", a: {timestamp: string, masked?: DateTimeGranularityType[]} | string, b: {timestamp: string, masked?: DateTimeGranularityType[]} | string): boolean {
-    if (typeof a === "string") a = {timestamp: a}
-    if (typeof b === "string") b = {timestamp: b}
-    
+export function compareDates(op: "equals" | "after" | "before" | "after_or_equals" | "before_or_equals", a: { timestamp: string, masked?: DateTimeGranularityType[] } | string, b: { timestamp: string, masked?: DateTimeGranularityType[] } | string): boolean {
+    if (typeof a === "string") a = { timestamp: a }
+    if (typeof b === "string") b = { timestamp: b }
+
     let mask: DateTimeGranularityType[] = []
     if (a.masked && b.masked) {
         mask = Array.from(new Set(a.masked.concat(b.masked)))
@@ -220,9 +225,9 @@ export function compareDates(op: "equals" | "after" | "before" | "after_or_equal
     return false
 }
 
-export function dateDiff(a: {timestamp: string, masked?: DateTimeGranularityType[]} | string, b: {timestamp: string, masked?: DateTimeGranularityType[]} | string): number {
-    if (typeof a === "string") a = {timestamp: a}
-    if (typeof b === "string") b = {timestamp: b}
+export function dateDiff(a: { timestamp: string, masked?: DateTimeGranularityType[] } | string, b: { timestamp: string, masked?: DateTimeGranularityType[] } | string): number {
+    if (typeof a === "string") a = { timestamp: a }
+    if (typeof b === "string") b = { timestamp: b }
 
     // get the unit as the smallest granularity not masked
     let unit: DateTimeGranularityType = "second"

@@ -9,7 +9,9 @@ import { nodePolyfills } from 'vite-plugin-node-polyfills'
 export default mergeConfig(baseConfig, {
     plugins: [
         dts({ include: ['src'] }),
-        nodePolyfills(),
+        nodePolyfills({
+            buffer: true
+        }),
     ],
     build: {
         copyPublicDir: false,

@@ -1,44 +1,64 @@
 import { AST, ASTNodeKind, ASTNode, isOperationNode, isPrimitiveNode, isSetNode } from "../builder/ast";
 import { TypeChecker } from "@/data/type_checker";
-import { OperationNodeQueryTransformerDefinition, PrimitiveNodeQueryTransformerDefinition, QueryTransformerDefinition, QueryTransformerForNode, SetNodeQueryTransformerDefinition } from "./query_transformer";
+import { OperationNodeQueryTransformerDefinition, PrimitiveNodeQueryTransformerDefinition, QueryFunctionTransformer, QueryTransformerDefinition, QueryTransformerForNode, SetNodeQueryTransformerDefinition, TransformerKind } from "./query_transformer";
 import types from "@/data/types";
 import { traverseASTReverse } from "../builder/ast_traverser";
 
 export interface QueryGeneratorParams {
     transformers: QueryTransformerDefinition[];
+    formatCode?: (code: string) => Promise<string>;
+    verifyCode?: (code: string) => Promise<boolean>;
+    optimizeCode?: (code: string) => Promise<string>;
+    ambientFunctions?: string[];
 }
 
-export abstract class QueryCodeGenerator {
+export class QueryCodeGenerator {
     protected transformers: TransformerIndex;
     protected generatedCodeMap: Map<string, string> = new Map()
 
     constructor(protected params: QueryGeneratorParams) {
         this.transformers = this.buildTransformerIndex(params.transformers);
+        this.formatCode = params.formatCode || this.formatCode
+        this.optimizeCode = params.optimizeCode || this.optimizeCode
+        this.verifyCode = params.verifyCode || this.verifyCode
     }
 
-    public generateCode(ast: AST): string {
-        traverseASTReverse(ast, {
-            visit: (node) => {
-                const transformer = this.getTransformerForNode(node)
-                if (isOperationNode(node)) {
-                    for (const [name, arg] of Object.entries(node.args)) {
-                        // TODO this is really bad
-                        // @ts-ignore
-                        node.args[name] = this.generatedCodeMap.get(this.getNodeHash(arg))
+    public generateCode(ast: AST): Promise<string> {
+        return new Promise((resolve) => {
+            traverseASTReverse(ast, {
+                visit: (node) => {
+                    const transformer = this.getTransformerForNode(node)
+                    if (isOperationNode(node)) {
+                        for (const [name, arg] of Object.entries(node.args)) {
+                            // TODO this is really bad
+                            // @ts-ignore
+                            node.args[name] = this.generatedCodeMap.get(this.getNodeHash(arg))
+                        }
                     }
-                }
 
-                if (isSetNode(node) && node.operations) {
-                    // @ts-ignore
-                    node.operations = node.operations.map(op => {
-                        return this.generatedCodeMap.get(this.getNodeHash(op)) || ""
-                    })
-                }
+                    if (isSetNode(node) && node.operations) {
+                        // @ts-ignore
+                        node.operations = node.operations.map(op => {
+                            return this.generatedCodeMap.get(this.getNodeHash(op)) || ""
+                        })
+                    } else if (isSetNode(node)) {
+                        // we do not deal with target or source nodes here
+                        return
+                    }
 
-                this.generatedCodeMap.set(this.getNodeHash(node), transformer(node))
+                    this.generatedCodeMap.set(this.getNodeHash(node), transformer(node))
+                }
+            })
+
+            const ambientFunctions = (this.params.ambientFunctions || []).join("\n\n")
+            const sets = ast.sets.map(set => this.generatedCodeMap.get(this.getNodeHash(set)) || "").join("\n\n")
+            const queryFunction = this.getQueryFunctionTransformer()?.(ast.root, ast.sets, ast.targets)
+            if (queryFunction) {
+                return resolve(`${ambientFunctions}\n\n${sets}\n\n${queryFunction}`)
             }
+
+            return resolve(`${ambientFunctions}\n\n${sets}`)
         })
-        return this.generatedCodeMap.get(this.getNodeHash(ast.sets[0])) || ""
     }
 
     private buildTransformerIndex(transformers: QueryTransformerDefinition[]): TransformerIndex {
@@ -66,6 +86,10 @@ export abstract class QueryCodeGenerator {
                 return acc
             }, {} as TransformerIndex[ASTNodeKind.Set])
         }
+    }
+
+    private getQueryFunctionTransformer(): QueryFunctionTransformer | undefined {
+        return this.params.transformers.find(def => def.kind === TransformerKind.QueryFunction)?.transformer as QueryFunctionTransformer | undefined
     }
 
     private getTransformerForNode<K extends ASTNodeKind>(node: ASTNode<K>): QueryTransformerForNode {
@@ -108,6 +132,18 @@ export abstract class QueryCodeGenerator {
             hash = hash & hash;
         }
         return `ASTNode<${hash}>`;
+    }
+
+    public async formatCode(code: string): Promise<string> {
+        return new Promise(resolve => resolve(code))
+    }
+
+    public async optimizeCode(code: string): Promise<string> {
+        return new Promise(resolve => resolve(code))
+    }
+
+    public async verifyCode(_code: string): Promise<boolean> {
+        return new Promise(resolve => resolve(true))
     }
 }
 

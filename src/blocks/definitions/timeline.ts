@@ -267,6 +267,7 @@ export const TimelineDateBlock = createBlock({
     output: types.timestamp,
     style: "timeline_blocks",
     extensions: [ParentColorExtension],
+    
 })
 
 export const TimelineOrBlock = createBlock({
