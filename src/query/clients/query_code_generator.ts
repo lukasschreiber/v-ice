@@ -25,8 +25,11 @@ export class QueryCodeGenerator {
 
     public generateCode(ast: AST): Promise<string> {
         return new Promise((resolve) => {
-            traverseASTReverse(ast, {
+            const clonedAST: AST = JSON.parse(JSON.stringify(ast))
+            traverseASTReverse(clonedAST, {
                 visit: (node) => {
+                    if (isSetNode(node) && !node.operations) return;
+
                     const transformer = this.getTransformerForNode(node)
                     if (isOperationNode(node)) {
                         for (const [name, arg] of Object.entries(node.args)) {
@@ -41,9 +44,6 @@ export class QueryCodeGenerator {
                         node.operations = node.operations.map(op => {
                             return this.generatedCodeMap.get(this.getNodeHash(op)) || ""
                         })
-                    } else if (isSetNode(node)) {
-                        // we do not deal with target or source nodes here
-                        return
                     }
 
                     this.generatedCodeMap.set(this.getNodeHash(node), transformer(node))
@@ -51,8 +51,8 @@ export class QueryCodeGenerator {
             })
 
             const ambientFunctions = (this.params.ambientFunctions || []).join("\n\n")
-            const sets = ast.sets.map(set => this.generatedCodeMap.get(this.getNodeHash(set)) || "").join("\n\n")
-            const queryFunction = this.getQueryFunctionTransformer()?.(ast.root, ast.sets, ast.targets)
+            const sets = clonedAST.sets.map(set => this.generatedCodeMap.get(this.getNodeHash(set)) || "").join("\n\n")
+            const queryFunction = this.getQueryFunctionTransformer()?.(clonedAST.root, clonedAST.sets, clonedAST.targets)
             if (queryFunction) {
                 return resolve(`${ambientFunctions}\n\n${sets}\n\n${queryFunction}`)
             }

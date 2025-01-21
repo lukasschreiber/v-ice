@@ -118,11 +118,11 @@ export const jsQueryClient = createQueryClient({
                         GEQ: ">="
                     }
 
-                    if (!(astNode.args.operator in operators)) {
-                        throw new Error(`Unknown operator: ${astNode.args.operator}`)
+                    if (!(astNode.args.operator.replaceAll("\"", "") in operators)) {
+                        throw new Error(`Unknown operator: ${astNode.args.operator.replaceAll("\"", "") }`)
                     }
 
-                    return `(${astNode.args.a} ${operators[astNode.args.operator as keyof typeof operators]} ${astNode.args.b})`
+                    return `(${astNode.args.a} ${operators[astNode.args.operator.replaceAll("\"", "") as keyof typeof operators]} ${astNode.args.b})`
                 }
             }),
             createOperationTransformer({
@@ -136,11 +136,11 @@ export const jsQueryClient = createQueryClient({
                         GEQ: "after_or_equals"
                     }
 
-                    if (!(astNode.args.operator in operators)) {
-                        throw new Error(`Unknown operator: ${astNode.args.operator}`)
+                    if (!(astNode.args.operator.replaceAll("\"", "") in operators)) {
+                        throw new Error(`Unknown operator: ${astNode.args.operator.replaceAll("\"", "") }`)
                     }
 
-                    return `compareDates("${operators[astNode.args.operator as keyof typeof operators]}", ${astNode.args.a}, ${astNode.args.b})`
+                    return `compareDates("${operators[astNode.args.operator.replaceAll("\"", "") as keyof typeof operators]}", ${astNode.args.a}, ${astNode.args.b})`
                 }
             }),
 
@@ -165,8 +165,12 @@ export const jsQueryClient = createQueryClient({
 
             // Primitive Transformers
             createPrimitiveTransformer({
-                type: t.nullable(t.union(t.number, t.string, t.boolean, t.enum(t.wildcard), t.hierarchy(t.wildcard), t.timestamp)),
+                type: t.nullable(t.union(t.number, t.boolean, t.timestamp)),
                 transformer: (astNode) => `${astNode.value}`
+            }),
+            createPrimitiveTransformer({
+                type: t.nullable(t.union(t.string, t.enum(t.wildcard), t.hierarchy(t.wildcard))),
+                transformer: (astNode) => `"${astNode.value}"`
             }),
             createPrimitiveTransformer({
                 type: t.nullable(t.list(t.wildcard)),
@@ -180,7 +184,7 @@ export const jsQueryClient = createQueryClient({
             createOperationTransformer({
                 operation: "get_variable",
                 args: { name: t.string },
-                transformer: (astNode) => `p["${astNode.args.name}"]`
+                transformer: (astNode) => `p["${astNode.args.name.replaceAll("\"", "")}"]`
             }),
 
             createSubsetTransformer({
@@ -195,15 +199,25 @@ export const jsQueryClient = createQueryClient({
                 transformer: (source, sets, targets) => {
                     function processInputs(inputs: ASTSetNodeInput[] | undefined): string {
                         if (inputs === undefined || inputs?.length === 0) return ""
-                        if (inputs.length === 1) return `sets["${inputs[0].connectedSetId}"]${inputs[0].connectionPoint && inputs[0].connectionPoint in ["positive", "negative"] ? `["${inputs[0].connectionPoint}"]` : ""}`
-                        return `merge(${inputs.map(input => `sets["${input.connectedSetId}"]${input.connectionPoint && input.connectionPoint in ["positive", "negative"] ? `["${input.connectionPoint}"]` : ""}`).join(", ")})`
+
+                        const evaluatedInputs = []
+                        for (const input of inputs) {
+                            if (input.connectedSetId === source.attributes.id) {
+                                evaluatedInputs.push("source")
+                                continue
+                            }
+
+                            const set = sets.find(set => set.attributes.id === input.connectedSetId)
+                            if (set === undefined) throw new Error(`Set with id ${input.connectedSetId} not found`)
+                            evaluatedInputs.push(`evaluated_set_${set.attributes.name}${input.connectionPoint === "positive" || input.connectionPoint === "negative" ? `["${input.connectionPoint}"]` : ""}`)
+                        }
+
+                        if (evaluatedInputs.length === 1) return evaluatedInputs[0]
+                        return `merge(${evaluatedInputs.join(", ")})`
                     }
 
                     return `function query_${source.attributes.name}(source) {
-                        const sets = {
-                            "${source.attributes.id}": source,
-                            ${sets.map(set => `"${set.attributes.id}": set_${set.attributes.name}(${processInputs(set.inputs?.["input"])})`).join(", ")}
-                        }
+                        ${sets.map(set => `const evaluated_set_${set.attributes.name} = set_${set.attributes.name}(${processInputs(set.inputs?.["input"])})`).join("\n")}
                         return {
                             targets: {${targets.map(target => `"${target.attributes.id}": ${processInputs(target.inputs?.["input"])}`).join(", ")}}
                         }

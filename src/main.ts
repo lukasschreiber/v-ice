@@ -87,8 +87,6 @@ import { ISerializedWorkspace, clearWorkspace, deserializeWorkspace, serializeWo
 import { defineToolbox, defineBlock, defineCategory, blockDefinitionToBlock, blockToBlockDefinition } from "./blocks/toolbox/toolbox_definition"
 import emitter, { EvaluationAction } from "./evaluation_emitter"
 import { HelpPage as HelpPageElement } from "./components/HelpPage"
-import { queryGenerator } from "@/query/query_generator"
-import { runQuery } from "@/query/query_runner"
 import { Variables } from "./blocks/toolbox/categories/variables"
 import { Nodes } from "./blocks/toolbox/categories/nodes"
 import { DefaultToolbox } from "./blocks/toolbox/default_toolbox"
@@ -263,14 +261,3 @@ export { type ISerializedWorkspace } from "./serializer"
 export { type ToolboxDefinition, type FlyoutItemInfo, type BlockInfo } from "blockly/core/utils/toolbox"
 export { BlockPreview } from "@/components/common/BlockPreview"
 export { WorkspacePreview } from "@/components/common/WorkspacePreview"
-
-// TODO: adapt this to the new query system
-export const QueryBackend = {
-    generateQuery: (workspace: Blockly.Workspace) => {
-        const code = queryGenerator.workspaceToCode(workspace)
-        return code
-    },
-    runQuery: (query: string, source: DataTable) => {
-        return runQuery(query, source)
-    }
-}

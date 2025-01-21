@@ -41,8 +41,12 @@ export class ASTBuilder {
 
         const sortedNodes = bfsWithDependencies(root as NodeBlock)
 
-        const subsetBlocks = sortedNodes.filter(block => block.type === Blocks.Names.NODE.SUBSET)
-        const targetBlocks = sortedNodes.filter(block => block.type === Blocks.Names.NODE.TARGET)
+        const subsetBlocks = sortedNodes.filter(block => block.type === Blocks.Names.NODE.SUBSET && !block.isDeadOrDying())
+        const targetBlocks = sortedNodes.filter(block => block.type === Blocks.Names.NODE.TARGET && !block.isDeadOrDying())
+
+        if (targetBlocks.length === 0) {
+            return this.emptyAST()
+        }
 
         return {
             root: {

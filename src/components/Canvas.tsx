@@ -2,7 +2,6 @@ import React, { createRef, useContext, useEffect, useMemo, useState } from "reac
 import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
 import { LightTheme } from "@/themes/themes";
-import { queryGenerator } from "@/main";
 import { ContinuousMetrics } from "@/toolbox/metrics";
 import { ContinuousFlyout } from "@/toolbox/flyout";
 import { ContinuousToolbox } from "@/toolbox/toolbox";
@@ -12,7 +11,6 @@ import { BlockDragger } from "@/renderer/block_dragger";
 import { SettingsContext } from "@/store/settings/settings_context";
 import { SettingsModal } from "@/components/SettingsModal";
 import { setBlocklyLocale } from "@/i18n";
-import { runQuery } from "@/query/query_runner";
 import { setJson, setXml, setCode, setQueryJson } from "@/store/code/generated_code_slice";
 import { setQueryResults } from "@/store/data/data_slice";
 import { useDispatch, useSelector } from "@/store/hooks";
@@ -41,6 +39,8 @@ import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 import { LoadingOverlay } from "./common/LoadingOverlay";
 import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance";
 import { setTheme } from "@/themes/colors";
+import { QueryClient } from "@/query/clients/query_client";
+import { LocalQueryClient } from "@/query/clients/local_query_client";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -55,11 +55,12 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     media?: string;
     helpUrl?: string;
     toolbox?: ToolboxDefinition;
+    queryClient?: QueryClient;
     theme?: Blockly.Theme;
 };
 
 export function Canvas(props: CanvasProps) {
-    const { language, helpUrl, media, width, height, toolbox, ...divProps } = props;
+    const { language, helpUrl, media, width, height, toolbox, queryClient, ...divProps } = props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
     const workspaceRef = useContext(WorkspaceContext).workspaceRef;
@@ -203,8 +204,12 @@ export function Canvas(props: CanvasProps) {
         if (!workspace) return;
 
         // this has been deserialized after running the query and is now serialized again... maybe we can take a shortcut from rows to json
-        new Promise<void>((resolve) => {
-            const result = runQuery(code, memoizedSource);
+        new Promise<void>(async (resolve) => {
+            if (!queryClient) {
+                resolve();
+                return;
+            }
+            const result = await queryClient.execute(code, memoizedSource);
             const serialized: Record<string, SerializedTable> = {};
             for (const [id, table] of Object.entries(result.targets)) {
                 serialized[id] = table.serialize();
@@ -229,11 +234,20 @@ export function Canvas(props: CanvasProps) {
             )
                 return;
 
-            const query = queryGenerator.workspaceToCode(workspace!);
-            const queryJsonCode = JSON.stringify(getASTBuilderInstance().build(workspace!), null, 2);
-            if (code !== query) {
-                dispatch(setCode(query));
+            const ast = getASTBuilderInstance().build(workspace!);
+            if (queryClient) {
+                queryClient.generateCode(ast ?? "")
+                .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
+                .then((code) => (queryClient as LocalQueryClient).formatCode(code))
+                .then((code) => {
+                    if (code !== queryJson) {
+                        dispatch(setCode(code));
+                    }
+                });
             }
+           
+            const queryJsonCode = JSON.stringify(ast, null, 2);
+           
 
             if (queryJson !== queryJsonCode) {
                 dispatch(setQueryJson(queryJsonCode));

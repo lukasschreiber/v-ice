@@ -65,7 +65,7 @@ export const TargetNodeBlock = createBlock({
                 input: scope.buildASTForConnectionPoint("INPUT")
             },
             attributes: {
-                id: scope.block.id,
+                id: scope.getField<FieldLabelTargetNode>("LABEL").getId() ?? "unknown_target",
                 name: scope.getField<FieldLabelTargetNode>("LABEL").getName() ?? ""
             }
         })

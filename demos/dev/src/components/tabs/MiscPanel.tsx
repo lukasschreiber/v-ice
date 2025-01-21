@@ -1,4 +1,4 @@
-import { DataColumn, DataTable, IType, QueryBackend, Themes, ValueOf, useQuery, useSettings } from "v-ice";
+import { Themes, useSettings } from "v-ice";
 import { useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";
@@ -6,95 +6,14 @@ import { Toolbox, useWorkspace } from "@/main";
 import { showNotification } from "@/store/notifications/notification_emitter";
 import types from "@/data/types";
 import { TypeIconPreview } from "@/components/common/TypeIconPreview";
-import { faker } from "@faker-js/faker";
 import { Accordion } from "../Accordion";
 
 export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], setTheme: (theme: typeof Themes[keyof typeof Themes]) => void }) {
     const { settings, set } = useSettings();
     const { workspace, save, load } = useWorkspace();
     const [language, setLanguage] = useState(localStorage.getItem("language") ?? "en");
-    const { setQuerySource } = useQuery();
     const [screenshotModeEnabled, setScreenshotModeEnabled] = useState(false);
 
-    const fakerFunctions: [string, IType, () => unknown, null | string][] = [
-        ["Number", types.number, () => faker.number.int(), null],
-        ["Word", types.string, () => faker.lorem.word(), null],
-        ["Boolean", types.boolean, () => faker.datatype.boolean(), null],
-        ["Date", types.timestamp, () => faker.date.recent().toISOString(), null],
-        ["Animal", types.enum("Dog"), () => faker.animal.dog(), "Dog"],
-        ["Animal", types.enum("Cat"), () => faker.animal.cat(), "Cat"],
-        ["Street", types.string, () => faker.location.street(), null],
-        ["City", types.string, () => faker.location.city(), null],
-        ["Country", types.string, () => faker.location.country(), null],
-        ["Latitude", types.number, () => faker.location.latitude(), null],
-        ["Longitude", types.number, () => faker.location.longitude(), null],
-        ["Email", types.string, () => faker.internet.email(), null],
-        ["Phone", types.string, () => faker.phone.number(), null],
-        ["Company", types.string, () => faker.company.name(), null],
-        ["Job Title", types.string, () => faker.person.jobTitle(), null],
-        ["Name", types.string, () => faker.person.fullName(), null],
-        ["Age", types.number, () => faker.number.int({ min: 18, max: 99 }), null],
-    ];
-
-    async function runPerformanceTest(
-        fromRows: number,
-        toRows: number,
-        fromCols: number,
-        toCols: number,
-        seed: number
-    ) {
-        const results = [];
-        for (let rows = fromRows; rows <= toRows; rows += 10) {
-            for (let cols = fromCols; cols <= toCols; cols += 10) {
-                const data = loadPerformanceTestData(rows, cols, seed);
-                setQuerySource(data);
-
-                await new Promise((resolve) => setTimeout(resolve, 2000));
-
-                const start = performance.now();
-                const query = QueryBackend.generateQuery(workspace!);
-                QueryBackend.runQuery(query, data);
-                const end = performance.now();
-                const duration = end - start;
-
-                results.push({ rows, cols, duration });
-            }
-        }
-
-        return results;
-    }
-
-    function loadPerformanceTestData(rows: number, cols: number, seed: number) {
-        faker.seed(seed); // Set the seed for reproducibility
-        const data = new DataTable();
-        const nameCounts = new Map<string, number>();
-
-        // use faker to generate random data
-        for (let i = 0; i < cols; i++) {
-            const typeIndex = i % fakerFunctions.length;
-            const [_name, type, fakerFunction, enumDefinition] = fakerFunctions[typeIndex];
-            let name = _name;
-
-            // Ensure unique column names
-            if (nameCounts.has(name)) {
-                while (nameCounts.has(name)) {
-                    nameCounts.set(name, nameCounts.get(name)! + 1);
-                    name = `${name} ${nameCounts.get(name)}`;
-                }
-            } else {
-                nameCounts.set(name, 1);
-            }
-
-            if (enumDefinition) {
-                types.registry.registerEnum(enumDefinition, { columns: [name] });
-            }
-
-            const columnData = Array.from({ length: rows }, () => fakerFunction());
-            data.addColumn(new DataColumn(name, type, columnData as ValueOf<typeof type>[]));
-        }
-
-        return data;
-    }
 
     return (
         <div className="p-3">
@@ -185,23 +104,6 @@ export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], se
                         }}
                     >
                         Reload
-                    </Button>
-                    <Button
-                        onClick={() => {
-                            const data = loadPerformanceTestData(5, 5, 1234);
-                            setQuerySource(data);
-                            showNotification("Performance test prepared");
-                        }}
-                    >
-                        Prepare Performance Test
-                    </Button>
-                    <Button
-                        onClick={async () => {
-                            const results = await runPerformanceTest(5, 10, 5, 10, 1234);
-                            console.table(results);
-                        }}
-                    >
-                        Run Performance Test
                     </Button>
                 </div>
             </Accordion>

@@ -8,12 +8,12 @@ import { MiscPanel } from "./components/tabs/MiscPanel";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ToolboxPanel } from "./components/tabs/ToolboxPanel";
 import { WorkspaceSavePanel } from "./components/tabs/WorspaceSavePanel";
+import { showNotification } from "@/store/notifications/notification_emitter";
 
 function App() {
     const [language] = useState(localStorage.getItem("language") ?? "en");
     const [queryClient, setQueryClient] = useState("js");
-    const { json, xml, queryJson } = useGeneratedCode();
-    const [code, setCode] = useState("");
+    const { json, xml, queryJson, code } = useGeneratedCode();
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [themeName, setThemeName] = useLocalStorage("theme", "light");
@@ -65,6 +65,7 @@ function App() {
                         media="/media/"
                         toolbox={toolbox}
                         theme={themeName === "light" ? Themes.LightTheme : Themes.DarkTheme}
+                        queryClient={Clients[queryClient as keyof typeof Clients]}
                     />
                 </Panel>
                 <PanelResizeHandle />
@@ -101,14 +102,7 @@ function App() {
                                     ))}
                                 </select>
                                 <Button
-                                    onClick={() => {
-                                        const client = Clients[queryClient as keyof typeof Clients];
-                                        client
-                                            .generateCode(JSON.parse(queryJson))
-                                            .then((code) => client.optimizeCode(code))
-                                            .then((code) => client.formatCode(code))
-                                            .then((code) => setCode(code));
-                                    }}
+                                    onClick={() => showNotification("No Action has been performed")}
                                 >
                                     Run
                                 </Button>

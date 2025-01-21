@@ -20,6 +20,7 @@ export function serializeWorkspace(workspace: Blockly.WorkspaceSvg): ISerialized
 
 export function deserializeWorkspace(workspace: Blockly.WorkspaceSvg, serialized: ISerializedWorkspace) {
     Blockly.serialization.workspaces.load(serialized.workspaceState, workspace)
+    // TODO: This does not take serialized target blocks into account
     workspace.scroll(serialized.panPosition.x, serialized.panPosition.y)
     if (serialized.toolboxScrollPosition) {
         workspace.getToolbox()?.getFlyout()?.getWorkspace().scroll(serialized.toolboxScrollPosition.x, serialized.toolboxScrollPosition.y)
