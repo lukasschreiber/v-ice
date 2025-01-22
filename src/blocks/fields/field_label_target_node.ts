@@ -22,6 +22,10 @@ export class FieldLabelTargetNode extends Blockly.FieldLabelSerializable impleme
         return this.getValue()
     }
 
+    setName(name: string) {
+        this.setValue(name)
+    }
+
     getId() {
         return this.id
     }

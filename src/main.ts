@@ -173,8 +173,10 @@ export function useQuery() {
         setQuerySource: (source: DataTable) => {
             dispatch(setSource(source.serialize()))
         },
-        addTarget: (name: string) => {
-            const id = Blockly.utils.idGenerator.genUid()
+        addTarget: (name: string, id: string) => {
+            if (/[^a-zA-Z0-9_]/.test(name)) {
+                throw new Error(`Target name must only contain alphanumeric characters and underscores`)
+            }
             dispatch(setTargetBlocks({ ...targetBlocks, [id]: name }))
             return id
         },

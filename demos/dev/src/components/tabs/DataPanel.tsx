@@ -152,7 +152,7 @@ export function DataPanel() {
                             <td className="px-2 py-1 whitespace-nowrap text-center">
                                 <Button
                                     onClick={() => {
-                                        const uid = addTarget(newTarget.name);
+                                        const uid = addTarget(newTarget.name, newTarget.name.replace(/\s/g, "_"));
                                         newTarget.uid = uid;
                                         setDataTables((prev) => [...prev, newTarget]);
                                         setNewTarget({ name: "", type: "TARGET", immutable: false });

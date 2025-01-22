@@ -11,11 +11,17 @@ export interface ISerializedWorkspace {
     toolboxScrollPosition: { x: number, y: number } | undefined
 }
 
+export interface ISerializedTarget {
+    id: string,
+    name: string,
+    blocks: string[],
+}
+
 export function serializeWorkspace(workspace: Blockly.WorkspaceSvg): ISerializedWorkspace {
     return {
         workspaceState: Blockly.serialization.workspaces.save(workspace),
         panPosition: { x: workspace.scrollX, y: workspace.scrollY },
-        toolboxScrollPosition: workspace.getToolbox()?.getFlyout() ? { x: workspace.getToolbox()!.getFlyout()!.getWorkspace().scrollX, y: workspace.getToolbox()!.getFlyout()!.getWorkspace().scrollY } : undefined
+        toolboxScrollPosition: workspace.getToolbox()?.getFlyout() ? { x: workspace.getToolbox()!.getFlyout()!.getWorkspace().scrollX, y: workspace.getToolbox()!.getFlyout()!.getWorkspace().scrollY } : undefined,
     }
 }
 

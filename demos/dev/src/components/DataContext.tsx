@@ -53,7 +53,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
 
         // add an initial target node
         // FIXME: should not be needed for most basic cases, default target should automatically be added
-        const baseTargetId = addTarget("Target")
+        const baseTargetId = addTarget("Target", "default_target")
         setDataTables([{ name: "Source", type: "SOURCE", immutable: true }, { name: "Target", type: "TARGET", immutable: false, uid: baseTargetId }]);
         setInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -199,7 +199,7 @@ export const DataContext = createContext<{
     isExpandable: boolean;
     setExpandable: (newValue: boolean) => void;
     dataIsLikeDemoData: (data: DataTable) => boolean
-    addTarget(name: string): string;
+    addTarget(name: string, id: string): string;
     removeTarget(id: string): void;
     targets: Record<string, string>;
     dataTables: DataTableDefinition[];
