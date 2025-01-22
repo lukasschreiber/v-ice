@@ -8,6 +8,7 @@ import { FieldEdgeConnection } from "@/blocks/fields/field_edge_connection";
 import { Blocks } from "@/blocks";
 import { PathObject } from "./path_object";
 import { Edge } from "@/utils/edges";
+import { NodeBlock } from "@/blocks/extensions/node";
 
 export class Renderer extends Blockly.zelos.Renderer {
     constructor() {
@@ -72,25 +73,25 @@ export class Renderer extends Blockly.zelos.Renderer {
         const info = this.makeRenderInfo_(block);
         info.measure();
         this.makeDrawer_(block, info).draw();
-        this.renderEdges(block)
+        if (Blocks.Types.isNodeBlock(block) && block.shouldDrawEdges()) {
+            this.renderEdges(block)
+        }
     }
 
-    renderEdges(block: Blockly.BlockSvg) {
-        if (Blocks.Types.isNodeBlock(block) && block.shouldDrawEdges()) {
-            this.linkSvgRoot_!.querySelectorAll(`[data-id="${block.id}"]`).forEach((element) => element.remove())
-            // FIXME: currently connections are drawn two times and only updated on either side
-            const connections = block.edgeConnections
-            for (const [fieldName, connectionObj] of connections) {
-                for (const connection of connectionObj.connections) {
-                    const targetBlock = connection.targetBlock()
-                    if (connection.isConnected() && Blocks.Types.isNodeBlock(targetBlock)) {
-                        this.makeEdgeDrawer({
-                            sourceBlock: block,
-                            sourceField: block.getField(fieldName) as FieldEdgeConnection,
-                            targetBlock: targetBlock,
-                            targetField: targetBlock.getField([...targetBlock.edgeConnections.entries()].find(([, value]) => value.connections.includes(connection.targetConnection!))![0]) as FieldEdgeConnection,
-                        }).draw()
-                    }
+    renderEdges(block: Blockly.BlockSvg & NodeBlock) {
+        this.linkSvgRoot_!.querySelectorAll(`[data-id="${block.id}"]`).forEach((element) => element.remove())
+        // FIXME: currently connections are drawn two times and only updated on either side
+        const connections = block.edgeConnections
+        for (const [fieldName, connectionObj] of connections) {
+            for (const connection of connectionObj.connections) {
+                const targetBlock = connection.targetBlock()
+                if (connection.isConnected() && Blocks.Types.isNodeBlock(targetBlock)) {
+                    this.makeEdgeDrawer({
+                        sourceBlock: block,
+                        sourceField: block.getField(fieldName) as FieldEdgeConnection,
+                        targetBlock: targetBlock,
+                        targetField: targetBlock.getField([...targetBlock.edgeConnections.entries()].find(([, value]) => value.connections.includes(connection.targetConnection!))![0]) as FieldEdgeConnection,
+                    }).draw()
                 }
             }
         }

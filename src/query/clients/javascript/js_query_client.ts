@@ -162,6 +162,94 @@ export const jsQueryClient = createQueryClient({
                 transformer: (astNode) => `(${astNode.args.a} === null)`
             }),
 
+            createOperationTransformer({
+                operation: "get_struct_property",
+                args: { struct: t.nullable(t.struct(t.wildcard)), property: t.nullable(t.string) },
+                transformer: (astNode) => `${astNode.args.struct}?.["${astNode.args.property}"]`
+            }),
+            createOperationTransformer({
+                operation: "get_struct_property",
+                args: { struct: t.nullable(t.list(t.struct(t.wildcard))), property: t.nullable(t.string) },
+                transformer: (astNode) => `(${astNode.args.struct}?.map(it => it["${astNode.args.property}"]).filter(it => it !== undefined) || [])`
+            }),
+
+            createOperationTransformer({
+                operation: "unary_list_operation",
+                args: { operator: t.string, list: t.list(t.number) },
+                transformer: (astNode) => {
+                    switch (astNode.args.operator.replaceAll("\"", "")) {
+                        case "SUM": return `sum(${astNode.args.list})`
+                        case "AVERAGE": return `mean(${astNode.args.list})`
+                        case "MIN": return `Math.min(...${astNode.args.list})`
+                        case "MAX": return `Math.max(...${astNode.args.list})`
+                        case "MEDIAN": return `quantile(${astNode.args.list}, 0.5)`
+                        case "STD": return `std(${astNode.args.list})`
+                        case "MODE": return `mode(${astNode.args.list})`
+                        case "VARIANCE": return `variance(${astNode.args.list})`
+                        case "RANGE": return `Math.max(...${astNode.args.list}) - Math.min(...${astNode.args.list})`
+                        case "IQR": return `quantile(${astNode.args.list}, 0.75) - quantile(${astNode.args.list}, 0.25)`
+                        case "Q1": return `quantile(${astNode.args.list}, 0.25)`
+                        case "Q3": return `quantile(${astNode.args.list}, 0.75)`
+                        case "COUNT": return `${astNode.args.list}.length`
+                        default: return astNode.args.list
+                    }
+                }
+            }),
+            
+            createOperationTransformer({
+                operation: "list_length",
+                args: { list: t.list(t.nullable(t.wildcard)) },
+                transformer: (astNode) => `${astNode.args.list}.length`
+            }),
+
+            createOperationTransformer({
+                operation: "list_contains",
+                args: { list: t.list(t.nullable(t.wildcard)), value: t.nullable(t.wildcard) },
+                transformer: (astNode) => `(${astNode.args.list}).includes(${astNode.args.value})`
+            }),
+
+            createOperationTransformer({
+                operation: "list_any_all",
+                args: { list: t.list(t.nullable(t.wildcard)), value: t.string, operation: t.string, query: t.string },
+                transformer: (astNode) => {
+                    const operators = {
+                        ANY: "some",
+                        ALL: "every"
+                    }
+
+                    if (!(astNode.args.operation.replaceAll("\"", "") in operators)) {
+                        throw new Error(`Unknown operator: ${astNode.args.operation.replaceAll("\"", "")}`)
+                    }
+
+                    return `(${astNode.args.list}).${operators[astNode.args.operation.replaceAll("\"", "") as keyof typeof operators]}(${astNode.args.value} => ${astNode.args.query})`
+                }
+            }),
+
+            createOperationTransformer({
+                operation: "flatten_list",
+                args: { list: t.list(t.list(t.wildcard)) },
+                transformer: (astNode) => `[].concat(...${astNode.args.list})`
+            }),
+
+            createOperationTransformer({
+                operation: "list_equals",
+                args: { a: t.list(t.wildcard), b: t.list(t.wildcard), operator: t.string },
+                transformer: (astNode) => {
+                    const operator = astNode.args.operator.replaceAll("\"", "")
+                    const a = astNode.args.a
+                    const b = astNode.args.b
+
+                    switch (operator) {
+                        case "EQUALS": return `(${a}.length === ${b}.length && (${a}).every((v, i) => v === (${b})[i]))`
+                        case "CONTAINS": return `(${a}).join(",").includes((${b}).join(","))`
+                        case "STARTS_WITH": return `(${a}.length >= ${b}.length && (${a}).slice(0, (${b}).length).join(",") === (${b}).join(","))`
+                        case "ENDS_WITH": return `(${a}.length >= ${b}.length && (${a}).slice(-(${b}).length).join(",") === (${b}).join(","))`
+                        case "CONTAINS_ALL_ITEMS_OF": return `(${b}).every(v => (${a}).includes(v))`
+                        default: throw new Error(`Unknown operator: ${operator}`)
+                    }
+                }
+            }),
+
             // Primitive Transformers
             createPrimitiveTransformer({
                 type: t.nullable(t.union(t.number, t.boolean, t.timestamp)),

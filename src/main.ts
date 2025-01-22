@@ -59,15 +59,6 @@ import * as TimelineBlocks from "@/blocks/definitions/timeline"
 
 import { LightTheme, DarkTheme } from "./themes/themes"
 
-import "@/query/generation/comparisons"
-import "@/query/generation/variables"
-import "@/query/generation/math"
-import "@/query/generation/lists"
-import "@/query/generation/enum"
-import "@/query/generation/logic"
-import "@/query/generation/timeline"
-import "@/query/generation/nodes"
-
 import "@/connection_checker";
 
 export * from "@/query/query_generator"

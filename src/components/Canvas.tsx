@@ -41,6 +41,7 @@ import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance";
 import { setTheme } from "@/themes/colors";
 import { QueryClient } from "@/query/clients/query_client";
 import { LocalQueryClient } from "@/query/clients/local_query_client";
+import { NodeBlock } from "@/blocks/extensions/node";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -223,7 +224,7 @@ export function Canvas(props: CanvasProps) {
         // render the edges again
         const nodes = workspace.getAllBlocks().filter((b) => Blocks.Types.isNodeBlock(b));
         for (const node of nodes) {
-            (workspace.getRenderer() as Renderer).renderEdges(node);
+            (workspace.getRenderer() as Renderer).renderEdges(node as NodeBlock & Blockly.BlockSvg);
         }
 
         function saveCode(e: Blockly.Events.Abstract | null = null) {
