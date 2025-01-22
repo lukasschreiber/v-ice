@@ -41,10 +41,10 @@ export class QueryCodeGenerator {
                     if (isSetNode(node) && node.inputs) {
                         for (const [name, edges] of Object.entries(node.inputs)) {
                             for (const edge of edges) {
-                                edgeSetMap.set(`${edge.connectedSetId}-${edge.connectionPoint ?? "source"}_${node.attributes.id}-${name}`, {
+                                edgeSetMap.set(`${edge.connectedSetId}-${edge.connectionPoint ?? "output"}_${node.attributes.id}-${name}`, {
                                     sourceBlockId: edge.connectedSetId,
                                     targetBlockId: node.attributes.id,
-                                    sourceField: edge.connectionPoint ?? "source",
+                                    sourceField: edge.connectionPoint ?? "output", // output is the name of the output on the source block
                                     targetField: name
                                 })
                             }
