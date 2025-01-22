@@ -1,8 +1,9 @@
-import { AST, ASTNodeKind, ASTNode, isOperationNode, isPrimitiveNode, isSetNode } from "../builder/ast";
+import { AST, ASTNodeKind, ASTNode, isOperationNode, isPrimitiveNode, isSetNode, ASTSetNode, ASTEdge } from "../builder/ast";
 import { TypeChecker } from "@/data/type_checker";
 import { OperationNodeQueryTransformerDefinition, PrimitiveNodeQueryTransformerDefinition, QueryFunctionTransformer, QueryTransformerDefinition, QueryTransformerForNode, SetNodeQueryTransformerDefinition, TransformerKind } from "./query_transformer";
 import types from "@/data/types";
 import { traverseASTReverse } from "../builder/ast_traverser";
+import { SerializedEdge } from "@/utils/edges";
 
 export interface QueryGeneratorParams {
     transformers: QueryTransformerDefinition[];
@@ -26,8 +27,30 @@ export class QueryCodeGenerator {
     public generateCode(ast: AST): Promise<string> {
         return new Promise((resolve) => {
             const clonedAST: AST = JSON.parse(JSON.stringify(ast))
+            // each set can have one or more (named) inputs
+            // each input is connected to one or more sets and the connection point is specified
+            // Each edge count therefore only contains one distint set
+            const edgeSetMap: Map<string, SerializedEdge> = new Map()
+            const setMap: Map<string, ASTSetNode> = new Map()
             traverseASTReverse(clonedAST, {
                 visit: (node) => {
+                    if (isSetNode(node)) {
+                        setMap.set(node.attributes.id, node)
+                    }
+
+                    if (isSetNode(node) && node.inputs) {
+                        for (const [name, edges] of Object.entries(node.inputs)) {
+                            for (const edge of edges) {
+                                edgeSetMap.set(`${edge.connectedSetId}-${edge.connectionPoint ?? "source"}_${node.attributes.id}-${name}`, {
+                                    sourceBlockId: edge.connectedSetId,
+                                    targetBlockId: node.attributes.id,
+                                    sourceField: edge.connectionPoint ?? "source",
+                                    targetField: name
+                                })
+                            }
+                        }
+                    }
+
                     if (isSetNode(node) && !node.operations) return;
 
                     const transformer = this.getTransformerForNode(node)
@@ -52,7 +75,16 @@ export class QueryCodeGenerator {
 
             const ambientFunctions = (this.params.ambientFunctions || []).join("\n\n")
             const sets = clonedAST.sets.map(set => this.generatedCodeMap.get(this.getNodeHash(set)) || "").join("\n\n")
-            const queryFunction = this.getQueryFunctionTransformer()?.(clonedAST.root, clonedAST.sets, clonedAST.targets)
+            const edgeSetMapResolved: Map<string, ASTEdge> = new Map()
+            for (const [hash, set] of edgeSetMap) {
+                edgeSetMapResolved.set(hash, {
+                    sourceBlock: setMap.get(set.sourceBlockId)!,
+                    sourceField: set.sourceField,
+                    targetBlock: setMap.get(set.targetBlockId)!,
+                    targetField: set.targetField
+                })
+            }
+            const queryFunction = this.getQueryFunctionTransformer()?.(clonedAST.root, clonedAST.sets, clonedAST.targets, edgeSetMapResolved)
             if (queryFunction) {
                 return resolve(`${ambientFunctions}\n\n${sets}\n\n${queryFunction}`)
             }

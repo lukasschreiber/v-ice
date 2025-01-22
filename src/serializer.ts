@@ -3,6 +3,7 @@ import { Blocks } from './blocks';
 import types from './data/types';
 import { ScopedBlock } from './blocks/extensions/scoped';
 import { FieldLocalVariable } from './blocks/fields/field_local_variable';
+import { SerializedEdge } from './utils/edges';
 
 export interface ISerializedWorkspace {
     workspaceState: Record<string, unknown>
@@ -54,7 +55,7 @@ Blockly.serialization.registry.register(
     "edges",
     {
         save(workspace: Blockly.WorkspaceSvg) {
-            const edges: { sourceBlockId: string, targetBlockId: string, sourceField: string, targetField: string }[] = []
+            const edges: SerializedEdge[] = []
             workspace.getAllBlocks().forEach(block => {
                 if (Blocks.Types.isNodeBlock(block)) {
                     block.edgeConnections.forEach((value, key) => {
@@ -72,7 +73,7 @@ Blockly.serialization.registry.register(
             })
             return edges
         },
-        load(state: { sourceBlockId: string, targetBlockId: string, sourceField: string, targetField: string }[], workspace: Blockly.WorkspaceSvg) {
+        load(state: SerializedEdge[], workspace: Blockly.WorkspaceSvg) {
             state.forEach(edge => {
                 const sourceBlock = workspace.getBlockById(edge.sourceBlockId)
                 const targetBlock = workspace.getBlockById(edge.targetBlockId)

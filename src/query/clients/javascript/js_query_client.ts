@@ -33,8 +33,7 @@ export const jsQueryClient = createQueryClient({
                         tables[id] = DataTable.fromRows(rows, source.getColumnTypes(), source.getColumnNames())
                     }
 
-                    resolve({ targets: tables, edgeCounts: {} })
-                    // resolve({ targets: tables, edgeCounts: result.edgeCounts })
+                    resolve({ targets: tables, edgeCounts: result.edgeCounts })
                     return;
                 } catch (e) {
                     console.warn(e)
@@ -196,7 +195,7 @@ export const jsQueryClient = createQueryClient({
             }),
 
             createQueryFunctionTransformer({
-                transformer: (source, sets, targets) => {
+                transformer: (source, sets, targets, edgeSetMap) => {
                     function processInputs(inputs: ASTSetNodeInput[] | undefined): string {
                         if (inputs === undefined || inputs?.length === 0) return ""
 
@@ -219,7 +218,11 @@ export const jsQueryClient = createQueryClient({
                     return `function query_${source.attributes.name}(source) {
                         ${sets.map(set => `const evaluated_set_${set.attributes.name} = set_${set.attributes.name}(${processInputs(set.inputs?.["input"])})`).join("\n")}
                         return {
-                            targets: {${targets.map(target => `"${target.attributes.id}": ${processInputs(target.inputs?.["input"])}`).join(", ")}}
+                            targets: {${targets.map(target => `"${target.attributes.targetId}": ${processInputs(target.inputs?.["input"])}`).join(", ")}},
+                            edgeCounts: {${Array.from(edgeSetMap.entries()).map(([key, value]) => `"${key}": count(${processInputs([{
+                                connectedSetId: value.sourceBlock.attributes.id,
+                                connectionPoint: value.sourceField
+                            }])})`).join(", ")}}
                         }
                     }`
                 }

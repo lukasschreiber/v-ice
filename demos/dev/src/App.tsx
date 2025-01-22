@@ -114,7 +114,7 @@ function App() {
                                 decorations={[
                                     { regex: /(?<=function\s+)(query_\w*)/g, className: "bg-orange-200" },
                                     { regex: /(?<=function\s+)(set_\w*)/g, className: "bg-purple-200" },
-                                    { regex: /"[a-zA-Z0-9,=()@|/{}\$~\*!:\+\-`^%\[\]\._]{20}"/g, className: "bg-green-50 text-green-300" },
+                                    { regex: /"[a-zA-Z0-9,=()@|/{}\$~\*!:;\+\-`#^%?\[\]\._]{20}"/g, className: "bg-green-50 text-green-300" },
                                 ]}
                             />
                         </Tab>

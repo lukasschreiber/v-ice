@@ -1,4 +1,4 @@
-import { ASTNodeKind, ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "../builder/ast"
+import { ASTEdge, ASTNodeKind, ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "../builder/ast"
 import { IType, ValueOf } from "@/data/types"
 
 export enum TransformerKind {
@@ -42,7 +42,7 @@ export type QueryTransformerForOperationNode<A extends {[key: string]: IType}> =
 export type QueryTransformerForPrimitiveNode<T extends IType> = (astNode: ASTPrimitiveNode & {value: ValueOf<T>}) => string
 export type QueryTransformerForSetNode = (astNode: ASTSetNode) => string
 export type QueryTransformerForNode = (astNode: any) => string
-export type QueryFunctionTransformer = (source: ASTSetNode, sets: ASTSetNode[], targets: ASTSetNode[]) => string
+export type QueryFunctionTransformer = (source: ASTSetNode, sets: ASTSetNode[], targets: ASTSetNode[], edges: Map<string, ASTEdge>) => string
 
 export function createOperationTransformer<A extends {[key: string]: IType}>(
     definition: Omit<OperationNodeQueryTransformerDefinition<A>, "kind">

@@ -23,6 +23,13 @@ export interface ASTNode<K extends ASTNodeKind> {
     kind: K
 }
 
+export interface ASTEdge {
+    sourceBlock: ASTSetNode,
+    sourceField: string,
+    targetBlock: ASTSetNode,
+    targetField: string
+}
+
 export interface ASTSetNode extends ASTNode<ASTNodeKind.Set> {
     inputs?: Record<string, ASTSetNodeInput[]>
     operations?: ASTOperationNode[]

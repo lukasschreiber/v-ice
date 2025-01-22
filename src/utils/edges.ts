@@ -8,6 +8,13 @@ export interface Edge {
     targetField?: FieldEdgeConnection
 }
 
+export interface SerializedEdge {
+    sourceBlockId: string,
+    targetBlockId: string,
+    sourceField: string,
+    targetField: string
+}
+
 // create a class edge with this function in it
 export function getEdgeId(edge: Edge): string {
     if(!edge.sourceBlock || !edge.sourceField || !edge.targetBlock || !edge.targetField) throw new Error("Edge is not complete")
@@ -15,8 +22,8 @@ export function getEdgeId(edge: Edge): string {
     // edge ids always start with the output edge and end with the input edge
     // this is to ensure that the edge is unique
     if(edge.sourceField.getConnectionType() === NodeConnectionType.INPUT) {
-        return `${edge.targetBlock.id}-${edge.targetField.name}_${edge.sourceBlock.id}-${edge.sourceField.name}`
+        return `${edge.targetBlock.id}-${edge.targetField.name?.toLowerCase()}_${edge.sourceBlock.id}-${edge.sourceField.name?.toLowerCase()}`
     } else {
-        return `${edge.sourceBlock.id}-${edge.sourceField.name}_${edge.targetBlock.id}-${edge.targetField.name}`
+        return `${edge.sourceBlock.id}-${edge.sourceField.name?.toLowerCase()}_${edge.targetBlock.id}-${edge.targetField.name?.toLowerCase()}`
     }
 }
