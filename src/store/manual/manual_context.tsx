@@ -1,8 +1,8 @@
 import { createContext, useState, PropsWithChildren, useContext, useEffect } from "react";
 import { WorkspaceContext } from "@/workspace_context";
 import { createPortal } from "react-dom";
-import { HelpModal } from "@/components/HelpModal";
-import emitter from "./help_emitter";
+import { HelpModal } from "@/components/ManualModal";
+import emitter from "./manual_emitter";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 
 export interface IHelpContext {

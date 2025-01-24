@@ -1,19 +1,19 @@
-import { useHelp } from "@/store/help/help_hooks";
+import { useHelp } from "@/store/manual/manual_hooks";
 import { InvariantMarkdownView } from "./common/MarkdownView";
 // import { getHelpMarkdown } from "@/i18n";
 import { useTranslation } from "react-i18next";
 import { Fragment, useEffect, useMemo, useRef, useState } from "react";
-import { showHelp } from "@/store/help/help_emitter";
+import { showHelp } from "@/store/manual/manual_emitter";
 import ChevronRightIcon from "@/assets/ChevronRightIcon.svg?react";
 import { createPortal } from "react-dom";
-import { getManualMarkdown } from "@/store/help/help_loader";
+import { getManualMarkdown } from "@/store/manual/manual_loader";
 
 interface BreadCrumb {
     text: string;
     href: string;
 }
 
-export function HelpPage() {
+export function ManualPage() {
     const { i18n } = useTranslation();
     const { activePage } = useHelp();
     const [hoveredBreadCrumbElement, setHoveredBreadCrumbElement] = useState<HTMLElement | null>(null);

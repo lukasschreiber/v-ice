@@ -77,7 +77,7 @@ import { WorkspaceContext } from "./workspace_context"
 import { ISerializedWorkspace, clearWorkspace, deserializeWorkspace, serializeWorkspace } from "./serializer"
 import { defineToolbox, defineBlock, defineCategory, blockDefinitionToBlock, blockToBlockDefinition } from "./blocks/toolbox/toolbox_definition"
 import emitter, { EvaluationAction } from "./evaluation_emitter"
-import { HelpPage as HelpPageElement } from "./components/HelpPage"
+import { ManualPage as ManualPageElement } from "./components/ManualPage"
 import { Variables } from "./blocks/toolbox/categories/variables"
 import { Nodes } from "./blocks/toolbox/categories/nodes"
 import { DefaultToolbox } from "./blocks/toolbox/default_toolbox"
@@ -95,7 +95,7 @@ import { jsQueryClient } from "./query/clients/javascript/js_query_client"
  */
 export const Canvas = CanvasElement
 
-export const HelpPage = HelpPageElement
+export const HelpPage = ManualPageElement
 
 /**
  * Provider for the Blockly context. This provider should wrap the entire application.

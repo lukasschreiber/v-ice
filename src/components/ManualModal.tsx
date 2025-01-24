@@ -1,6 +1,6 @@
 import { DraggableModal, ModalContent, ModalHeader, ModalProps } from "./common/DraggableModal";
 import { createPortal } from "react-dom";
-import { HelpPage } from "./HelpPage";
+import { ManualPage } from "./ManualPage";
 import { useTranslation } from "react-i18next";
 
 export function HelpModal(props: ModalProps) {
@@ -11,7 +11,7 @@ export function HelpModal(props: ModalProps) {
                 {t("help.title")}
             </ModalHeader>
             <ModalContent>
-                <HelpPage />
+                <ManualPage />
             </ModalContent>
         </DraggableModal>,
         document.body

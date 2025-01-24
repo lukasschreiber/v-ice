@@ -9,7 +9,7 @@ import { TypeIconPreview } from "./TypeIconPreview";
 import { BlockInlinePreview } from "./BlockInlinePreview";
 import { GenericBlockDefinition } from "@/blocks/toolbox/toolbox_definition";
 import React, { HTMLProps, memo } from "react";
-import { showHelp } from "@/store/help/help_emitter";
+import { showHelp } from "@/store/manual/manual_emitter";
 import { InfoBox, InfoBoxType } from "./InfoBox";
 import { BlockInfoWidget } from "./BlockInfoWidget";
 
