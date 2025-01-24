@@ -6,7 +6,7 @@ export const generatedCodeSlice = createSlice({
         json: "",
         xml: "",
         code: "",
-        queryJson: ""
+        astJson: ""
     },
     reducers: {
         setCode: (state, action) => {
@@ -19,11 +19,11 @@ export const generatedCodeSlice = createSlice({
         setXml: (state, action) => {
             state.xml = action.payload
         },
-        setQueryJson: (state, action) => {
-            state.queryJson = action.payload
+        setASTJson: (state, action) => {
+            state.astJson = action.payload
         }
     }
 })
 
-export const { setCode, setJson, setXml, setQueryJson } = generatedCodeSlice.actions
+export const { setCode, setJson, setXml, setASTJson } = generatedCodeSlice.actions
 export const generatedCodeReducer = generatedCodeSlice.reducer

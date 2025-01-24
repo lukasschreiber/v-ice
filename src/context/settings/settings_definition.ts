@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import { CheckboxSetting, ColorSetting, RangeSetting, defineSettings } from "@/store/settings/settings";
+import { CheckboxSetting, ColorSetting, RangeSetting, defineSettings } from "@/context/settings/settings";
 
 export interface LayoutSettings {
     // Blockly

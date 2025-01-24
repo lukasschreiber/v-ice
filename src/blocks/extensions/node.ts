@@ -4,8 +4,8 @@ import { EdgeCreate } from "@/events/events_edge_create"
 import { Blocks } from "@/blocks"
 import { EdgeDelete } from "@/events/events_edge_delete"
 import { Edge } from "@/utils/edges"
-import { showNotification } from "@/store/notifications/notification_emitter"
-import { NotificationType } from "@/store/notifications/notification_config"
+import { showNotification } from "@/context/notifications/notification_emitter"
+import { NotificationType } from "@/context/notifications/notification_config"
 import { BlockExtension } from "../block_extensions"
 
 export type EdgeConnection = { type: Blockly.ConnectionType, connections: Blockly.Connection[] }

@@ -1,7 +1,7 @@
 import { createContext, useState, PropsWithChildren, useEffect, useContext, useRef } from "react";
 import emitter from "./notification_emitter";
 import { Notification } from "@/components/common/Notification";
-import { WorkspaceContext } from "@/workspace_context";
+import { WorkspaceContext } from "@/context/workspace_context";
 import { createPortal } from "react-dom";
 import { NotificationLocalStorageEntry, NotificationType, notificationConfig } from "./notification_config";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";

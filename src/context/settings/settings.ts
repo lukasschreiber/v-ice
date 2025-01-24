@@ -1,6 +1,6 @@
 import {
     type LayoutSettings as layout,
-} from "@/store/settings/settings_definition";
+} from "@/context/settings/settings_definition";
 
 export type LayoutSettings = layout;
 

@@ -5,8 +5,8 @@ import types from '@/data/types';
 import { FieldLocalVariable } from '../fields/field_local_variable';
 import { ConstantProvider } from '@/renderer/constants';
 import { FieldTypeLabel } from '../fields/field_type_label';
-import { showNotification } from '@/store/notifications/notification_emitter';
-import { NotificationType } from '@/store/notifications/notification_config';
+import { showNotification } from '@/context/notifications/notification_emitter';
+import { NotificationType } from '@/context/notifications/notification_config';
 import { BlockMutator } from '../block_mutators';
 
 export interface ListAnyAllBlock {

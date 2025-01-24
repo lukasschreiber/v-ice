@@ -8,16 +8,16 @@ import { ContinuousToolbox } from "@/toolbox/toolbox";
 import { DefaultToolbox } from "@/blocks/toolbox/default_toolbox";
 import { useTranslation } from "react-i18next";
 import { BlockDragger } from "@/renderer/block_dragger";
-import { SettingsContext } from "@/store/settings/settings_context";
+import { SettingsContext } from "@/context/settings/settings_context";
 import { SettingsModal } from "@/components/SettingsModal";
 import { setBlocklyLocale } from "@/i18n";
-import { setJson, setXml, setCode, setQueryJson } from "@/store/code/generated_code_slice";
+import { setJson, setXml, setCode, setASTJson } from "@/store/code/generated_code_slice";
 import { setQueryResults } from "@/store/data/data_slice";
 import { useDispatch, useSelector } from "@/store/hooks";
 import { DataTable, SerializedTable } from "@/data/table";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { Blocks } from "@/blocks";
-import { WorkspaceContext } from "@/workspace_context";
+import { WorkspaceContext } from "@/context/workspace_context";
 import { ButtonStack } from "./common/ButtonStack";
 import { RoundButton } from "./common/RoundButton";
 import ZoomMinusIcon from "@/assets/ZoomMinusIcon.svg?react";
@@ -31,8 +31,8 @@ import { QueryMagicWand } from "@/query_magic_wand";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 import { ISerializedWorkspace, serializeWorkspace } from "@/serializer";
 import { ToolboxButton, ToolboxButtonStack } from "./ToolboxButton";
-import { showHelp } from "@/store/manual/manual_emitter";
-import { useHelp } from "@/store/manual/manual_hooks";
+import { showHelp } from "@/context/manual/manual_emitter";
+import { useHelp } from "@/context/manual/manual_hooks";
 import { Tooltip } from "./common/Tooltip";
 import { EmptyToolbox } from "@/blocks/toolbox/empty_toolbox";
 import { ToolboxDefinition } from "blockly/core/utils/toolbox";
@@ -77,7 +77,7 @@ export function Canvas(props: CanvasProps) {
         variables: false,
     });
     const code = useSelector((state) => state.generatedCode.code);
-    const queryJson = useSelector((state) => state.generatedCode.queryJson);
+    const astJson = useSelector((state) => state.generatedCode.astJson);
     const source = useSelector((state) => state.data.source);
     const memoizedSource = useMemo(() => DataTable.deserialize(source), [source]);
     const dispatch = useDispatch();
@@ -241,17 +241,17 @@ export function Canvas(props: CanvasProps) {
                 .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
                 .then((code) => (queryClient as LocalQueryClient).formatCode(code))
                 .then((code) => {
-                    if (code !== queryJson) {
+                    if (code !== astJson) {
                         dispatch(setCode(code));
                     }
                 });
             }
            
-            const queryJsonCode = JSON.stringify(ast, null, 2);
+            const astJsonCode = JSON.stringify(ast, null, 2);
            
 
-            if (queryJson !== queryJsonCode) {
-                dispatch(setQueryJson(queryJsonCode));
+            if (astJson !== astJsonCode) {
+                dispatch(setASTJson(astJsonCode));
             }
         }
 

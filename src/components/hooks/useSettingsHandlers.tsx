@@ -1,4 +1,4 @@
-import { Settings } from '@/store/settings/settings';
+import { Settings } from '@/context/settings/settings';
 import * as Blockly from 'blockly/core';
 import { useEffect } from 'react';
 

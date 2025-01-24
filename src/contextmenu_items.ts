@@ -1,6 +1,6 @@
 import * as Blockly from "blockly/core"
 import { Blocks } from "./blocks"
-import { showHelp } from "./store/manual/manual_emitter"
+import { showHelp } from "./context/manual/manual_emitter"
 import { NodeBlockSvg } from "./blocks/extensions/node"
 import { EvaluationAction, triggerAction } from "./evaluation_emitter"
 

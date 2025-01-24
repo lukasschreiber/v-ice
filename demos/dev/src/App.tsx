@@ -8,12 +8,12 @@ import { MiscPanel } from "./components/tabs/MiscPanel";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ToolboxPanel } from "./components/tabs/ToolboxPanel";
 import { WorkspaceSavePanel } from "./components/tabs/WorspaceSavePanel";
-import { showNotification } from "@/store/notifications/notification_emitter";
+import { showNotification } from "@/context/notifications/notification_emitter";
 
 function App() {
     const [language] = useState(localStorage.getItem("language") ?? "en");
     const [queryClient, setQueryClient] = useState("js");
-    const { json, xml, queryJson, code } = useGeneratedCode();
+    const { json, xml, astJson, code } = useGeneratedCode();
     const [width, setWidth] = useState(0);
     const [height, setHeight] = useState(0);
     const [themeName, setThemeName] = useLocalStorage("theme", "light");
@@ -119,7 +119,7 @@ function App() {
                             />
                         </Tab>
                         <Tab label="AST" description="The generated JSON reperesentation of the code">
-                            <Code language="json" code={queryJson} />
+                            <Code language="json" code={astJson} />
                         </Tab>
                         <Tab label="JSON" description="The worspace as JSON">
                             <Code language="json" code={json} />

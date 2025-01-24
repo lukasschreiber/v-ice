@@ -1,9 +1,9 @@
-import { SettingsProvider } from "@/store/settings/settings_context";
+import { SettingsProvider } from "@/context/settings/settings_context";
 import { Provider } from "react-redux";
 import { store } from "@/store/store";
-import { WorkspaceProvider } from "@/workspace_context";
-import { NotificationProvider } from "./notifications/notification_context";
-import { HelpProvider } from "./manual/manual_context";
+import { WorkspaceProvider } from "@/context/workspace_context";
+import { NotificationProvider } from "../context/notifications/notification_context";
+import { HelpProvider } from "../context/manual/manual_context";
 
 export function ApplicationContextProvider(props: React.ComponentPropsWithoutRef<"div">) {
 

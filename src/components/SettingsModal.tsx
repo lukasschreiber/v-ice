@@ -1,7 +1,7 @@
 import { useContext, useEffect, useState } from "react";
 import { DraggableModal, ModalContent, ModalHeader, ModalProps } from "./common/DraggableModal";
-import { SettingsContext } from "@/store/settings/settings_context";
-import { Setting, Settings, isCheckboxSetting, isColorSetting, isRangeSetting } from "@/store/settings/settings";
+import { SettingsContext } from "@/context/settings/settings_context";
+import { Setting, Settings, isCheckboxSetting, isColorSetting, isRangeSetting } from "@/context/settings/settings";
 import { useTranslation } from "react-i18next";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 

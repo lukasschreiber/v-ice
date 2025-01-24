@@ -3,7 +3,7 @@ import { useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";
 import { Toolbox, useWorkspace } from "@/main";
-import { showNotification } from "@/store/notifications/notification_emitter";
+import { showNotification } from "@/context/notifications/notification_emitter";
 import types from "@/data/types";
 import { TypeIconPreview } from "@/components/common/TypeIconPreview";
 import { Accordion } from "../Accordion";

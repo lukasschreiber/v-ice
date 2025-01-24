@@ -1,9 +1,9 @@
 import { createContext, useEffect } from "react";
-import { LayoutGroup, Settings, getDefaultSettings } from "@/store/settings/settings";
+import { LayoutGroup, Settings, getDefaultSettings } from "@/context/settings/settings";
 import { useDispatch } from "react-redux";
 import { useSelector } from "@/store/hooks";
-import { setSettings } from "@/store/settings/settings_slice";
-import { getSettingsDefinition } from "@/store/settings/settings_definition";
+import { setSettings } from "@/context/settings/settings_slice";
+import { getSettingsDefinition } from "@/context/settings/settings_definition";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 
 export interface IPublicSettingsContext {

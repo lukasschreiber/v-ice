@@ -1,7 +1,7 @@
 import React, { createRef, useContext } from "react";
 import Draggable from "react-draggable";
 import CloseIcon from "@/assets/CloseIcon.svg?react";
-import { SettingsContext } from "@/store/settings/settings_context";
+import { SettingsContext } from "@/context/settings/settings_context";
 
 export type ModalProps = React.HTMLProps<HTMLDivElement> & { open: boolean; onClose?: () => void};
 
