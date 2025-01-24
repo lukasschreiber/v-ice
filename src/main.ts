@@ -162,9 +162,8 @@ export function useQuery() {
         }, [queryResults]),
         querySource: useMemo(() => querySource, [querySource]),
         setQuerySource: (source: DataTable) => {
-            const normalized = source.toNormalizedTable()
-            console.log(normalized)
-            dispatch(setSourceTable(normalized))
+            console.log("setting query source from local storage");
+            dispatch(setSourceTable(source.toNormalizedTable()))
         },
         addTarget: (name: string, id: string) => {
             if (/[^a-zA-Z0-9_]/.test(name)) {

@@ -618,6 +618,10 @@ export class DataTable {
 
             if (type === null) throw new Error(`Could not infer type for column ${name}`)
 
+            if (t.utils.isEnum(type) && !t.registry.getEnum(type.enumName)) {
+                t.registry.registerEnum(type.enumName, { columns: [name] })
+            }
+
             const values = rows.map(row => TypeConverter.toType(row[name], type!));
             return new DataColumn(name, type, values);
         });

@@ -245,7 +245,9 @@ export function ImportModal(props: ModalProps & { file?: File }) {
                                 const finalTable = getFinalTable();
                                 if (finalTable) {
                                     setExpandable(dataIsLikeDemoData(finalTable));
+                                    console.time("setSource");
                                     setSource(finalTable);
+                                    console.timeEnd("setSource");
                                 }
                                 onClose();
                             }}

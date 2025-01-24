@@ -32,19 +32,19 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
         setQuerySource(dataTable.clone());
     }
 
-    useEffect(() => {
-        if(querySource.getColumnCount() > 0){
-            try {
-               localStorage.setItem("querySource", JSON.stringify(querySource.toJSON()));
-            } catch (e) {
-                // ignore
-            }
-        }
-    }, [querySource]);
+    // useEffect(() => {
+    //     if(querySource.getColumnCount() > 0){
+    //         try {
+    //            localStorage.setItem("querySource", JSON.stringify(querySource.toJSON()));
+    //         } catch (e) {
+    //             // ignore
+    //         }
+    //     }
+    // }, [querySource]);
 
     useEffect(() => {
         if (!workspace || initialized) return;
-        const savedQuerySource = JSON.parse(localStorage.getItem("querySource") ?? "null");
+        const savedQuerySource = undefined // JSON.parse(localStorage.getItem("querySource") ?? "null");
         if (savedQuerySource) {
             setQuerySource(DataTable.fromJSON(savedQuerySource));
         } else {

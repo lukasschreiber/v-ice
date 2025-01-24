@@ -14,7 +14,8 @@ export const store = configureStore({
         settings: settingsReducer,
         blockly: blocklyReducer,
         edgeCounts: edgeCountReducer
-    }
+    },
+    devTools: process.env.NODE_ENV !== 'production',
 })
 
 export type RootState = ReturnType<typeof store.getState>

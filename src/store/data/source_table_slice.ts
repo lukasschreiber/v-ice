@@ -38,10 +38,12 @@ const sourceTableSlice = createSlice({
             state.index = state.index.filter((index) => index !== rowIndex);
         },
         setSourceTable: (state, action: PayloadAction<NormalizedDataTable>) => {
+            console.time("setSourceTable");
             const { columns, index, rows } = action.payload;
             state.columns = columns;
             state.index = index;
             state.rows = rows;
+            console.timeEnd("setSourceTable");
         }
     }
 });
