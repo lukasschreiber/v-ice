@@ -141,7 +141,7 @@ export class ListSelectMutator extends BlockMutator<Blockly.BlockSvg & ListSelec
             this.addListElementInput_()
         }
 
-        subscribe(state => state.data.source, () => {
+        subscribe(state => state.sourceTable, () => {
             this.updateOutputType_()
         }, { immediate: true })
     }

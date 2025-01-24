@@ -42,7 +42,7 @@ export class TypeRegistry {
 
         if (typeof definition === "function") {
             if (table !== undefined && !(table instanceof DataTable)) table = DataTable.deserialize(table);
-            else if (table === undefined) table = DataTable.deserialize(store.getState().data.source);
+            else if (table === undefined) table = DataTable.fromNormalizedTable(store.getState().sourceTable);
             return definition(table);
         } else {
             let values: string[] = [];
@@ -63,9 +63,9 @@ export class TypeRegistry {
                         column = { type: dataColumn.type, name: dataColumn.name, values: dataColumn.values };
                     }
                 } else if (table === undefined) {
-                    const serializedColumn = store.getState().data.source.find(column => column.name === columnName);
+                    const serializedColumn = store.getState().sourceTable.columns.find(column => column.name === columnName);
                     if (serializedColumn) {
-                        column = { type: types.utils.fromString(serializedColumn.type), name: serializedColumn.name, values: serializedColumn.values };
+                        column = { type: serializedColumn.type, name: serializedColumn.name, values: store.getState().sourceTable.rows.map(row => row[columnName]) };
                     }
                 }
 

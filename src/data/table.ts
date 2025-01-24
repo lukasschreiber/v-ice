@@ -6,6 +6,7 @@ import { TypePredictor } from "./type_predictor";
 import { InvalidColumnValueAddedError } from "./exception";
 import { IHierarchyDefinition } from "./hierarchy";
 import { EnumDefinition } from "./type_registry";
+import { NormalizedDataTable } from "@/store/data/source_table_slice";
 
 export type SerializedColumn<T extends ColumnType> = { name: string, type: string, values: ValueOf<T>[] }
 export type SerializedTable = SerializedColumn<ColumnType>[]
@@ -96,7 +97,7 @@ export class DataTable {
     constructor(columns: DataColumn<ColumnType>[] = []) {
         for (const column of columns) {
             for (const value of column.values) {
-                const {valid, reason} = TypeChecker.checkTypeWithReason(column.type, value)
+                const { valid, reason } = TypeChecker.checkTypeWithReason(column.type, value)
                 if (!valid) {
                     throw new InvalidColumnValueAddedError(column, value, reason)
                 }
@@ -353,31 +354,41 @@ export class DataTable {
         return [this.index_.serialize(), ...this.columns_.map(col => col.serialize())]
     }
 
+    toNormalizedTable(): NormalizedDataTable {
+        const names = this.getColumnNames();
+        const types = this.getColumnTypes();
+        return {
+            columns: names.map((name, i) => ({ name, type: types[i] })),
+            index: this.getIndexColumn().values,
+            rows: this.getRows()
+        }
+    }
+
     private getAllInstancesOfType<T>(checker: (type: IType) => boolean): T[] {
         const instances: T[] = [];
-    
+
         const findInstances = (type: IType) => {
             if (checker(type)) {
                 instances.push(type as T);
             }
-    
+
             if (t.utils.isList(type)) {
                 findInstances(type.elementType);
             }
-    
+
             if (t.utils.isStruct(type)) {
                 Object.values(type.fields).forEach(findInstances);
             }
-    
+
             if (t.utils.isUnion(type)) {
                 type.types.forEach(findInstances);
             }
         };
-    
+
         this.columns_.forEach(column => {
             findInstances(column.type);
         });
-    
+
         return instances;
     }
 
@@ -390,7 +401,7 @@ export class DataTable {
     toJSON(): TableSaveFile {
         const usedHierarchyNames = this.getAllInstancesOfType<IHierarchyType>(t.utils.isHierarchy).map(hierarchy => hierarchy.hierarchy)
         const usedEnumNames = this.getAllInstancesOfType<IEnumType>(t.utils.isEnum).map(enumType => enumType.enumName)
-        
+
         return {
             meta: {
                 hierarchies: Array.from(usedHierarchyNames).reduce((acc, hierarchyName) => {
@@ -634,6 +645,11 @@ export class DataTable {
         return deserializedTable
     }
 
+    static fromNormalizedTable(normalizedTable: NormalizedDataTable): DataTable {
+        const columns = normalizedTable.columns.map(col => new DataColumn(col.name, col.type, normalizedTable.rows.map(row => row[col.name])))
+        return new DataTable(columns)
+    }
+
     /**
      * Create a DataTable from a CSV file.
      * 
@@ -706,7 +722,7 @@ export class DataTable {
     }
 
     static fromJSON(json: TableSaveFile): DataTable {
-        if(json.meta) {
+        if (json.meta) {
             for (const [name, hierarchy] of Object.entries(json.meta.hierarchies ?? {})) {
                 t.registry.registerHierarchy(name, hierarchy)
             }

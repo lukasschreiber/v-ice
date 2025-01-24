@@ -86,7 +86,7 @@ export const CompleteToolbox = defineToolbox([
             },
         }),
         defineBlock(IsNullBlock).withCondition((_workspace, table) => {
-            return !table.some(col => types.utils.fromString(col.type).nullable)
+            return !table.getColumns().some(col => col.type.nullable)
         }),
     ]
     ),
@@ -186,14 +186,12 @@ export const CompleteToolbox = defineToolbox([
                 }
             }),
             defineBlock(TimelineStartOfIntervalBlock).withCondition((_workspace, table) => {
-                return !table.some(col => {
-                    const type = types.utils.fromString(col.type)
+                return !table.getColumnTypes().some(type => {
                     return types.utils.isTimeline(type) && (types.utils.isInterval(type.elementType) || (types.utils.isUnion(type.elementType) && type.elementType.types.some(types.utils.isInterval)))
                 })
             }),
             defineBlock(TimelineEndOfIntervalBlock).withCondition((_workspace, table) => {
-                return !table.some(col => {
-                    const type = types.utils.fromString(col.type)
+                return !table.getColumnTypes().some(type => {
                     return types.utils.isTimeline(type) && (types.utils.isInterval(type.elementType) || (types.utils.isUnion(type.elementType) && type.elementType.types.some(types.utils.isInterval)))
                 })
             }),

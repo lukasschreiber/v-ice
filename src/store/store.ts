@@ -4,11 +4,13 @@ import { dataReducer } from "@/store/data/data_slice";
 import { settingsReducer } from "@/context/settings/settings_slice";
 import { blocklyReducer } from "@/store/blockly/blockly_slice";
 import { edgeCountReducer } from "./blockly/edge_count_slice";
+import sourceTableReducer from "./data/source_table_slice";
 
 export const store = configureStore({
     reducer: {
         generatedCode: generatedCodeReducer,
         data: dataReducer,
+        sourceTable: sourceTableReducer,
         settings: settingsReducer,
         blockly: blocklyReducer,
         edgeCounts: edgeCountReducer

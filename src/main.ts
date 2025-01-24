@@ -69,7 +69,6 @@ import { ApplicationContextProvider } from "@/context/app_context_provider"
 import { Canvas as CanvasElement } from "@/components/Canvas"
 import { useDispatch, useSelector } from "@/store/hooks"
 import { DataTable } from "@/data/table"
-import { setSource } from "@/store/data/data_slice"
 import { setTargetBlocks } from "./store/blockly/blockly_slice"
 import * as Blockly from "blockly/core"
 import Types from "@/data/types"
@@ -85,6 +84,7 @@ import { RegistrableExtension } from "@/blocks/block_extensions"
 import { RegistrableMutator } from "./blocks/block_mutators"
 import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox"
 import { jsQueryClient } from "./query/clients/javascript/js_query_client"
+import { selectDataTable, setSourceTable } from "./store/data/source_table_slice"
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `BlocklyProvider`.
@@ -148,7 +148,7 @@ export function useWorkspace() {
  */
 export function useQuery() {
     const dispatch = useDispatch()
-    const querySource = useSelector(state => state.data.source)
+    const querySource = useSelector(selectDataTable)
     const queryResults = useSelector(state => state.data.queryResults)
     const targetBlocks = useSelector(state => state.blockly.targetBlocks)
 
@@ -160,9 +160,11 @@ export function useQuery() {
             }
             return deserialized
         }, [queryResults]),
-        querySource: useMemo(() => DataTable.deserialize(querySource), [querySource]),
+        querySource: useMemo(() => querySource, [querySource]),
         setQuerySource: (source: DataTable) => {
-            dispatch(setSource(source.serialize()))
+            const normalized = source.toNormalizedTable()
+            console.log(normalized)
+            dispatch(setSourceTable(normalized))
         },
         addTarget: (name: string, id: string) => {
             if (/[^a-zA-Z0-9_]/.test(name)) {

@@ -4,6 +4,7 @@ import { subscribe } from '@/store/subscribe';
 import types from "@/data/types"
 import { FieldAutocompleteText } from '../fields/field_autocomplete_textinput';
 import { BlockMutator } from '../block_mutators';
+import { DataTable } from '@/data/table';
 
 export interface EnumSelectBlock {
     variableType: string,
@@ -39,7 +40,8 @@ export class EnumSelectMutator extends BlockMutator<Blockly.Block & EnumSelectBl
         const type = types.utils.fromString(this.variableType)
         if(!types.utils.isEnum(type)) return []
 
-        const source = store.getState().data.source
+        // TODO: Do we really need the entire table here? Maybe we can cache the enum values in the store?
+        const source = DataTable.fromNormalizedTable(store.getState().sourceTable)
         return [...new Set(types.registry.getEnumValues(type.enumName, source) || [])].sort()
     }
 
@@ -57,7 +59,7 @@ export class EnumSelectMutator extends BlockMutator<Blockly.Block & EnumSelectBl
     public domToMutation(this: Blockly.Block & EnumSelectBlock, xmlElement: Element) {
         this.variableType = xmlElement.getAttribute("variableType")!
 
-        subscribe(state => state.data.source, () => {
+        subscribe(state => state.sourceTable, () => {
             this.updateDropdown_()
         }, {immediate: true})
     }

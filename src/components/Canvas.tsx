@@ -1,4 +1,4 @@
-import React, { createRef, useContext, useEffect, useMemo, useState } from "react";
+import React, { createRef, useContext, useEffect, useState } from "react";
 import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
 import { LightTheme } from "@/themes/themes";
@@ -14,7 +14,7 @@ import { setBlocklyLocale } from "@/i18n";
 import { setJson, setXml, setCode, setASTJson } from "@/store/code/generated_code_slice";
 import { setQueryResults } from "@/store/data/data_slice";
 import { useDispatch, useSelector } from "@/store/hooks";
-import { DataTable, SerializedTable } from "@/data/table";
+import { SerializedTable } from "@/data/table";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { Blocks } from "@/blocks";
 import { WorkspaceContext } from "@/context/workspace_context";
@@ -42,6 +42,7 @@ import { setTheme } from "@/themes/colors";
 import { QueryClient } from "@/query/clients/query_client";
 import { LocalQueryClient } from "@/query/clients/local_query_client";
 import { NodeBlock } from "@/blocks/extensions/node";
+import { selectDataTable } from "@/store/data/source_table_slice";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -78,8 +79,7 @@ export function Canvas(props: CanvasProps) {
     });
     const code = useSelector((state) => state.generatedCode.code);
     const astJson = useSelector((state) => state.generatedCode.astJson);
-    const source = useSelector((state) => state.data.source);
-    const memoizedSource = useMemo(() => DataTable.deserialize(source), [source]);
+    const source = useSelector(selectDataTable);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -99,11 +99,11 @@ export function Canvas(props: CanvasProps) {
 
     useEffect(() => {
         const workspace = workspaceRef.current;
-        if (memoizedSource && workspace) {
+        if (source && workspace) {
             Blockly.Events.disable();
             const variables = workspace.getAllVariables();
             // add new variables
-            for (const column of memoizedSource.getColumns()) {
+            for (const column of source.getColumns()) {
                 if (variables.find((v) => v.name === column.name && v.type === column.type.name) === undefined) {
                     workspace.createVariable(column.name, column.type.name);
                 }
@@ -112,7 +112,7 @@ export function Canvas(props: CanvasProps) {
             // remove old variables
             for (const variable of variables) {
                 if (
-                    !memoizedSource.getColumns().find((c) => c.name === variable.name && c.type.name === variable.type)
+                    !source.getColumns().find((c) => c.name === variable.name && c.type.name === variable.type)
                 ) {
                     workspace.deleteVariableById(variable.getId());
                 }
@@ -121,7 +121,7 @@ export function Canvas(props: CanvasProps) {
         }
 
         setFeaturesReady((old) => ({ ...old, variables: true }));
-    }, [memoizedSource]);
+    }, [source]);
 
     useEffect(() => {
         workspaceRef.current?.updateToolbox(toolbox ?? EmptyToolbox);
@@ -210,7 +210,7 @@ export function Canvas(props: CanvasProps) {
                 resolve();
                 return;
             }
-            const result = await queryClient.execute(code, memoizedSource);
+            const result = await queryClient.execute(code, source);
             const serialized: Record<string, SerializedTable> = {};
             for (const [id, table] of Object.entries(result.targets)) {
                 serialized[id] = table.serialize();
@@ -261,7 +261,7 @@ export function Canvas(props: CanvasProps) {
 
         return () => workspace.removeChangeListener(saveCode);
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [memoizedSource, code]);
+    }, [source, code]);
 
     useEffect(() => {
         function handleToolboxResize(event: UIEvent) {

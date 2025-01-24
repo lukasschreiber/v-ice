@@ -2,7 +2,6 @@ import * as Blockly from 'blockly';
 import { FieldDynamicDropdown } from '@/blocks/fields/field_dynamic_dropdown';
 import { store } from '@/store/store';
 import { subscribe } from '@/store/subscribe';
-import { DataTable } from '@/data/table';
 import types from '@/data/types';
 // import { TypeChecker } from '@/data/type_checker';
 import { FieldTypeLabel } from '../fields/field_type_label';
@@ -61,13 +60,12 @@ export class ColumnSelectMutator extends BlockMutator<Blockly.Block & ColumnSele
 
     @BlockMutator.mixin
     getDropDownOptions_(this: Blockly.Block & ColumnSelectBlock) {
-        const source = store.getState().data.source
+        const sourceColumns = store.getState().sourceTable.columns
         const columnNames: string[] = []
 
-        for (const column of source) {
-            if (column.name === DataTable.indexColumnName_) continue
+        for (const column of sourceColumns) {
             columnNames.push(column.name)
-            this.columnTypeMap.set(column.name, column.type)
+            this.columnTypeMap.set(column.name, types.utils.toString(column.type))
         }
 
         return columnNames
@@ -86,7 +84,7 @@ export class ColumnSelectMutator extends BlockMutator<Blockly.Block & ColumnSele
         const type = types.utils.fromString(state.elementType)
         this.setOutput(true, types.list(type).name)
 
-        subscribe(state => state.data.source, () => {
+        subscribe(state => state.sourceTable.columns, () => {
             this.updateDropdown_(false)
         }, { immediate: true })
     }
