@@ -63,7 +63,7 @@ import "@/connection_checker";
 
 export * from "@/query/query_generator"
 
-import { useContext, useMemo } from "react"
+import { useContext } from "react"
 import { IPublicSettingsContext, SettingsContext } from "@/context/settings/settings_context"
 import { ApplicationContextProvider } from "@/context/app_context_provider"
 import { Canvas as CanvasElement } from "@/components/Canvas"
@@ -84,7 +84,7 @@ import { RegistrableExtension } from "@/blocks/block_extensions"
 import { RegistrableMutator } from "./blocks/block_mutators"
 import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox"
 import { jsQueryClient } from "./query/clients/javascript/js_query_client"
-import { selectDataTable, setSourceTable } from "./store/data/source_table_slice"
+import { selectSourceDataTable, setSourceTable } from "./store/data/source_table_slice"
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `BlocklyProvider`.
@@ -148,21 +148,20 @@ export function useWorkspace() {
  */
 export function useQuery() {
     const dispatch = useDispatch()
-    const querySource = useSelector(selectDataTable)
-    const queryResults = useSelector(state => state.data.queryResults)
+    const querySource = useSelector(selectSourceDataTable)
     const targetBlocks = useSelector(state => state.blockly.targetBlocks)
 
+    const resultTables = useSelector((state) => state.resultTables);
+
+    const getQueryResultById = (id: string) => {
+        const normalizedTable = resultTables[id];
+        return normalizedTable ? DataTable.fromNormalizedTable(normalizedTable) : null;
+    };
+
     return {
-        queryResults: useMemo(() => {
-            const deserialized: Record<string, DataTable> = {}
-            for (const [id, table] of Object.entries(queryResults)) {
-                deserialized[id] = DataTable.deserialize(table)
-            }
-            return deserialized
-        }, [queryResults]),
+        getQueryResultById,
         querySource: querySource,
         setQuerySource: (source: DataTable) => {
-            console.log("setting query source from local storage");
             dispatch(setSourceTable(source.toNormalizedTable()))
         },
         addTarget: (name: string, id: string) => {

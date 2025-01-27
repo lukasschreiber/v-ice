@@ -1,23 +1,14 @@
 import { DataTable, IndexedDataRow } from "v-ice";
 import { Table } from "v-ice-commons";
 import { Button } from "../Button";
-import { useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
+import { useContext, useState, useEffect, useMemo, useRef } from "react";
 import { DataContext, DataTableDefinition } from "../DataContext";
 import { ImportModal } from "../ImportModal";
 import { Accordion } from "../Accordion";
 
 export function DataPanel() {
-    const {
-        source,
-        queryResults,
-        reset,
-        save,
-        sort,
-        addTarget,
-        removeTarget,
-        dataTables,
-        setDataTables,
-    } = useContext(DataContext);
+    const { source, getQueryResultById, reset, save, sort, addTarget, removeTarget, dataTables, setDataTables } =
+        useContext(DataContext);
     const [page, setPage] = useState(0);
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
@@ -26,18 +17,22 @@ export function DataPanel() {
     const [importModalOpen, setImportModalOpen] = useState(false);
     const [importModalFile, setImportModalFile] = useState<File | undefined>(undefined);
     const [selectedTable, setSelectedTable] = useState<DataTableDefinition | undefined>(undefined);
+    const [currentTable, setCurrentTable] = useState<DataTable>(new DataTable());
     const [newTarget, setNewTarget] = useState<DataTableDefinition>({ name: "", type: "TARGET", immutable: false });
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    const getSelectedTable = useCallback(() => {
+    useEffect(() => {
         if (selectedTable?.type === "SOURCE") {
-            return source;
+            setCurrentTable(source);
+        } else if (selectedTable && selectedTable.uid) {
+            const table = getQueryResultById(selectedTable.uid);
+            if (table) {
+                setCurrentTable(table);
+            }
+        } else {
+            setCurrentTable(DataTable.fromRows([], source.getColumnTypes(), source.getColumnNames()));
         }
-        if (selectedTable && selectedTable.uid && selectedTable.type === "TARGET" && queryResults[selectedTable.uid]) {
-            return queryResults[selectedTable.uid];
-        }
-        return DataTable.fromRows([], source.getColumnTypes(), source.getColumnNames());
-    }, [queryResults, selectedTable, source]);
+    }, [getQueryResultById, selectedTable, source]);
 
     const highlightedRows = useMemo(() => {
         return highlightOnly
@@ -46,20 +41,18 @@ export function DataPanel() {
                   .slice(page * rowsPerPage, (page + 1) * rowsPerPage)
                   .map((row, index) => [row, index])
                   .filter(([row]) =>
-                      getSelectedTable()
-                          .getRows()
-                          .find((r) => (row as IndexedDataRow).index_ === r.index_)
+                      currentTable.getRows().find((r) => (row as IndexedDataRow).index_ === r.index_)
                   )
                   .map(([, index]) => index as number)
             : undefined;
-    }, [highlightOnly, source, getSelectedTable, page, rowsPerPage]);
+    }, [highlightOnly, source, currentTable, page, rowsPerPage]);
 
     const lastPage = useMemo(
         () =>
             highlightOnly
                 ? Math.ceil(source.getRowCount() / rowsPerPage)
-                : Math.ceil(getSelectedTable().getRowCount() / rowsPerPage),
-        [getSelectedTable, rowsPerPage, source, highlightOnly]
+                : Math.ceil(currentTable.getRowCount() / rowsPerPage),
+        [currentTable, rowsPerPage, source, highlightOnly]
     );
 
     useEffect(() => {
@@ -167,119 +160,119 @@ export function DataPanel() {
                 </table>
             </Accordion>
             <Accordion title="Test Data" defaultOpen={true}>
-            <div className="m-2 gap-2 flex flex-row items-center text-sm justify-between">
-                <div className="flex flex-row gap-1 items-center">
-                    <input
-                        type="checkbox"
-                        id="highlight"
-                        checked={highlightOnly}
-                        onChange={(e) => {
-                            setHighlightOnly(e.target.checked);
-                        }}
-                    />
-                    <label htmlFor="highlight">Highlight Only</label>
-                </div>
-                <div className="flex flex-row gap-1 items-center">
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value)}
-                        className="max-w-[100px] bg-white rounded-sm border-slate-300 border border-solid"
-                    >
-                        {source.getColumns().map((col, index) => (
-                            <option key={index} value={col.name}>
-                                {col.name}
-                            </option>
-                        ))}
-                    </select>
-                    <select
-                        value={sortOrder}
-                        onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
-                        className="bg-white rounded-sm border-slate-300 border border-solid"
-                    >
-                        <option value="asc">ASC</option>
-                        <option value="desc">DESC</option>
-                    </select>
-                </div>
-                <div className="flex flex-row gap-1 items-center">
-                    <input
-                        type="number"
-                        className="w-12 border border-solid border-slate-300 rounded-sm text-center outline-none"
-                        value={rowsPerPage}
-                        onChange={(e) => {
-                            setRowsPerPage(parseInt(e.target.value));
-                        }}
-                    />
-                    Rows per page
-                </div>
-            </div>
-            <hr className="my-2" />
-            <div className="m-2 flex flex-row gap-2 items-center">
-                <Button onClick={() => save()} className="bg-slate-300 !text-slate-800">
-                    Save
-                </Button>
-                <label
-                    htmlFor="file"
-                    className="py-0.5 px-1.5 text-sm rounded-md bg-slate-300 text-slate-800 hover:cursor-pointer"
-                >
-                    Import
-                </label>
-                <input
-                    id="file"
-                    type="file"
-                    accept=".json,.csv"
-                    onChange={(e) => {
-                        setImportModalOpen(true);
-                        setImportModalFile(e.target.files![0]);
-                    }}
-                    ref={fileInputRef}
-                    className="hidden"
-                />
-                <Button onClick={() => reset()} className="bg-red-300 !text-red-900">
-                    Reset
-                </Button>
-                <div className="flex flex-row gap-2 items-center ml-auto">
-                    <Button
-                        onClick={() => setPage((prev) => Math.max(0, prev - 1))}
-                        className="bg-slate-300 !text-slate-800 aspect-square"
-                        disabled={page <= 0}
-                    >
-                        {"<"}
-                    </Button>
-                    <div className="flex flex-col items-center text-slate-500 text-xs">
-                        <div>
-                            Page {page + 1} of {Math.max(lastPage, 1)}
-                        </div>
-                        <div>
-                            {(highlightOnly ? source : getSelectedTable()).getRowCount() ? (
-                                <>
-                                    {page * rowsPerPage + 1} -{" "}
-                                    {Math.min(
-                                        (page + 1) * rowsPerPage,
-                                        (highlightOnly ? source : getSelectedTable()).getRowCount()
-                                    )}{" "}
-                                    of {(highlightOnly ? source : getSelectedTable()).getRowCount()}
-                                </>
-                            ) : (
-                                "No data"
-                            )}
-                        </div>
+                <div className="m-2 gap-2 flex flex-row items-center text-sm justify-between">
+                    <div className="flex flex-row gap-1 items-center">
+                        <input
+                            type="checkbox"
+                            id="highlight"
+                            checked={highlightOnly}
+                            onChange={(e) => {
+                                setHighlightOnly(e.target.checked);
+                            }}
+                        />
+                        <label htmlFor="highlight">Highlight Only</label>
                     </div>
-                    <Button
-                        onClick={() => setPage((prev) => Math.min(lastPage - 1, prev + 1))}
-                        className="bg-slate-300 !text-slate-800 aspect-square"
-                        disabled={page >= lastPage - 1}
-                    >
-                        {">"}
-                    </Button>
+                    <div className="flex flex-row gap-1 items-center">
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value)}
+                            className="max-w-[100px] bg-white rounded-sm border-slate-300 border border-solid"
+                        >
+                            {source.getColumns().map((col, index) => (
+                                <option key={index} value={col.name}>
+                                    {col.name}
+                                </option>
+                            ))}
+                        </select>
+                        <select
+                            value={sortOrder}
+                            onChange={(e) => setSortOrder(e.target.value as "asc" | "desc")}
+                            className="bg-white rounded-sm border-slate-300 border border-solid"
+                        >
+                            <option value="asc">ASC</option>
+                            <option value="desc">DESC</option>
+                        </select>
+                    </div>
+                    <div className="flex flex-row gap-1 items-center">
+                        <input
+                            type="number"
+                            className="w-12 border border-solid border-slate-300 rounded-sm text-center outline-none"
+                            value={rowsPerPage}
+                            onChange={(e) => {
+                                setRowsPerPage(parseInt(e.target.value));
+                            }}
+                        />
+                        Rows per page
+                    </div>
                 </div>
-            </div>
-            <Table
-                dataTable={highlightOnly ? source : getSelectedTable()}
-                page={page}
-                showIndex={true}
-                rowsPerPage={rowsPerPage}
-                highlightedRows={!selectedTable || selectedTable?.type === "SOURCE" ? undefined : highlightedRows}
-            />   
+                <hr className="my-2" />
+                <div className="m-2 flex flex-row gap-2 items-center">
+                    <Button onClick={() => save()} className="bg-slate-300 !text-slate-800">
+                        Save
+                    </Button>
+                    <label
+                        htmlFor="file"
+                        className="py-0.5 px-1.5 text-sm rounded-md bg-slate-300 text-slate-800 hover:cursor-pointer"
+                    >
+                        Import
+                    </label>
+                    <input
+                        id="file"
+                        type="file"
+                        accept=".json,.csv"
+                        onChange={(e) => {
+                            setImportModalOpen(true);
+                            setImportModalFile(e.target.files![0]);
+                        }}
+                        ref={fileInputRef}
+                        className="hidden"
+                    />
+                    <Button onClick={() => reset()} className="bg-red-300 !text-red-900">
+                        Reset
+                    </Button>
+                    <div className="flex flex-row gap-2 items-center ml-auto">
+                        <Button
+                            onClick={() => setPage((prev) => Math.max(0, prev - 1))}
+                            className="bg-slate-300 !text-slate-800 aspect-square"
+                            disabled={page <= 0}
+                        >
+                            {"<"}
+                        </Button>
+                        <div className="flex flex-col items-center text-slate-500 text-xs">
+                            <div>
+                                Page {page + 1} of {Math.max(lastPage, 1)}
+                            </div>
+                            <div>
+                                {(highlightOnly ? source : currentTable).getRowCount() ? (
+                                    <>
+                                        {page * rowsPerPage + 1} -{" "}
+                                        {Math.min(
+                                            (page + 1) * rowsPerPage,
+                                            (highlightOnly ? source : currentTable).getRowCount()
+                                        )}{" "}
+                                        of {(highlightOnly ? source : currentTable).getRowCount()}
+                                    </>
+                                ) : (
+                                    "No data"
+                                )}
+                            </div>
+                        </div>
+                        <Button
+                            onClick={() => setPage((prev) => Math.min(lastPage - 1, prev + 1))}
+                            className="bg-slate-300 !text-slate-800 aspect-square"
+                            disabled={page >= lastPage - 1}
+                        >
+                            {">"}
+                        </Button>
+                    </div>
+                </div>
+                <Table
+                    dataTable={highlightOnly ? source : currentTable}
+                    page={page}
+                    showIndex={true}
+                    rowsPerPage={rowsPerPage}
+                    highlightedRows={!selectedTable || selectedTable?.type === "SOURCE" ? undefined : highlightedRows}
+                />
             </Accordion>
             <ImportModal
                 open={importModalOpen}

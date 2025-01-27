@@ -1,14 +1,8 @@
-import { IType, ValueOf } from '@/data/types';
-import { ColumnType, DataTable } from '@/data/table';
+import { IType } from '@/data/types';
+import { DataTable, NormalizedDataTable } from '@/data/table';
 import { createSlice, PayloadAction } from '@reduxjs/toolkit';
 import { createSelector } from "reselect";
 import { RootState } from '../store';
-
-export interface NormalizedDataTable {
-    columns: {name: string, type: IType}[];
-    rows: Record<string, ValueOf<ColumnType>>[];
-    index: number[];
-}
 
 const sourceTableSlice = createSlice({
     name: "data-table",
@@ -38,12 +32,10 @@ const sourceTableSlice = createSlice({
             state.index = state.index.filter((index) => index !== rowIndex);
         },
         setSourceTable: (state, action: PayloadAction<NormalizedDataTable>) => {
-            console.time("setSourceTable");
             const { columns, index, rows } = action.payload;
             state.columns = columns;
             state.index = index;
             state.rows = rows;
-            console.timeEnd("setSourceTable");
         }
     }
 });
@@ -51,10 +43,9 @@ const sourceTableSlice = createSlice({
 export const { addSourceColumn, addSourceRow, updateSourceCell, removeSourceRow, setSourceTable } = sourceTableSlice.actions;
 export default sourceTableSlice.reducer;
 
-const selectSourceTable = (state: RootState) => state.sourceTable;
+const selectRawSourceTable = (state: RootState) => state.sourceTable;
 
-// Memoized selector to create a DataTable from the normalized table
-export const selectDataTable = createSelector(
-  [selectSourceTable], // Input selector
-  (sourceTable) => DataTable.fromNormalizedTable(sourceTable) // Output transformation
+export const selectSourceDataTable = createSelector(
+  [selectRawSourceTable],
+  (sourceTable) => DataTable.fromNormalizedTable(sourceTable)
 );

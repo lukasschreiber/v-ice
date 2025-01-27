@@ -1,7 +1,7 @@
 import * as Blockly from 'blockly/core';
 import { IType, ValueOf } from '@/data/types';
 import { AnyRegistrableBlock, BlockLinesDefinition } from '../block_definitions';
-import { NormalizedDataTable } from '@/store/data/source_table_slice';
+import { NormalizedDataTable } from '@/data/table';
 
 export type DataTableStructure = NormalizedDataTable["columns"]
 

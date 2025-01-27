@@ -19,7 +19,7 @@ export type DataTableDefinition = {
 };
 
 export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">) {
-    const { querySource, queryResults, setQuerySource, addTarget, removeTarget, targets } = useQuery();
+    const { querySource, getQueryResultById, setQuerySource, addTarget, removeTarget, targets } = useQuery();
     const [dataTables, setDataTables] = useState<DataTableDefinition[]>([]);
     const [sourceName, setSourceName] = useState("Source");
     const { workspace } = useWorkspace();
@@ -98,10 +98,10 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
                 setSource: setQuerySource,
                 sourceName,
                 setSourceName,
+                getQueryResultById,
                 reset,
                 save,
                 sort,
-                queryResults,
                 addTarget,
                 removeTarget,
                 targets,
@@ -118,7 +118,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
 export const DataContext = createContext<{
     source: DataTable;
     sourceName: string
-    queryResults: Record<string, DataTable>;
+    getQueryResultById: (id: string) => DataTable | null;
     setSource: (source: DataTable) => void;
     setSourceName: (sourceName: string) => void;
     reset(): void;
@@ -134,7 +134,7 @@ export const DataContext = createContext<{
     source: DataTable.empty(),
     sourceName: "Source",
     setSourceName: () => {},
-    queryResults: {},
+    getQueryResultById: () => null,
     setSource: () => {},
     reset: () => {},
     save: () => {},

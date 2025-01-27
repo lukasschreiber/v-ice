@@ -6,7 +6,12 @@ import { TypePredictor } from "./type_predictor";
 import { InvalidColumnValueAddedError } from "./exception";
 import { IHierarchyDefinition } from "./hierarchy";
 import { EnumDefinition } from "./type_registry";
-import { NormalizedDataTable } from "@/store/data/source_table_slice";
+
+export interface NormalizedDataTable {
+    columns: {name: string, type: IType}[];
+    rows: Record<string, ValueOf<ColumnType>>[];
+    index: number[];
+}
 
 export type SerializedColumn<T extends ColumnType> = { name: string, type: string, values: ValueOf<T>[] }
 export type SerializedTable = SerializedColumn<ColumnType>[]

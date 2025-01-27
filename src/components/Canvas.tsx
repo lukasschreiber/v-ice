@@ -12,9 +12,8 @@ import { SettingsContext } from "@/context/settings/settings_context";
 import { SettingsModal } from "@/components/SettingsModal";
 import { setBlocklyLocale } from "@/i18n";
 import { setJson, setXml, setCode, setASTJson } from "@/store/code/generated_code_slice";
-import { setQueryResults } from "@/store/data/data_slice";
 import { useDispatch, useSelector } from "@/store/hooks";
-import { SerializedTable } from "@/data/table";
+import { NormalizedDataTable } from "@/data/table";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { Blocks } from "@/blocks";
 import { WorkspaceContext } from "@/context/workspace_context";
@@ -42,7 +41,8 @@ import { setTheme } from "@/themes/colors";
 import { QueryClient } from "@/query/clients/query_client";
 import { LocalQueryClient } from "@/query/clients/local_query_client";
 import { NodeBlock } from "@/blocks/extensions/node";
-import { selectDataTable } from "@/store/data/source_table_slice";
+import { selectSourceDataTable } from "@/store/data/source_table_slice";
+import { setResultTables } from "@/store/data/result_tables_slice";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -79,7 +79,7 @@ export function Canvas(props: CanvasProps) {
     });
     const code = useSelector((state) => state.generatedCode.code);
     const astJson = useSelector((state) => state.generatedCode.astJson);
-    const source = useSelector(selectDataTable);
+    const source = useSelector(selectSourceDataTable);
     const dispatch = useDispatch();
 
     useEffect(() => {
@@ -211,12 +211,12 @@ export function Canvas(props: CanvasProps) {
                 return;
             }
             const result = await queryClient.execute(code, source);
-            const serialized: Record<string, SerializedTable> = {};
+            const normalized: Record<string, NormalizedDataTable> = {};
             for (const [id, table] of Object.entries(result.targets)) {
-                serialized[id] = table.serialize();
+                normalized[id] = table.toNormalizedTable();
             }
 
-            dispatch(setQueryResults(serialized));
+            dispatch(setResultTables(normalized));
             dispatch(setEdgeCounts(result.edgeCounts));
             resolve();
         });
