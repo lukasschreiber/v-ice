@@ -1,6 +1,5 @@
 import * as Blockly from 'blockly/core';
 import { IType, ValueOf } from '@/data/types';
-import { DataTable } from '@/data/table';
 import { AnyRegistrableBlock, BlockLinesDefinition } from '../block_definitions';
 import { NormalizedDataTable } from '@/store/data/source_table_slice';
 
