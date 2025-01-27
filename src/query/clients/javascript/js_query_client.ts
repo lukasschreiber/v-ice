@@ -271,6 +271,7 @@ export const jsQueryClient = createQueryClient({
                 type: t.null,
                 transformer: () => `null`
             }),
+            // TODO: check that always the strictest type is used
 
             createOperationTransformer({
                 operation: "get_variable",

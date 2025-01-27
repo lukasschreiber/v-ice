@@ -149,7 +149,11 @@ export class QueryCodeGenerator {
 
         if (!transformer) {
             console.warn(`No transformer found for node: ${JSON.stringify(node)}, kind: ${node.kind} - returning default transformer`)
-            transformer = (astNode: any) => `/* No transformer found for node: ${JSON.stringify(astNode)} */`
+            if (isPrimitiveNode(node)) {
+                transformer = () => `undefined`
+            } else {
+                transformer = (astNode: any) => `/* No transformer found for node: ${JSON.stringify(astNode)} */`
+            }
         }
 
         return transformer
@@ -160,7 +164,7 @@ export class QueryCodeGenerator {
         let hash = 0;
         for (var i = 0; i < string.length; i++) {
             let code = string.charCodeAt(i);
-            hash = ((hash<<5)-hash)+code;
+            hash = ((hash << 5) - hash) + code;
             hash = hash & hash;
         }
         return `ASTNode<${hash}>`;
