@@ -181,7 +181,8 @@ export class StructSelectMutator extends BlockMutator<Blockly.BlockSvg & StructS
     public domToMutation(this: Blockly.BlockSvg & StructSelectBlock, xmlElement: Element) {
         this.variableType = xmlElement.getAttribute("variableType")!
 
-        subscribe(state => state.sourceTable, () => {
+        // we only need to update if the structure changes
+        subscribe(state => state.sourceTable.columns, () => {
             this.updateOutputType_()
         }, { immediate: true })
     }

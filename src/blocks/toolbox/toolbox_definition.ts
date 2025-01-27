@@ -2,6 +2,9 @@ import * as Blockly from 'blockly/core';
 import { IType, ValueOf } from '@/data/types';
 import { DataTable } from '@/data/table';
 import { AnyRegistrableBlock, BlockLinesDefinition } from '../block_definitions';
+import { NormalizedDataTable } from '@/store/data/source_table_slice';
+
+export type DataTableStructure = NormalizedDataTable["columns"]
 
 export function defineToolbox(toolbox: ToolboxDefinition): Blockly.utils.toolbox.ToolboxDefinition {
     return {
@@ -84,10 +87,10 @@ export function hasIsHiddenFunc<T>(item: T): item is T & { isHidden: IsHiddenFun
 }
 
 // TODO: narrow down T
-export function evaluateIsHiddenFunc<T>(item: T, workspace: Blockly.Workspace, table: DataTable): boolean {
+export function evaluateIsHiddenFunc<T>(item: T, workspace: Blockly.Workspace, tableStructure: DataTableStructure): boolean {
     if (hasIsHiddenFunc(item)) {
         if (typeof item.isHidden === "function") {
-            return item.isHidden(workspace, table)
+            return item.isHidden(workspace, tableStructure)
         } else {
             return item.isHidden
         }
@@ -247,7 +250,7 @@ function categoryDefinitionToCategory(category: IDynamicCategory | IBlockCategor
 
 type ToolboxDefinition = (IDynamicCategory | IBlockCategory)[]
 
-export type IsHiddenFunc = ((workspace: Blockly.Workspace, table: DataTable) => boolean) | (() => boolean) | boolean
+export type IsHiddenFunc = ((workspace: Blockly.Workspace, tableStructure: DataTableStructure) => boolean) | (() => boolean) | boolean
 
 interface IToolboxCategoryDefinition {
     name: string

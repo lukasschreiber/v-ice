@@ -9,7 +9,7 @@ const delimiters = [",", ";"];
 
 export function ImportModal(props: ModalProps & { file?: File }) {
     const { open, onClose, file, ...rest } = props;
-    const { setSource, setExpandable, dataIsLikeDemoData } = useContext(DataContext);
+    const { setSource } = useContext(DataContext);
     const [manualOverride, setManualOverride] = useState(false);
     const [columnNames, setColumnNames] = useState<string[]>([]);
     const [columnTypes, setColumnTypes] = useState<ColumnType[]>([]);
@@ -244,7 +244,6 @@ export function ImportModal(props: ModalProps & { file?: File }) {
                             onClick={() => {
                                 const finalTable = getFinalTable();
                                 if (finalTable) {
-                                    setExpandable(dataIsLikeDemoData(finalTable));
                                     console.time("setSource");
                                     setSource(finalTable);
                                     console.timeEnd("setSource");

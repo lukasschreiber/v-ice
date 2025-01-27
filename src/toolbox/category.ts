@@ -15,7 +15,6 @@ import { getColor } from "@/themes/colors";
 import { evaluateIsHiddenFunc, hasIsHiddenFunc } from '@/blocks/toolbox/toolbox_definition';
 import { store } from '@/store/store';
 import { EvaluationAction, triggerAction } from '@/evaluation_emitter';
-import { DataTable } from '@/main';
 
 /** Toolbox category for continuous toolbox. */
 export class ContinuousCategory extends Blockly.ToolboxCategory {
@@ -79,7 +78,7 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
 
     isHidden() {
         if (hasIsHiddenFunc(this.categoryDef_)) {
-            return evaluateIsHiddenFunc(this.categoryDef_, this.workspace_, DataTable.fromNormalizedTable(store.getState().sourceTable));
+            return evaluateIsHiddenFunc(this.categoryDef_, this.workspace_, store.getState().sourceTable.columns);
         }
 
         return false;

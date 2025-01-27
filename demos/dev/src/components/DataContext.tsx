@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
-import { DataColumn, DataRow, DataTable, useQuery, Types, useWorkspace } from "v-ice";
-import { faker } from "@faker-js/faker";
+import { DataColumn, DataTable, useQuery, Types, useWorkspace } from "v-ice";
 
 Types.registry.registerEnum("Name", {columns: ["Name"]})
 Types.registry.registerEnum("Major", {columns: ["Major"]})
@@ -21,30 +20,28 @@ export type DataTableDefinition = {
 
 export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">) {
     const { querySource, queryResults, setQuerySource, addTarget, removeTarget, targets } = useQuery();
-    const [expandable, setExpandable] = useState(true);
     const [dataTables, setDataTables] = useState<DataTableDefinition[]>([]);
     const [sourceName, setSourceName] = useState("Source");
     const { workspace } = useWorkspace();
     const [initialized, setInitialized] = useState(false);
 
     function populateDemoData() {
-        setExpandable(true);
         setQuerySource(dataTable.clone());
     }
 
-    // useEffect(() => {
-    //     if(querySource.getColumnCount() > 0){
-    //         try {
-    //            localStorage.setItem("querySource", JSON.stringify(querySource.toJSON()));
-    //         } catch (e) {
-    //             // ignore
-    //         }
-    //     }
-    // }, [querySource]);
+    useEffect(() => {
+        if(querySource.getColumnCount() > 0){
+            try {
+               localStorage.setItem("querySource", JSON.stringify(querySource.toJSON()));
+            } catch (e) {
+                // ignore
+            }
+        }
+    }, [querySource]);
 
     useEffect(() => {
         if (!workspace || initialized) return;
-        const savedQuerySource = undefined // JSON.parse(localStorage.getItem("querySource") ?? "null");
+        const savedQuerySource = JSON.parse(localStorage.getItem("querySource") ?? "null");
         if (savedQuerySource) {
             setQuerySource(DataTable.fromJSON(savedQuerySource));
         } else {
@@ -59,32 +56,6 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [workspace]);
 
-    function dataIsLikeDemoData(data: DataTable) {
-        return data.getColumns().every((column, index) => {
-            const referenceColumn = dataTable.getColumn(index);
-            if (referenceColumn && column.name === referenceColumn.name && column.type === referenceColumn.type) {
-                return true;
-            }
-        });
-    }
-
-    function generateCourseName() {
-        const courseNames = [
-            "Chemistry",
-            "Biology",
-            "Physics",
-            "Mathematics",
-            "History",
-            "Literature",
-            "Computer Science",
-            "Art",
-            "Music",
-            "Geography",
-        ];
-        const randomIndex = Math.floor(Math.random() * courseNames.length);
-        return courseNames[randomIndex];
-    }
-
     function clearData() {
         setQuerySource(DataTable.empty());
     }
@@ -94,42 +65,6 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
         populateDemoData();
     }
 
-    function addRow(partialRow: DataRow) {
-        const clonedSource = querySource.clone();
-        const rowValues = [
-            faker.person.firstName(),
-            faker.number.int({ min: 12, max: 40 }),
-            faker.datatype.boolean(0.8),
-            faker.number.float({ min: 1.0, max: 4.0, multipleOf: 0.1 }),
-            generateCourseName(),
-        ];
-        const newRow = Object.fromEntries(
-            clonedSource
-                .getColumns()
-                .map((column) => [
-                    column.name,
-                    partialRow[column.name] ??
-                        rowValues[clonedSource.getColumns().indexOf(column)] ??
-                        Math.floor(Math.random() * 100),
-                ])
-        );
-
-        clonedSource.addRow(newRow);
-        setQuerySource(clonedSource);
-    }
-
-    function addCol() {
-        const clonedSource = querySource.clone();
-        const newCol = new DataColumn(
-            `New #${clonedSource.getColumnCount() - dataTable.getColumnCount() + 1}`,
-            Types.number,
-            Array(clonedSource.getRowCount())
-                .fill(0)
-                .map(() => Math.floor(Math.random() * 100))
-        );
-        clonedSource.addColumn(newCol);
-        setQuerySource(clonedSource);
-    }
 
     function save() {
         const timeIndex = new Date().toISOString().replace(/:/g, "-");
@@ -163,15 +98,10 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
                 setSource: setQuerySource,
                 sourceName,
                 setSourceName,
-                addCol,
-                addRow,
                 reset,
                 save,
                 sort,
                 queryResults,
-                isExpandable: expandable,
-                setExpandable,
-                dataIsLikeDemoData,
                 addTarget,
                 removeTarget,
                 targets,
@@ -191,14 +121,9 @@ export const DataContext = createContext<{
     queryResults: Record<string, DataTable>;
     setSource: (source: DataTable) => void;
     setSourceName: (sourceName: string) => void;
-    addRow(partialRow: DataRow): void;
-    addCol(): void;
     reset(): void;
     save(): void;
     sort(sortBy: string, ascending: boolean): void;
-    isExpandable: boolean;
-    setExpandable: (newValue: boolean) => void;
-    dataIsLikeDemoData: (data: DataTable) => boolean
     addTarget(name: string, id: string): string;
     removeTarget(id: string): void;
     targets: Record<string, string>;
@@ -211,14 +136,9 @@ export const DataContext = createContext<{
     setSourceName: () => {},
     queryResults: {},
     setSource: () => {},
-    addCol: () => {},
-    addRow: () => {},
     reset: () => {},
     save: () => {},
     sort: () => {},
-    isExpandable: true,
-    setExpandable: () => {},
-    dataIsLikeDemoData: () => false,
     addTarget: () => "",
     removeTarget: () => {},
     targets: {},

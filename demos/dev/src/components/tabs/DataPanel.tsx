@@ -1,4 +1,4 @@
-import { DataRow, DataTable, IndexedDataRow } from "v-ice";
+import { DataTable, IndexedDataRow } from "v-ice";
 import { Table } from "v-ice-commons";
 import { Button } from "../Button";
 import { useContext, useState, useEffect, useMemo, useRef, useCallback } from "react";
@@ -10,12 +10,9 @@ export function DataPanel() {
     const {
         source,
         queryResults,
-        addCol,
-        addRow,
         reset,
         save,
         sort,
-        isExpandable,
         addTarget,
         removeTarget,
         dataTables,
@@ -26,7 +23,6 @@ export function DataPanel() {
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
     const [rowsPerPage, setRowsPerPage] = useState(10);
     const [highlightOnly, setHighlightOnly] = useState(true);
-    const [manualRow, setManualRow] = useState<DataRow>({});
     const [importModalOpen, setImportModalOpen] = useState(false);
     const [importModalFile, setImportModalFile] = useState<File | undefined>(undefined);
     const [selectedTable, setSelectedTable] = useState<DataTableDefinition | undefined>(undefined);
@@ -283,79 +279,7 @@ export function DataPanel() {
                 showIndex={true}
                 rowsPerPage={rowsPerPage}
                 highlightedRows={!selectedTable || selectedTable?.type === "SOURCE" ? undefined : highlightedRows}
-            >
-                {isExpandable && (
-                    <>
-                        <tr>
-                            {source.getColumns().map((col, index) => (
-                                <td key={index} className="border-r border-b border-solid border-slate-200">
-                                    {col.type.name === "Boolean" ? (
-                                        <input
-                                            type="checkbox"
-                                            className="w-full outline-0"
-                                            checked={manualRow[col.name] as boolean}
-                                            onChange={(e) => {
-                                                setManualRow({ ...manualRow, [col.name]: e.target.checked });
-                                            }}
-                                        />
-                                    ) : col.type.name === "Number" ? (
-                                        <input
-                                            type="number"
-                                            className="w-full outline-0"
-                                            value={(manualRow[col.name] as number) || ""}
-                                            onChange={(e) => {
-                                                setManualRow({ ...manualRow, [col.name]: Number(e.target.value) });
-                                            }}
-                                        />
-                                    ) : (
-                                        <>
-                                            <input
-                                                type="text"
-                                                className="w-full outline-0"
-                                                value={(manualRow[col.name] as string) || ""}
-                                                list={col.name}
-                                                onChange={(e) => {
-                                                    setManualRow({ ...manualRow, [col.name]: e.target.value });
-                                                }}
-                                            />
-                                            <datalist id={col.name}>
-                                                {[...new Set(col.values)].map((value, index) => (
-                                                    <option key={index} value={value as string} />
-                                                ))}
-                                            </datalist>
-                                        </>
-                                    )}
-                                </td>
-                            ))}
-                        </tr>
-                        <tr>
-                            <td
-                                colSpan={source.getColumnCount()}
-                                className="border-r border-b border-solid border-slate-200 px-1.5"
-                            >
-                                <div className="flex flex-row gap-2">
-                                    <div>Customize the data set:</div>
-                                    <div
-                                        onClick={() => {
-                                            addRow(manualRow);
-                                            setManualRow({});
-                                        }}
-                                        className="text-blue-500 hover:cursor-pointer underline"
-                                    >
-                                        Add Row
-                                    </div>
-                                    <div
-                                        onClick={() => addCol()}
-                                        className="text-blue-500 hover:cursor-pointer underline"
-                                    >
-                                        Add Column
-                                    </div>
-                                </div>
-                            </td>
-                        </tr>
-                    </>
-                )}
-            </Table>
+            />   
             </Accordion>
             <ImportModal
                 open={importModalOpen}

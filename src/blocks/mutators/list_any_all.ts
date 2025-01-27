@@ -104,7 +104,7 @@ export class ListAnyAllMutator extends BlockMutator<Blockly.BlockSvg & ListAnyAl
     public domToMutation(this: Blockly.BlockSvg & ListAnyAllBlock, xmlElement: Element) {
         this.variableType = xmlElement.getAttribute("variableType")!
 
-        subscribe(state => state.sourceTable, () => {
+        subscribe(state => state.sourceTable.columns, () => {
             this.updateType()
         }, { immediate: true })
     }

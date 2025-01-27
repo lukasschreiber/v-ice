@@ -5,140 +5,120 @@ import { DateTime } from "luxon";
 export function Table(
     props: React.HTMLProps<HTMLTableElement> & {
         dataTable: DataTable;
-        highlightedRows?: number[] | undefined;
+        highlightedRows?: number[];
         page: number;
         rowsPerPage: number;
         header?: boolean;
         showIndex?: boolean;
     }
 ) {
-    const { dataTable, highlightedRows, page, header, rowsPerPage, showIndex, children, className, ...rest } = props;
+    const {
+        dataTable,
+        highlightedRows,
+        page,
+        rowsPerPage,
+        header = true,
+        showIndex = false,
+        className,
+        ...rest
+    } = props;
 
-    function formatTableCell<T extends IType>(value: ValueOf<T>, type: T) {
-        if (Types.utils.isTimestamp(type)) {
-            return DateTime.fromISO(value as string)
-                .setLocale("de-DE")
-                .toLocaleString();
-        }
-        if (value === undefined || value === null) {
-            return <span>unknown</span>;
-        }
-        if (Types.utils.isTimeline(type)) {
-            const timeline = value as ValueOf<typeof type>;
-            const head = timeline.slice(0, 3);
-            const tail = timeline.slice(-3);
-            const hasRest = timeline.length > 6;
-            return (
-                <>
-                    {head.map((_, index) => {
-                        return <div key={index}>{formatTimelineLine(timeline, type, index)}</div>;
-                    })}
-                    {hasRest && <div>...</div>}
-                    {tail.map((_, index) => {
-                        return (
-                            <div key={timeline.length - 3 + index}>
-                                {formatTimelineLine(timeline, type, timeline.length - 3 + index)}
-                            </div>
-                        );
-                    })}
-                </>
-            );
-        }
-        if (Types.utils.isList(type)) {
-            return (
-                <div className="flex flex-row gap-1">
-                    {(value as ValueOf<typeof type>).map((item, index, list) => (
-                        <div key={index} className="flex flex-row items-end">
-                            <div>{formatTableCell(item, type.elementType)}</div>
-                            <div>{index < list.length - 1 ? "," : ""}</div>
-                        </div>
-                    ))}
-                </div>
-            );
-        }
-        if (Types.utils.isStruct(type)) {
-            return Object.entries(type.fields).map(([key, fieldType]) => (
-                <div key={key}>{`${key}: ${formatTableCell((value as ValueOf<typeof type>)[key], fieldType)}`}</div>
-            ));
-        }
-        return value.toString();
-    }
-
-    function formatTimelineLine<T extends IType>(value: ValueOf<T>, type: T, index: number) {
-        if (!Types.utils.isTimeline(type)) return null;
-        const entry = (value as ValueOf<typeof type>)[index];
-        if (!entry) return null;
-        return (
-            <div key={index}>
-                {entry.timestamp && DateTime.fromISO(entry.timestamp).setLocale("de-DE").toLocaleString()}
-                {entry.start &&
-                    `${DateTime.fromISO(entry.start).setLocale("de-DE").toLocaleString()} - ${DateTime.fromISO(
-                        entry.end
-                    )
-                        .setLocale("de-DE")
-                        .toLocaleString()}`}
-                : {entry.type}
-                {Object.keys(Types.utils.customFields(entry)).length > 0 && (
-                    <span>
-                        {" "}
-                        (
-                        {Object.entries(Types.utils.customFields(entry))
-                            .map(([key, value]) => `${key}: ${value}`)
-                            .join(", ")}
-                        )
-                    </span>
-                )}
-            </div>
-        );
-    }
-
-    const renderTableHeader = () => (
-        <thead className="text-xs text-gray-700 bg-gray-100">
-            <tr>
-                {dataTable.getColumns(showIndex).map((col, colIndex) => (
-                    <th key={`h_${colIndex}`} className="px-2 py-1 whitespace-nowrap font-medium">
-                        {col.name === DataTable.indexColumnName_ ? "#" : col.name}
-                    </th>
-                ))}
-            </tr>
-        </thead>
+    // Memoize headers and rows
+    const headers = React.useMemo(
+        () => dataTable.getColumns(showIndex),
+        [dataTable, showIndex]
     );
 
-    const renderTableBody = () => (
-        <tbody>
-            {dataTable.getRows().length === 0 && (
+    const rows = React.useMemo(() => {
+        const start = page * rowsPerPage;
+        const end = start + rowsPerPage;
+        return dataTable.getRows().slice(start, end);
+    }, [dataTable, page, rowsPerPage]);
+
+    const formatTableCell = React.useCallback(
+        <T extends IType>(value: ValueOf<T>, type: T) => {
+            if (Types.utils.isTimestamp(type)) {
+                return DateTime.fromISO(value as string)
+                    .setLocale("de-DE")
+                    .toLocaleString();
+            }
+            if (value === undefined || value === null) {
+                return <span>unknown</span>;
+            }
+            if (Types.utils.isList(type)) {
+                return (
+                    <div className="flex flex-row gap-1">
+                        {(value as ValueOf<typeof type>).map((item, index) => (
+                            <div key={index} className="flex flex-row items-end">
+                                <div>{formatTableCell(item, type.elementType)}</div>
+                                {index < (value as any[]).length - 1 && ","}
+                            </div>
+                        ))}
+                    </div>
+                );
+            }
+            if (Types.utils.isStruct(type)) {
+                return Object.entries(type.fields).map(([key, fieldType]) => (
+                    <div key={key}>
+                        {key}: {formatTableCell((value as never)[key], fieldType)}
+                    </div>
+                ));
+            }
+            return value.toString();
+        },
+        []
+    );
+
+    const renderTableHeader = React.useMemo(
+        () => (
+            <thead className="text-xs text-gray-700 bg-gray-100">
                 <tr>
-                    <td colSpan={dataTable.getColumns(showIndex).length} className="text-center py-5 border-b">
-                        No data available
-                    </td>
+                    {headers.map((col, colIndex) => (
+                        <th key={`h_${colIndex}`} className="px-2 py-1 whitespace-nowrap font-medium">
+                            {col.name === DataTable.indexColumnName_ ? "#" : col.name}
+                        </th>
+                    ))}
                 </tr>
-            )}
-            {dataTable.getColumn(0) &&
-                dataTable
-                    .getColumn(0)!
-                    .values.slice(page * rowsPerPage, (page + 1) * rowsPerPage)
-                    .map((_, rowIndex) => (
+            </thead>
+        ),
+        [headers]
+    );
+
+    const renderTableBody = React.useMemo(
+        () => (
+            <tbody>
+                {rows.length === 0 ? (
+                    <tr>
+                        <td colSpan={headers.length} className="text-center py-5 border-b">
+                            No data available
+                        </td>
+                    </tr>
+                ) : (
+                    rows.map((row) => (
                         <tr
-                            key={page * rowsPerPage + rowIndex}
+                            key={row[DataTable.indexColumnName_]}
                             className={`border-b ${
-                                highlightedRows?.includes(rowIndex) ? "bg-green-100 border-green-200" : "bg-white"
+                                highlightedRows?.includes(row[DataTable.indexColumnName_]) ? "bg-green-100 border-green-200" : "bg-white"
                             }`}
                         >
-                            {dataTable.getColumns(showIndex).map((col, colIndex) => (
-                                <td key={`${rowIndex}_${colIndex}`} className="px-2 py-1 whitespace-nowrap align-top">
-                                    {formatTableCell(col.values[page * rowsPerPage + rowIndex], col.type)}
+                            {headers.map((col, colIndex) => (
+                                <td key={`${row[DataTable.indexColumnName_]}_${colIndex}`} className="px-2 py-1 whitespace-nowrap align-top">
+                                    {formatTableCell(col.values[row[DataTable.indexColumnName_]], col.type)}
                                 </td>
                             ))}
                         </tr>
-                    ))}
-        </tbody>
+                    ))
+                )}
+            </tbody>
+        ),
+        [rows, headers, highlightedRows, formatTableCell]
     );
 
     return (
         <div className={`overflow-x-auto ${className}`}>
             <table {...rest} className="overflow-hidden text-xs text-left text-gray-500 table-auto min-w-full">
-                {header !== false ? renderTableHeader() : children}
-                {renderTableBody()}
+                {header  !== false ? renderTableHeader : props.children}
+                {renderTableBody}
             </table>
         </div>
     );

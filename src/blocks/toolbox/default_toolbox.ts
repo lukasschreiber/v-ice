@@ -3,7 +3,6 @@ import { Variables } from "@/blocks/toolbox/categories/variables";
 import { Nodes } from "./categories/nodes";
 import { DateTime } from "luxon";
 import { defineBlock, defineCategory, defineToolbox } from "./toolbox_definition";
-import types from "@/data/types";
 import { FibBlock, MathBinaryOperationBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock, NumberBlock } from "../definitions/math";
 import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "../definitions/comparisons";
 import { ListAnyAllBlock, ListArithmeticBlock, ListContainsBlock, ListEqualsBlock, ListLengthBlock } from "../definitions/lists";
@@ -90,7 +89,7 @@ export const DefaultToolbox = defineToolbox([
             }
         }),
         defineBlock(IsNullBlock).withCondition((_workspace, table) => {
-            return !table.some(col => types.utils.fromString(col.type).nullable)
+            return !table.some(col => col.type.nullable)
         }),
     ]
     ),

@@ -16,7 +16,6 @@ import { Blocks } from '@/blocks';
 import { evaluateIsHiddenFunc, hasIsHiddenFunc, registerCategory } from '@/blocks/toolbox/toolbox_definition';
 import { store } from '@/store/store';
 import { ContinuousCategory } from './category';
-import { DataTable } from '@/main';
 export * from './category'
 
 export class ContinuousToolbox extends Blockly.Toolbox {
@@ -82,7 +81,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
                 } else {
                     contents = contents.concat(itemContents.filter((item) => {
                         if(hasIsHiddenFunc(item)) {
-                            return !evaluateIsHiddenFunc(item, this.workspace_, DataTable.fromNormalizedTable(store.getState().sourceTable));
+                            return !evaluateIsHiddenFunc(item, this.workspace_, store.getState().sourceTable.columns);
                         }
                     }));
                 }
@@ -94,7 +93,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
     protected override renderContents_(toolboxDef: Blockly.utils.toolbox.ToolboxItemInfo[]) {
         super.renderContents_(toolboxDef.filter((item) => {
             if(hasIsHiddenFunc(item)) {
-                return !evaluateIsHiddenFunc(item, this.workspace_, DataTable.fromNormalizedTable(store.getState().sourceTable));
+                return !evaluateIsHiddenFunc(item, this.workspace_, store.getState().sourceTable.columns);
             }
 
             return true;

@@ -160,7 +160,7 @@ export function useQuery() {
             }
             return deserialized
         }, [queryResults]),
-        querySource: useMemo(() => querySource, [querySource]),
+        querySource: querySource,
         setQuerySource: (source: DataTable) => {
             console.log("setting query source from local storage");
             dispatch(setSourceTable(source.toNormalizedTable()))

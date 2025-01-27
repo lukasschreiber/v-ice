@@ -52,7 +52,7 @@ export class HierarchySelectMutator extends BlockMutator<Blockly.Block & Hierarc
     public domToMutation(this: Blockly.Block & HierarchySelectBlock, xmlElement: Element) {
         this.variableType = xmlElement.getAttribute("variableType")!
 
-        subscribe(state => state.sourceTable, () => {
+        subscribe(state => state.sourceTable.columns, () => {
             this.updateHierarchyField_()
         }, {immediate: true})
     }

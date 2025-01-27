@@ -257,7 +257,7 @@ export const jsQueryClient = createQueryClient({
             }),
             createPrimitiveTransformer({
                 type: t.nullable(t.union(t.string, t.enum(t.wildcard), t.hierarchy(t.wildcard))),
-                transformer: (astNode) => `"${astNode.value}"`
+                transformer: (astNode) => `"${astNode.value?.replaceAll("\"", "\\\"")}"`
             }),
             createPrimitiveTransformer({
                 type: t.nullable(t.list(t.wildcard)),
@@ -266,6 +266,10 @@ export const jsQueryClient = createQueryClient({
             createPrimitiveTransformer({
                 type: t.nullable(t.struct(t.wildcard)),
                 transformer: (astNode) => `${astNode.value === null ? "null" : JSON.stringify(astNode.value)}`
+            }),
+            createPrimitiveTransformer({
+                type: t.null,
+                transformer: () => `null`
             }),
 
             createOperationTransformer({
