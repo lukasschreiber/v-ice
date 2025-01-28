@@ -1,8 +1,8 @@
-import { Canvas, DataColumn, DataTable, Types, useQuery } from "v-ice";
+import { Canvas, Clients, DataColumn, DataTable, Types, useQuery } from "v-ice";
 import { useEffect, useState } from "react";
 
 function App() {
-    const {setQuerySource, addTarget, queryResults} = useQuery();
+    const {setQuerySource, addTarget, getQueryResultById} = useQuery();
     const [target, setTarget] = useState<string>("");
 
     useEffect(() => {
@@ -18,18 +18,18 @@ function App() {
                 new DataColumn("Major", Types.enum("Major"), ["Computer Science", "Mathematics", "Physics"]),
             ])
         );
-       setTarget(addTarget("Target"))
+       setTarget(addTarget("Target", "default_target"));
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     useEffect(() => {
-        console.log(queryResults[target]);
-    }, [queryResults, target]);
+        console.log(target, getQueryResultById(target));
+    }, [getQueryResultById, target]);
 
     return (
         <>
-            <Canvas width={1000} height={700} language={"en"} />
+            <Canvas width={1000} height={700} language={"en"} queryClient={Clients.js} />
         </>
     );
 }

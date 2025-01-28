@@ -87,11 +87,11 @@ import { jsQueryClient } from "./query/clients/javascript/js_query_client"
 import { selectSourceDataTable, setSourceTable } from "./store/data/source_table_slice"
 
 /**
- * The main component for the Blockly editor. This component should be wrapped in a `BlocklyProvider`.
+ * The main component for the Blockly editor. This component should be wrapped in a `VICEProvider`.
  * @example
- * <BlocklyProvider>
+ * <VICEProvider>
  *     <Canvas />
- * </BlocklyProvider>
+ * </VICEProvider>
  */
 export const Canvas = CanvasElement
 
@@ -100,11 +100,11 @@ export const HelpPage = ManualPageElement
 /**
  * Provider for the Blockly context. This provider should wrap the entire application.
  * @example
- * <BlocklyProvider>
+ * <VICEProvider>
  *     <App />
- * </BlocklyProvider>
+ * </VICEProvider>
  */
-export const BlocklyProvider = ApplicationContextProvider
+export const VICEProvider = ApplicationContextProvider
 
 /**
  * Hook to get the current generated code.

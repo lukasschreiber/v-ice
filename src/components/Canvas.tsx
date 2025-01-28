@@ -59,13 +59,14 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     toolbox?: ToolboxDefinition;
     queryClient?: QueryClient;
     theme?: Blockly.Theme;
+    debug?: boolean;
 };
 
 export function Canvas(props: CanvasProps) {
-    const { language, helpUrl, media, width, height, toolbox, queryClient, ...divProps } = props;
+    const { language, helpUrl, media, width, height, toolbox, queryClient, debug, ...divProps } = props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
-    const workspaceRef = useContext(WorkspaceContext).workspaceRef;
+    const {workspaceRef, setDebug} = useContext(WorkspaceContext);
     const [toolboxWidth, setToolboxWidth] = useState(0);
     const { i18n } = useTranslation();
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -85,6 +86,10 @@ export function Canvas(props: CanvasProps) {
     useEffect(() => {
         setHelpUrl(helpUrl ?? null);
     }, [helpUrl, setHelpUrl]);
+
+    useEffect(() => {
+        setDebug(debug ?? false);
+    }, [debug, setDebug]);
 
     useEffect(() => {
         i18n.changeLanguage(language);

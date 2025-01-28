@@ -1,6 +1,6 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
-import { BlocklyProvider, HelpPage } from "v-ice";
+import { VICEProvider, HelpPage } from "v-ice";
 import "./index.css";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import { EvaluationProvider } from "./store/EvaluationContext";
@@ -41,9 +41,9 @@ const router = createBrowserRouter([
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
         <EvaluationProvider>
-            <BlocklyProvider>
+            <VICEProvider>
                 <RouterProvider router={router} />
-            </BlocklyProvider>
+            </VICEProvider>
         </EvaluationProvider>
     </React.StrictMode>
 );

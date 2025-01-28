@@ -1,12 +1,12 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import App from "./App";
-import { BlocklyProvider } from "@/main";
+import { VICEProvider } from "@/main";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <BlocklyProvider>
+        <VICEProvider>
             <App />
-        </BlocklyProvider>
+        </VICEProvider>
     </React.StrictMode>
 );

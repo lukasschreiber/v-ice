@@ -1,7 +1,7 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom/client";
 import App from "./App";
-import { BlocklyProvider } from "@/main";
+import { VICEProvider } from "@/main";
 import { TabContextProvider } from "./components/tabs/TabContext";
 import "./style.css";
 import { DataContextProvider } from "./components/DataContext";
@@ -9,7 +9,7 @@ import { StoreWorkspaceContextProvider } from "./components/StoreWorkspaceContex
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <BlocklyProvider>
+        <VICEProvider>
             <TabContextProvider>
                 <DataContextProvider>
                     <StoreWorkspaceContextProvider>
@@ -17,6 +17,6 @@ ReactDOM.createRoot(document.getElementById("root")!).render(
                     </StoreWorkspaceContextProvider>
                 </DataContextProvider>
             </TabContextProvider>
-        </BlocklyProvider>
+        </VICEProvider>
     </React.StrictMode>
 );
