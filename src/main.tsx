@@ -63,7 +63,7 @@ import "@/connection_checker";
 
 export * from "@/query/query_generator"
 
-import { useContext } from "react"
+import { useContext, useRef } from "react"
 import { IPublicSettingsContext, SettingsContext } from "@/context/settings/settings_context"
 import { ApplicationContextProvider } from "@/context/app_context_provider"
 import { Canvas as CanvasElement } from "@/components/Canvas"
@@ -85,6 +85,7 @@ import { RegistrableMutator } from "./blocks/block_mutators"
 import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox"
 import { jsQueryClient } from "./query/clients/javascript/js_query_client"
 import { selectSourceDataTable, setSourceTable } from "./store/data/source_table_slice"
+import { subscribe } from "./store/subscribe"
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `VICEProvider`.
@@ -114,6 +115,21 @@ export const VICEProvider = ApplicationContextProvider
  * console.log(code) // the code generated from the blocks in the canvas
  */
 export function useGeneratedCode() {
+    const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
+    const unsubscribe = subscribe((state) => state.settings.debugger, (debuggerEnabled) => {
+        if (timeoutRef.current) {
+            clearTimeout(timeoutRef.current);
+        }
+
+        timeoutRef.current = setTimeout(() => {
+            if (!debuggerEnabled) {
+                console.warn("You are trying to access the generated code without the debugger enabled. This may not work because the generated code is only available in debug mode.");
+            }
+            unsubscribe();
+        }, 500);
+    });
+
     return useSelector((state) => state.generatedCode)
 }
 

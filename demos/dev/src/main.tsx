@@ -9,7 +9,7 @@ import { StoreWorkspaceContextProvider } from "./components/StoreWorkspaceContex
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <VICEProvider>
+        <VICEProvider debug={true}>
             <TabContextProvider>
                 <DataContextProvider>
                     <StoreWorkspaceContextProvider>

@@ -9,7 +9,6 @@ import resultTableReducer from "./data/result_tables_slice";
 export const store = configureStore({
     reducer: {
         generatedCode: generatedCodeReducer,
-        // data: dataReducer,
         sourceTable: sourceTableReducer,
         resultTables: resultTableReducer,
         settings: settingsReducer,

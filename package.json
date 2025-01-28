@@ -10,10 +10,10 @@
   "main": "./dist/filters.js",
   "types": "./dist/main.d.ts",
   "module": "./dist/filters.js",
-  "source": "./src/main.ts",
+  "source": "./src/main.tsx",
   "exports": {
     ".": {
-      "import": "./src/main.ts"
+      "import": "./src/main.tsx"
     }
   },
   "scripts": {

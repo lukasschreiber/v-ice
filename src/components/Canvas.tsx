@@ -59,14 +59,13 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     toolbox?: ToolboxDefinition;
     queryClient?: QueryClient;
     theme?: Blockly.Theme;
-    debug?: boolean;
 };
 
 export function Canvas(props: CanvasProps) {
-    const { language, helpUrl, media, width, height, toolbox, queryClient, debug, ...divProps } = props;
+    const { language, helpUrl, media, width, height, toolbox, queryClient, ...divProps } = props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
-    const {workspaceRef, setDebug} = useContext(WorkspaceContext);
+    const { workspaceRef } = useContext(WorkspaceContext);
     const [toolboxWidth, setToolboxWidth] = useState(0);
     const { i18n } = useTranslation();
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
@@ -78,6 +77,7 @@ export function Canvas(props: CanvasProps) {
         workspace: false,
         variables: false,
     });
+    const debuggingEnabled = useSelector((state) => state.settings.debugger);
     const code = useSelector((state) => state.generatedCode.code);
     const astJson = useSelector((state) => state.generatedCode.astJson);
     const source = useSelector(selectSourceDataTable);
@@ -86,10 +86,6 @@ export function Canvas(props: CanvasProps) {
     useEffect(() => {
         setHelpUrl(helpUrl ?? null);
     }, [helpUrl, setHelpUrl]);
-
-    useEffect(() => {
-        setDebug(debug ?? false);
-    }, [debug, setDebug]);
 
     useEffect(() => {
         i18n.changeLanguage(language);
@@ -116,9 +112,7 @@ export function Canvas(props: CanvasProps) {
 
             // remove old variables
             for (const variable of variables) {
-                if (
-                    !source.getColumns().find((c) => c.name === variable.name && c.type.name === variable.type)
-                ) {
+                if (!source.getColumns().find((c) => c.name === variable.name && c.type.name === variable.type)) {
                     workspace.deleteVariableById(variable.getId());
                 }
             }
@@ -166,36 +160,42 @@ export function Canvas(props: CanvasProps) {
 
             setFeaturesReady((old) => ({ ...old, workspace: true }));
 
-            let lastWorkspaceState: ISerializedWorkspace | undefined = undefined;
-            workspaceRef.current!.addChangeListener((e) => {
-                if (
-                    e.type === Blockly.Events.BLOCK_CREATE ||
-                    e.type === Blockly.Events.BLOCK_DELETE ||
-                    (e.type === Blockly.Events.BLOCK_MOVE &&
-                        (e as Blockly.Events.BlockMove).reason?.find((r) =>
-                            ["connect", "drag", "disconnect"].includes(r)
-                        ))
-                ) {
-                    const workspaceState = serializeWorkspace(workspaceRef.current!);
+            if (debuggingEnabled) {
+                let lastWorkspaceState: ISerializedWorkspace | undefined = undefined;
+                workspaceRef.current!.addChangeListener((e) => {
                     if (
-                        JSON.stringify(workspaceState.workspaceState) !==
-                        JSON.stringify(lastWorkspaceState?.workspaceState)
+                        e.type === Blockly.Events.BLOCK_CREATE ||
+                        e.type === Blockly.Events.BLOCK_DELETE ||
+                        (e.type === Blockly.Events.BLOCK_MOVE &&
+                            (e as Blockly.Events.BlockMove).reason?.find((r) =>
+                                ["connect", "drag", "disconnect"].includes(r)
+                            ))
                     ) {
-                        triggerAction(EvaluationAction.WorkspaceChanged, { workspaceState });
-                        lastWorkspaceState = workspaceState;
+                        const workspaceState = serializeWorkspace(workspaceRef.current!);
+                        if (
+                            JSON.stringify(workspaceState.workspaceState) !==
+                            JSON.stringify(lastWorkspaceState?.workspaceState)
+                        ) {
+                            triggerAction(EvaluationAction.WorkspaceChanged, { workspaceState });
+                            lastWorkspaceState = workspaceState;
+                        }
                     }
-                }
 
-                new Promise<void>((resolve) => {
-                    // those dispatches should only be called if the user is interested in the data
-                    dispatch(
-                        setJson(JSON.stringify(Blockly.serialization.workspaces.save(e.getEventWorkspace_()), null, 2))
-                    );
-                    dispatch(setXml(Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(e.getEventWorkspace_()))));
+                    new Promise<void>((resolve) => {
+                        // those dispatches should only be called if the user is interested in the data
+                        dispatch(
+                            setJson(
+                                JSON.stringify(Blockly.serialization.workspaces.save(e.getEventWorkspace_()), null, 2)
+                            )
+                        );
+                        dispatch(
+                            setXml(Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(e.getEventWorkspace_())))
+                        );
 
-                    resolve();
+                        resolve();
+                    });
                 });
-            });
+            }
         }
 
         return () => {
@@ -224,13 +224,13 @@ export function Canvas(props: CanvasProps) {
             dispatch(setResultTables(normalized));
             dispatch(setEdgeCounts(result.edgeCounts));
             resolve();
+        }).then(() => {
+            // render the edges again
+            const nodes = workspace.getAllBlocks().filter((b) => Blocks.Types.isNodeBlock(b));
+            for (const node of nodes) {
+                (workspace.getRenderer() as Renderer).renderEdges(node as NodeBlock & Blockly.BlockSvg);
+            }
         });
-
-        // render the edges again
-        const nodes = workspace.getAllBlocks().filter((b) => Blocks.Types.isNodeBlock(b));
-        for (const node of nodes) {
-            (workspace.getRenderer() as Renderer).renderEdges(node as NodeBlock & Blockly.BlockSvg);
-        }
 
         function saveCode(e: Blockly.Events.Abstract | null = null) {
             if (
@@ -242,29 +242,30 @@ export function Canvas(props: CanvasProps) {
 
             const ast = getASTBuilderInstance().build(workspace!);
             if (queryClient) {
-                queryClient.generateCode(ast ?? "")
-                .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
-                .then((code) => (queryClient as LocalQueryClient).formatCode(code))
-                .then((code) => {
-                    if (code !== astJson) {
-                        dispatch(setCode(code));
-                    }
-                });
+                queryClient
+                    .generateCode(ast ?? "")
+                    .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
+                    .then((code) => (queryClient as LocalQueryClient).formatCode(code))
+                    .then((code) => {
+                        if (code !== astJson) {
+                            dispatch(setCode(code));
+                        }
+                    });
             }
-           
+
             const astJsonCode = JSON.stringify(ast, null, 2);
-           
 
             if (astJson !== astJsonCode) {
                 dispatch(setASTJson(astJsonCode));
             }
         }
 
-        saveCode();
-
-        workspace.addChangeListener(saveCode);
-
-        return () => workspace.removeChangeListener(saveCode);
+        if (debuggingEnabled) {
+            saveCode();
+            workspace.addChangeListener(saveCode);
+            return () => workspace.removeChangeListener(saveCode);
+        }
+        
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [source, code]);
 

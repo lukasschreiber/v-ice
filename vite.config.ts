@@ -16,7 +16,7 @@ export default mergeConfig(baseConfig, {
     build: {
         copyPublicDir: false,
         lib: {
-            entry: resolve(__dirname, 'src/main.ts'),
+            entry: resolve(__dirname, 'src/main.tsx'),
             formats: ['es'],
         },
         rollupOptions: {
