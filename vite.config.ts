@@ -3,15 +3,15 @@ import { resolve } from 'path'
 import baseConfig from "./vite.config.base"
 import externalGlobals from 'rollup-plugin-external-globals'
 import dts from 'vite-plugin-dts'
-import { nodePolyfills } from 'vite-plugin-node-polyfills'
+// import { nodePolyfills } from 'vite-plugin-node-polyfills'
 
 // https://vitejs.dev/config/
 export default mergeConfig(baseConfig, {
     plugins: [
         dts({ include: ['src'] }),
-        nodePolyfills({
-            buffer: true
-        }),
+        // nodePolyfills({
+        //     buffer: true
+        // }),
     ],
     build: {
         copyPublicDir: false,

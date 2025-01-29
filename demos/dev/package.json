@@ -22,7 +22,7 @@
     "@types/node": "^20.14.11",
     "@types/prismjs": "^1.26.3",
     "@types/react": "^18.3.18",
-    "@types/react-dom": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
     "@typescript-eslint/eslint-plugin": "^7.0.2",
     "@typescript-eslint/parser": "^7.0.2",
     "@vitejs/plugin-react": "^4.3.4",
