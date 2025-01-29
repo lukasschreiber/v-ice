@@ -2,5 +2,3 @@ node_modules
 dist
 .VSCodeCounter
 .idea
-
-/src/assets/data/*
