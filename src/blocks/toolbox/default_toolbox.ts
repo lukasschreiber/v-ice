@@ -83,11 +83,6 @@ export const DefaultToolbox = defineToolbox([
                 shadow: mathNumberNull
             },
         }),
-        defineBlock(FibBlock).withInputs({
-            NUM: {
-                shadow: mathNumberNull
-            }
-        }),
         defineBlock(IsNullBlock).withCondition((_workspace, table) => {
             return !table.some(col => col.type.nullable)
         }),
@@ -140,6 +135,11 @@ export const DefaultToolbox = defineToolbox([
             }
         }),
         defineBlock(MathNumberPropertyBlock).withInputs({
+            NUM: {
+                shadow: mathNumberNull
+            }
+        }),
+        defineBlock(FibBlock).withInputs({
             NUM: {
                 shadow: mathNumberNull
             }

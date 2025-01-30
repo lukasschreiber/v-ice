@@ -293,7 +293,7 @@ export function Canvas(props: CanvasProps) {
 
     return (
         <>
-            <div className="overflow-hidden w-fit relative">
+            <div className="overflow-hidden w-fit relative canvas-container">
                 <LoadingOverlay isLoading={isLoading} />
                 <div
                     {...divProps}

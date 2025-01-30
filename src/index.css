@@ -20,6 +20,10 @@
     }
 }
 
+.canvas-container {
+    @apply text-black;
+}
+
 
 /* The blockly input field should have the correct size but due to aliasing it needs to be just a nudge smaller to not cover up parts of the border */
 .renderer-renderer.blocklyWidgetDiv:has(.blocklyHtmlInput) {
