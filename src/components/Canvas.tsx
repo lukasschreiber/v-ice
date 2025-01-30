@@ -265,7 +265,7 @@ export function Canvas(props: CanvasProps) {
             workspace.addChangeListener(saveCode);
             return () => workspace.removeChangeListener(saveCode);
         }
-        
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [source, code]);
 
@@ -292,89 +292,81 @@ export function Canvas(props: CanvasProps) {
     useSettingsHandlers(workspaceRef, settings);
 
     return (
-        <>
-            <div className="overflow-hidden w-fit relative canvas-container">
-                <LoadingOverlay isLoading={isLoading} />
-                <div
-                    {...divProps}
-                    style={{ width: `${width}px`, height: `${height}px`, ...divProps.style }}
-                    className="relative"
-                    ref={blocklyDiv}
-                    id={"canvas"}
-                ></div>
-                <ButtonStack className="absolute bottom-8 right-8 z-[1000]">
-                    <Tooltip text="Autocomplete" position="left">
-                        <RoundButton
-                            disabled={!workspaceRef.current || !QueryMagicWand.canAutoComplete(workspaceRef.current)}
-                            onClick={() => {
-                                triggerAction(EvaluationAction.UseMagicWand, {
-                                    workspaceState: serializeWorkspace(workspaceRef.current!),
-                                });
-                                QueryMagicWand.autoComplete(workspaceRef.current!);
-                            }}
-                        >
-                            <MagicWandIcon className="w-5 h-5" />
-                        </RoundButton>
-                    </Tooltip>
-                    <Tooltip text="Zentrieren" position="left">
-                        <RoundButton
-                            onClick={() => {
-                                workspaceRef.current?.scrollCenter();
-                                triggerAction(EvaluationAction.UseCenterButton);
-                            }}
-                        >
-                            <CrosshairIcon className="w-5 h-5" />
-                        </RoundButton>
-                    </Tooltip>
-                    <Tooltip text="Reinzoomen" position="left">
-                        <RoundButton
-                            onClick={() => {
-                                set(
-                                    "zoom",
-                                    Math.min(
-                                        settings.zoom + 0.1,
-                                        layout.find((g) => g.settings.zoom)!.settings.zoom!.max
-                                    )
-                                );
-                                triggerAction(EvaluationAction.UseZoomInButton);
-                            }}
-                            disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.max}
-                        >
-                            <ZoomPlusIcon className="w-5 h-5" />
-                        </RoundButton>
-                    </Tooltip>
-                    <Tooltip text="Rauszoomen" position="left">
-                        <RoundButton
-                            onClick={() => {
-                                set(
-                                    "zoom",
-                                    Math.max(
-                                        settings.zoom - 0.1,
-                                        layout.find((g) => g.settings.zoom)!.settings.zoom!.min
-                                    )
-                                );
-                                triggerAction(EvaluationAction.UseZoomOutButton);
-                            }}
-                            disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.min}
-                        >
-                            <ZoomMinusIcon className="w-5 h-5" />
-                        </RoundButton>
-                    </Tooltip>
-                </ButtonStack>
-                <ToolboxButtonStack style={{ width: `${toolboxWidth}px` }}>
-                    <Tooltip text="Handbuch">
-                        <ToolboxButton onClick={() => showHelp("#help-start")}>
-                            <BookOpenIcon className="h-6 w-6 text-white" />
-                        </ToolboxButton>
-                    </Tooltip>
-                    <Tooltip text="Einstellungen">
-                        <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
-                            <SettingsIcon className="h-6 w-6 text-white" />
-                        </ToolboxButton>
-                    </Tooltip>
-                </ToolboxButtonStack>
-                <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
-            </div>
-        </>
+        <div className="overflow-hidden w-fit relative canvas-container">
+            <LoadingOverlay isLoading={isLoading} />
+            <div
+                {...divProps}
+                style={{ width: `${width}px`, height: `${height}px`, ...divProps.style }}
+                className="relative"
+                ref={blocklyDiv}
+                id={"canvas"}
+            ></div>
+            <ButtonStack className="absolute bottom-8 right-8 z-[1000]">
+                <Tooltip text="Autocomplete" position="left" className="text-text">
+                    <RoundButton
+                        disabled={!workspaceRef.current || !QueryMagicWand.canAutoComplete(workspaceRef.current)}
+                        onClick={() => {
+                            triggerAction(EvaluationAction.UseMagicWand, {
+                                workspaceState: serializeWorkspace(workspaceRef.current!),
+                            });
+                            QueryMagicWand.autoComplete(workspaceRef.current!);
+                        }}
+                    >
+                        <MagicWandIcon className="w-5 h-5" />
+                    </RoundButton>
+                </Tooltip>
+                <Tooltip text="Zentrieren" position="left" className="text-text">
+                    <RoundButton
+                        onClick={() => {
+                            workspaceRef.current?.scrollCenter();
+                            triggerAction(EvaluationAction.UseCenterButton);
+                        }}
+                    >
+                        <CrosshairIcon className="w-5 h-5" />
+                    </RoundButton>
+                </Tooltip>
+                <Tooltip text="Reinzoomen" position="left" className="text-text">
+                    <RoundButton
+                        onClick={() => {
+                            set(
+                                "zoom",
+                                Math.min(settings.zoom + 0.1, layout.find((g) => g.settings.zoom)!.settings.zoom!.max)
+                            );
+                            triggerAction(EvaluationAction.UseZoomInButton);
+                        }}
+                        disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.max}
+                    >
+                        <ZoomPlusIcon className="w-5 h-5" />
+                    </RoundButton>
+                </Tooltip>
+                <Tooltip text="Rauszoomen" position="left" className="text-text">
+                    <RoundButton
+                        onClick={() => {
+                            set(
+                                "zoom",
+                                Math.max(settings.zoom - 0.1, layout.find((g) => g.settings.zoom)!.settings.zoom!.min)
+                            );
+                            triggerAction(EvaluationAction.UseZoomOutButton);
+                        }}
+                        disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.min}
+                    >
+                        <ZoomMinusIcon className="w-5 h-5" />
+                    </RoundButton>
+                </Tooltip>
+            </ButtonStack>
+            <ToolboxButtonStack style={{ width: `${toolboxWidth}px` }}>
+                <Tooltip text="Handbuch" className="text-text">
+                    <ToolboxButton onClick={() => showHelp("#help-start")}>
+                        <BookOpenIcon className="h-6 w-6 text-white" />
+                    </ToolboxButton>
+                </Tooltip>
+                <Tooltip text="Einstellungen" className="text-text">
+                    <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
+                        <SettingsIcon className="h-6 w-6 text-white" />
+                    </ToolboxButton>
+                </Tooltip>
+            </ToolboxButtonStack>
+            <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+        </div>
     );
 }

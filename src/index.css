@@ -21,7 +21,7 @@
 }
 
 .canvas-container {
-    @apply text-black;
+    @apply !text-text;
 }
 
 
