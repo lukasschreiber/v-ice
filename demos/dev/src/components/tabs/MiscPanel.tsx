@@ -1,5 +1,5 @@
 import { Themes, getBlockDefinitionById, useSettings } from "v-ice";
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";
 import { BlockInfo, Toolbox, useWorkspace } from "@/main";
@@ -7,10 +7,12 @@ import { showNotification } from "@/context/notifications/notification_emitter";
 import types from "@/data/types";
 import { TypeIconPreview } from "@/components/common/TypeIconPreview";
 import { Accordion } from "../Accordion";
+import { DataContext } from "../DataContext";
 
 export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], setTheme: (theme: typeof Themes[keyof typeof Themes]) => void }) {
     const { settings, set } = useSettings();
     const { workspace, save, load } = useWorkspace();
+    const { source } = useContext(DataContext);
     const [language, setLanguage] = useState(localStorage.getItem("language") ?? "en");
     const [screenshotModeEnabled, setScreenshotModeEnabled] = useState(false);
 
@@ -199,6 +201,10 @@ export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], se
                                 <div className="font-mono text-xs">{typeString}</div>
                                 <div className="text-xs text-gray-500">
                                     {types.utils.describe(types.utils.fromString(typeString))}
+                                </div>
+                                <div className="text-xs">
+                                    {/* @ts-ignore for some reason the types of DataTable mismatch */}
+                                    {types.utils.examplesForColumn(name, source, 3).join(", ")}
                                 </div>
                             </div>
                         )

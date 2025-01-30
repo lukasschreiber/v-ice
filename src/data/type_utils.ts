@@ -2,6 +2,9 @@ import { IEnumType, IEventType, IHierarchyType, IIntervalType, IListType, INullT
 import t from "./types";
 import { TypeChecker } from "./type_checker";
 import { typeRegistry } from "./type_registry";
+import { DataTable } from "./table";
+import * as faker from "@faker-js/faker";
+import { TypeConverter } from "./type_converter";
 
 export function toString(type: IType): string {
     return type.name;
@@ -295,4 +298,39 @@ export function describe(type: IType, singular: boolean = true, withArticle: boo
     }
 
     return type.name;
+}
+
+export function examples(type: IType, n: number = 3, table: DataTable | null = null): string[] {
+    const examples: string[] = [];
+    for (let i = 0; i < n; i++) {
+        examples.push(example(type, table));
+    }
+    return [...new Set(examples)];
+}
+
+export function examplesForColumn(column: string, table: DataTable, n: number = 3): string[] {
+    return [... new Set(faker.faker.helpers.arrayElements(table.getColumnByName(column)!.values.map(v => TypeConverter.toType(v, t.string)), n))];
+}
+
+export function example(type: IType, table: DataTable | null = null): string {
+    if (type.name === "Null") return "null";
+    if (isNullable(type)) return Math.random() < 0.25 ? "null" : example(removeNullable(type), table);
+    if (isUnion(type)) return example(faker.faker.helpers.arrayElement(type.types), table);
+    if (type.name === "Number") return faker.faker.number.int({min: -1000, max: 1000}).toString();
+    if (type.name === "String") return faker.faker.lorem.sentence();
+    if (type.name === "Boolean") return faker.faker.datatype.boolean().toString();
+    if (type.name === "Timestamp") return faker.faker.date.recent().toISOString();
+    if (type.name === "*") return faker.faker.lorem.word();
+    if (isEnum(type)) return faker.faker.helpers.arrayElement(typeRegistry.getEnumValues(type.enumName, table ?? undefined));
+    if (isHierarchy(type)) return faker.faker.helpers.arrayElement(typeRegistry.getHierarchy(type.hierarchy)?.getAllEntryNames() ?? []);
+    if (isList(type)) return `[${Array.from({ length: Math.floor(Math.random() * 5) }, () => example(type.elementType, table)).join(", ")}]`;
+    if (isStruct(type)) {
+        const x: string[] = [];
+        for (const [key, value] of Object.entries(type.fields)) {
+            x.push(`${key}: ${example(value, table)}`);
+        }
+        return `{${x.join(", ")}}`;
+    }
+
+    return "";
 }

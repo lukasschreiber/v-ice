@@ -60,6 +60,9 @@ export class TypeConverter {
 
     protected static toString(value: unknown, nullable: boolean): string | null {
         if (this.isNull(value)) return nullable ? null : "null";
+        if (Array.isArray(value) || typeof value === "object") {
+            value = JSON.stringify(value);
+        }
         return String(value);
     }
 

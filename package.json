@@ -27,6 +27,7 @@
         "analyze": "vite-bundle-visualizer -c vite.config.ts"
     },
     "dependencies": {
+        "@faker-js/faker": "^9.4.0",
         "@reduxjs/toolkit": "^2.2.3",
         "acorn": "^8.11.3",
         "blockly": "^11.1.0",
