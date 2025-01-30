@@ -257,3 +257,42 @@ export function fromString(type: string): IType {
 function nameWithoutNullable(type: IType): string {
     return type.name.replace("?", "");
 }
+
+export function describe(type: IType, singular: boolean = true, withArticle: boolean = true): string {
+    if (singular) {
+        if (type.name === "Null") return `${withArticle ? "a " : ""}missing value`;
+        if (isNullable(type)) return `${describe(removeNullable(type), singular, false)} or a missing value`;
+        if (isUnion(type)) return `either ${type.types.map(t => describe(t, true)).join(" or ")}`;
+        if (type.name === "Number") return `${withArticle ? "a " : ""}number`;
+        if (type.name === "Timestamp") return `${withArticle ? "a " : ""}timestamp`;
+        if (type.name === "String") return `${withArticle ? "a " : ""}string`;
+        if (type.name === "Boolean") return `${withArticle ? "a " : ""}boolean`;
+        if (type.name === "Null") return `${withArticle ? "a " : ""}missing value`;
+        if (type.name === "*") return withArticle ? "any value" : "value of any kind";
+        if (isEnum(type)) return `${withArticle ? "a " : ""}string limited to the values of the enumeration "${type.enumName}"`;
+        if (isHierarchy(type)) return `${withArticle ? "a " : ""}key of the hierarchy "${type.hierarchy}"`;
+        if (isTimeline(type)) return `${withArticle ? "a " : ""}timeline of ${describe(type.elementType, false)}`;
+        if (isEvent(type)) return `${withArticle ? "an " : ""}event with the attributes ${Object.entries(type.fields).map(([key, value]) => `${key} as ${describe(value, true)}`).join(", ")}`;
+        if (isInterval(type)) return `${withArticle ? "an " : ""}interval with the attributes ${Object.entries(type.fields).map(([key, value]) => `${key} as ${describe(value, true)}`).join(", ")}`;
+        if (isList(type)) return `${withArticle ? "a " : ""}list of ${describe(type.elementType, false)}`;
+        if (isStruct(type)) return `${withArticle ? "a " : ""}struct with the attributes ${Object.entries(type.fields).map(([key, value]) => `${key} as ${describe(value, true)}`).join(", ")}`;
+    } else {
+        if (type.name === "Null") return "missing values";
+        if (isNullable(type)) return `${describe(removeNullable(type), singular)} or missing values`;
+        if (isUnion(type)) return `either ${type.types.map(t => describe(t, true)).join(" or ")}`;
+        if (type.name === "Number") return "numbers";
+        if (type.name === "String") return "strings";
+        if (type.name === "Timestamp") return "timestamps";
+        if (type.name === "Boolean") return "booleans";
+        if (type.name === "*") return "any value";
+        if (isEnum(type)) return `strings limited to the values of the enumeration "${type.enumName}"`;
+        if (isHierarchy(type)) return `keys of the hierarchy "${type.hierarchy}"`;
+        if (isTimeline(type)) return `timelines of ${describe(type.elementType, false)}`;
+        if (isEvent(type)) return `events with the attributes ${Object.entries(type.fields).map(([key, value]) => `${key} as ${describe(value, true)}`).join(", ")}`;
+        if (isInterval(type)) return `intervals with the attributes ${Object.entries(type.fields).map(([key, value]) => `${key} as ${describe(value, true)}`).join(", ")}`;
+        if (isList(type)) return `lists of ${describe(type.elementType, false)}`;
+        if (isStruct(type)) return `structs with the attributes ${Object.entries(type.fields).map(([key, value]) => `${key} as ${describe(value, true)}`).join(", ")}`;
+    }
+
+    return type.name;
+}

@@ -1,8 +1,8 @@
-import { Themes, useSettings } from "v-ice";
+import { Themes, getBlockDefinitionById, useSettings } from "v-ice";
 import { useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";
-import { Toolbox, useWorkspace } from "@/main";
+import { BlockInfo, Toolbox, useWorkspace } from "@/main";
 import { showNotification } from "@/context/notifications/notification_emitter";
 import types from "@/data/types";
 import { TypeIconPreview } from "@/components/common/TypeIconPreview";
@@ -177,6 +177,32 @@ export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], se
                             );
                         })}
                     </div>
+                </div>
+            </Accordion>
+            <Accordion title="Variables" defaultOpen={true}>
+                <div className="flex flex-col gap-2">
+                    {workspace && Toolbox.Categories.Variables.flyoutCategoryBlocks(workspace).filter((block) => block.kind === "block").map((_block) => {
+                        const blockInfo = _block as BlockInfo;
+                        const block = getBlockDefinitionById(blockInfo.type);
+
+                        if (blockInfo.type !== "variable_get" || !block) return null;
+
+                        const typeString = blockInfo.fields?.["VAR"]?.["type"];
+                        const name = blockInfo.fields?.["VAR"]?.["name"];
+
+                        return (
+                            <div key={name} className="flex flex-col gap-1 py-2">
+                                <div key={blockInfo.type} className="flex flex-row gap-2 py-2 text-xs font-bold items-center">
+                                    <TypeIconPreview type={typeString} />
+                                    <div>{name}</div>
+                                </div>
+                                <div className="font-mono text-xs">{typeString}</div>
+                                <div className="text-xs text-gray-500">
+                                    {types.utils.describe(types.utils.fromString(typeString))}
+                                </div>
+                            </div>
+                        )
+                    })}
                 </div>
             </Accordion>
 
