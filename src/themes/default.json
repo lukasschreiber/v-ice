@@ -1,6 +1,7 @@
 {
     "colors": {
         "background": "#ffffff",
+        "text": "#000000",
         "secondary": "#4C97FF",
         "primary": {
             "50": "#E9FCF7",
