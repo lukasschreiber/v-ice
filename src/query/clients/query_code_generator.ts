@@ -137,9 +137,27 @@ export class QueryCodeGenerator {
         }
 
         if (isPrimitiveNode(node)) {
-            transformer = this.transformers[ASTNodeKind.Primitive].find(def => {
+            const eligibleTransformers = this.transformers[ASTNodeKind.Primitive].filter(def => {
                 return node.type === null ? false : TypeChecker.checkTypeCompatibility(def.type, types.utils.fromString(node.type))
-            })?.transformer || null
+            })
+
+            if (eligibleTransformers.length === 1) {
+                transformer = eligibleTransformers[0].transformer
+            }
+
+            // if there are multiple transformers that can handle the node, we choose the one with the most specific type, i.e. the one with the least union types or wildcards
+            eligibleTransformers.sort((a, b) => {
+                const aType = types.utils.fromString(a.type)
+                const bType = types.utils.fromString(b.type)
+                const aLevel = types.utils.isUnion(aType) ? aType.types.length : types.utils.isWildcard(aType) ? 10 : 1
+                const bLevel = types.utils.isUnion(bType) ? bType.types.length : types.utils.isWildcard(bType) ? 10 : 1
+                return aLevel - bLevel
+            })
+
+            if (eligibleTransformers.length > 1) {
+                console.warn(`Multiple transformers found for node: ${JSON.stringify(node)}, kind: ${node.kind} - choosing the one with the most specific type`)
+                transformer = eligibleTransformers[0].transformer
+            }
         }
 
         if (isSetNode(node)) {

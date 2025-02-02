@@ -42,6 +42,59 @@ export const jsQueryClient = createQueryClient({
                 }
             })
         }
+        // execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>> {
+        //     return new Promise((resolve) => {
+        //         if (source.getColumnCount() === 0 || source.getRowCount() === 0 || query === "") {
+        //             resolve({ targets: {}, edgeCounts: {} });
+        //             return;
+        //         }
+        
+        //         // Create a Blob representing the worker script
+        //         const workerBlob = new Blob([`
+        //             onmessage = function(e) {
+        //                 try {
+        //                     const { rows, query } = e.data;
+        //                     const queryFunction = new Function("init", \`${query.replaceAll("`", "\\`")};return query_root(init);\`);
+        //                     const result = queryFunction(rows);
+        //                     postMessage(result);
+        //                 } catch (e) {
+        //                     console.warn(e);
+        //                     postMessage({ targets: {}, edgeCounts: {} });
+        //                 }
+        //             }
+        //         `], { type: 'application/javascript' });
+        
+        //         // Create a URL for the Blob
+        //         const workerUrl = URL.createObjectURL(workerBlob);
+                
+        //         // Create a new Worker
+        //         const worker = new Worker(workerUrl);
+        
+        //         // Send the data to the worker
+        //         worker.postMessage({ rows: source.getRows(), query });
+        
+        //         // Listen for the worker's response
+        //         worker.onmessage = (event) => {
+        //             const result = event.data;
+        //             const tables: Record<string, DataTable> = {};
+        //             for (const [id, rows] of Object.entries(result.targets)) {
+        //                 tables[id] = DataTable.fromRows(rows as DataRow[], source.getColumnTypes(), source.getColumnNames());
+        //             }
+        
+        //             // Cleanup the worker
+        //             worker.terminate();
+        //             URL.revokeObjectURL(workerUrl); // Revoke the blob URL
+        //             resolve({ targets: tables, edgeCounts: result.edgeCounts });
+        //         };
+        
+        //         // Handle errors
+        //         worker.onerror = (error) => {
+        //             console.warn(error);
+        //             worker.terminate();
+        //             resolve({ targets: {}, edgeCounts: {} });
+        //         };
+        //     });
+        // }
     },
     generator: new QueryCodeGenerator({
         transformers: [
