@@ -48,6 +48,7 @@
         "remark-gfm": "^4.0.0",
         "remark-math": "^6.0.0",
         "reselect": "^5.1.1",
+        "ses": "^1.11.0",
         "terser": "^5.37.0",
         "unist-util-visit": "^5.0.0"
     },

@@ -8,94 +8,13 @@ import { QueryCodeGenerator } from "../query_code_generator";
 import { minify } from "terser";
 import * as ambient from "@/query/ambient_functions"
 import { ASTSetNodeInput } from "@/query/builder/ast";
-import { DataRow, DataTable } from "@/data/table";
-import { QueryFnReturnType } from "../local_query_runtime";
-import { typeRegistry } from "@/data/type_registry";
+import { JSHardenedRuntime } from "./js_hardened_runtime";
+
+// FIGMA to the rescue https://www.figma.com/blog/how-we-built-the-figma-plugin-system/#attempt-1-the-iframe-sandbox-approach
 
 export const jsQueryClient = createQueryClient({
     mode: "local",
-    runtime: {
-        execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>> {
-            return new Promise((resolve) => {
-                if (source.getColumnCount() === 0 || source.getRowCount() === 0 || query === "") {
-                    resolve({ targets: {}, edgeCounts: {} });
-                    return;
-                }
-                if (!window.Blockly.typeRegistry) window.Blockly.typeRegistry = typeRegistry
-                const rows = source.getRows()
-                
-                try {
-                    // we assume that only one source with the name root is present
-                    const queryFunction = new Function("init", `${query};return query_root(init);`)
-                    const result: QueryFnReturnType<DataRow[]> = queryFunction(rows)
-                    const tables: Record<string, DataTable> = {}
-                    for (const [id, rows] of Object.entries(result.targets)) {
-                        tables[id] = DataTable.fromRows(rows, source.getColumnTypes(), source.getColumnNames())
-                    }
-
-                    resolve({ targets: tables, edgeCounts: result.edgeCounts })
-                    return;
-                } catch (e) {
-                    console.warn(e)
-                    resolve({ targets: {}, edgeCounts: {} });
-                    return;
-                }
-            })
-        }
-        // execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>> {
-        //     return new Promise((resolve) => {
-        //         if (source.getColumnCount() === 0 || source.getRowCount() === 0 || query === "") {
-        //             resolve({ targets: {}, edgeCounts: {} });
-        //             return;
-        //         }
-        
-        //         // Create a Blob representing the worker script
-        //         const workerBlob = new Blob([`
-        //             onmessage = function(e) {
-        //                 try {
-        //                     const { rows, query } = e.data;
-        //                     const queryFunction = new Function("init", \`${query.replaceAll("`", "\\`")};return query_root(init);\`);
-        //                     const result = queryFunction(rows);
-        //                     postMessage(result);
-        //                 } catch (e) {
-        //                     console.warn(e);
-        //                     postMessage({ targets: {}, edgeCounts: {} });
-        //                 }
-        //             }
-        //         `], { type: 'application/javascript' });
-        
-        //         // Create a URL for the Blob
-        //         const workerUrl = URL.createObjectURL(workerBlob);
-                
-        //         // Create a new Worker
-        //         const worker = new Worker(workerUrl);
-        
-        //         // Send the data to the worker
-        //         worker.postMessage({ rows: source.getRows(), query });
-        
-        //         // Listen for the worker's response
-        //         worker.onmessage = (event) => {
-        //             const result = event.data;
-        //             const tables: Record<string, DataTable> = {};
-        //             for (const [id, rows] of Object.entries(result.targets)) {
-        //                 tables[id] = DataTable.fromRows(rows as DataRow[], source.getColumnTypes(), source.getColumnNames());
-        //             }
-        
-        //             // Cleanup the worker
-        //             worker.terminate();
-        //             URL.revokeObjectURL(workerUrl); // Revoke the blob URL
-        //             resolve({ targets: tables, edgeCounts: result.edgeCounts });
-        //         };
-        
-        //         // Handle errors
-        //         worker.onerror = (error) => {
-        //             console.warn(error);
-        //             worker.terminate();
-        //             resolve({ targets: {}, edgeCounts: {} });
-        //         };
-        //     });
-        // }
-    },
+    runtime: new JSHardenedRuntime(),
     generator: new QueryCodeGenerator({
         transformers: [
             // Equals Operation
@@ -171,7 +90,7 @@ export const jsQueryClient = createQueryClient({
                     }
 
                     if (!(astNode.args.operator.replaceAll("\"", "") in operators)) {
-                        throw new Error(`Unknown operator: ${astNode.args.operator.replaceAll("\"", "") }`)
+                        throw new Error(`Unknown operator: ${astNode.args.operator.replaceAll("\"", "")}`)
                     }
 
                     return `(${astNode.args.a} ${operators[astNode.args.operator.replaceAll("\"", "") as keyof typeof operators]} ${astNode.args.b})`
@@ -189,7 +108,7 @@ export const jsQueryClient = createQueryClient({
                     }
 
                     if (!(astNode.args.operator.replaceAll("\"", "") in operators)) {
-                        throw new Error(`Unknown operator: ${astNode.args.operator.replaceAll("\"", "") }`)
+                        throw new Error(`Unknown operator: ${astNode.args.operator.replaceAll("\"", "")}`)
                     }
 
                     return `compareDates("${operators[astNode.args.operator.replaceAll("\"", "") as keyof typeof operators]}", ${astNode.args.a}, ${astNode.args.b})`
@@ -248,7 +167,7 @@ export const jsQueryClient = createQueryClient({
                     }
                 }
             }),
-            
+
             createOperationTransformer({
                 operation: "list_length",
                 args: { list: t.list(t.nullable(t.wildcard)) },
@@ -366,9 +285,9 @@ export const jsQueryClient = createQueryClient({
                         return {
                             targets: {${targets.map(target => `"${target.attributes.targetId}": ${processInputs(target.inputs?.["input"])}`).join(", ")}},
                             edgeCounts: {${Array.from(edgeSetMap.entries()).map(([key, value]) => `"${key}": count(${processInputs([{
-                                connectedSetId: value.sourceBlock.attributes.id,
-                                connectionPoint: value.sourceField
-                            }])})`).join(", ")}}
+                        connectedSetId: value.sourceBlock.attributes.id,
+                        connectionPoint: value.sourceField
+                    }])})`).join(", ")}}
                         }
                     }`
                 }
