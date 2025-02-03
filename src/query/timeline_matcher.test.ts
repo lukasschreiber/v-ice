@@ -2,7 +2,7 @@
 import { expect, test } from "vitest"
 import { EventOp, SkipOp, TimeUnit, Timeline, TimelineTemplate } from "./generation/timeline_templates"
 import ts from "typescript"
-import ambientRaw from "@/generation/timeline_matcher?raw"
+import ambientRaw from "@/query/timeline_matcher?raw"
 import * as ambient from "@/query/timeline_matcher"
 import "@/window"
 

@@ -1,3 +1,11 @@
+import "ses"
+
+// @ts-ignore
+if (!Object.isFrozen({}.__proto__) && !process.env.NODE_ENV === "test") {
+    lockdown()
+    console.log("Lockdown is enabled")
+}
+
 import "./index.css"
 
 import "@/window"
@@ -45,7 +53,6 @@ import "@/blocks/mutators/struct_property_select"
 import "@/blocks/mutators/math_is_divisibleby"
 import "@/blocks/mutators/event_does_not_occur_for"
 import "@/blocks/mutators/list_any_all"
-import "ses"
 
 import { BlockLinesDefinition, RegistrableBlock, createBlock } from "@/blocks/block_definitions"
 import * as MathBlocks from "@/blocks/definitions/math"
@@ -87,8 +94,6 @@ import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox"
 import { jsQueryClient } from "./query/clients/javascript/js_query_client"
 import { selectSourceDataTable, setSourceTable } from "./store/data/source_table_slice"
 import { subscribe } from "./store/subscribe"
-
-lockdown()
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `VICEProvider`.

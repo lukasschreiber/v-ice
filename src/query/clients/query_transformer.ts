@@ -3,11 +3,17 @@ import { IType, ValueOf } from "@/data/types"
 
 export enum TransformerKind {
     QueryFunction = "query_function",
+    Alias = "alias",
 }
 
 export interface IQueryTransformerDefinition {
     kind: ASTNodeKind | TransformerKind
     transformer: QueryTransformerForNode | QueryFunctionTransformer
+}
+
+export interface AliasTransformerDefinition extends IQueryTransformerDefinition {
+    kind: TransformerKind.Alias
+    alias: string
 }
 
 export interface OperationNodeQueryTransformerDefinition<A extends {[key: string]: IType}> extends IQueryTransformerDefinition {
@@ -34,7 +40,7 @@ export interface QueryFunctionTransformerDefinition extends IQueryTransformerDef
     transformer: QueryFunctionTransformer
 }
 
-export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition<any> | SetNodeQueryTransformerDefinition | QueryFunctionTransformerDefinition
+export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition<any> | SetNodeQueryTransformerDefinition | QueryFunctionTransformerDefinition | AliasTransformerDefinition
 
 export type QueryTransformerForOperationNode<A extends {[key: string]: IType}> = (astNode: ASTOperationNode & {
     args: { [K in keyof A]: string }

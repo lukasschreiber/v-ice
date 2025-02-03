@@ -1,16 +1,14 @@
-import { createQueryClient } from "../query_client_build";
-import { createOperationTransformer, createPrimitiveTransformer, createQueryFunctionTransformer, createSubsetTransformer } from "../query_transformer";
+import { createQueryClient } from "@/query/clients/query_client_build";
+import { createOperationTransformer, createPrimitiveTransformer, createQueryFunctionTransformer, createSubsetTransformer } from "@/query/clients/query_transformer";
 import t from "@/data/types"
 import prettier from "prettier";
 import babelParser from "prettier/plugins/babel"
 import estree from "prettier/plugins/estree"
-import { QueryCodeGenerator } from "../query_code_generator";
+import { QueryCodeGenerator } from "@/query/clients/query_code_generator";
 import { minify } from "terser";
 import * as ambient from "@/query/ambient_functions"
 import { ASTSetNodeInput } from "@/query/builder/ast";
-import { JSHardenedRuntime } from "./js_hardened_runtime";
-
-// FIGMA to the rescue https://www.figma.com/blog/how-we-built-the-figma-plugin-system/#attempt-1-the-iframe-sandbox-approach
+import { JSHardenedRuntime } from "@/query/clients/javascript/js_hardened_runtime";
 
 export const jsQueryClient = createQueryClient({
     mode: "local",

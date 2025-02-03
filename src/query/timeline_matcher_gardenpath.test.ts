@@ -3,7 +3,7 @@ import "@/window"
 import { beforeAll, expect, test } from "vitest"
 import weather from "@/assets/data/weather.json"
 import { EventOp, SkipOp, TimeUnit, Timeline, TimelineTemplate } from "./generation/timeline_templates"
-import { DataTable, TableSaveFile } from "@/main"
+import { DataTable, TableSaveFile } from "@/data/table"
 import { StructFields } from "@/data/types"
 
 let weatherTable: DataTable
