@@ -218,13 +218,12 @@ export function Canvas(props: CanvasProps) {
         const workspace = workspaceRef.current;
         if (!workspace) return;
 
-        // this has been deserialized after running the query and is now serialized again... maybe we can take a shortcut from rows to json
         new Promise<void>(async (resolve) => {
             if (!queryClient) {
                 resolve();
                 return;
             }
-            const result = await queryClient.execute(code, source);
+            const result = await queryClient.execute(code);
             const normalized: Record<string, NormalizedDataTable> = {};
             for (const [id, table] of Object.entries(result.targets)) {
                 normalized[id] = table.toNormalizedTable();
@@ -241,16 +240,23 @@ export function Canvas(props: CanvasProps) {
             }
         });
 
+        let finishedLoading = false;
+
         function saveCode(e: Blockly.Events.Abstract | null = null) {
             if (
                 (e?.type === Blockly.Events.BLOCK_MOVE &&
-                    !(e as Blockly.Events.BlockMove).reason?.includes("connect")) ||
-                e?.type === Blockly.Events.VIEWPORT_CHANGE
+                    !(e as Blockly.Events.BlockMove).reason?.includes("connect")) 
+                    || e?.type === Blockly.Events.VIEWPORT_CHANGE 
+                    // || (!finishedLoading && e?.type !== Blockly.Events.FINISHED_LOADING)
             )
                 return;
 
+            if (e?.type === Blockly.Events.FINISHED_LOADING) {
+                finishedLoading = true;
+            }
+
             const ast = getASTBuilderInstance().build(workspace!);
-            if (queryClient && debuggingOptions.code) {
+            if (queryClient) {
                 queryClient
                     .generateCode(ast ?? "")
                     .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
@@ -269,11 +275,9 @@ export function Canvas(props: CanvasProps) {
             }
         }
 
-        if (debuggingOptions.code || debuggingOptions.ast) {
-            saveCode();
-            workspace.addChangeListener(saveCode);
-            return () => workspace.removeChangeListener(saveCode);
-        }
+        saveCode();
+        workspace.addChangeListener(saveCode);
+        return () => workspace.removeChangeListener(saveCode);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [source, code, debuggingOptions]);

@@ -13,7 +13,7 @@ export abstract class QueryClient {
         this.mode = params.mode;
     }
 
-    public abstract execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>>
+    public abstract execute(query: string): Promise<QueryFnReturnType<DataTable>>
 
     public abstract generateCode(ast: AST): Promise<string>
 }

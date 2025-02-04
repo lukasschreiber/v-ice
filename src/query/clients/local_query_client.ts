@@ -14,15 +14,29 @@ export interface LocalQueryClientParams extends QueryClientParams<"local"> {
 export class LocalQueryClient extends QueryClient {
     protected runtime: LocalQueryRuntime;
     protected generator: QueryCodeGenerator;
+    protected initialized: boolean = false;
 
     constructor(params: LocalQueryClientParams) {
         super(params);
         this.runtime = params.runtime;
         this.generator = params.generator;
+
+        this.runtime.initialize().then(() => {
+            this.initialized = true;
+        });
     }
 
-    public async execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>> {
-        return this.runtime.execute(query, source);
+    public async execute(query: string): Promise<QueryFnReturnType<DataTable>> {
+        if (!this.initialized) {
+            await this.runtime.initialize();
+            this.initialized = true;
+        }
+
+        return this.runtime.execute(query);
+    }
+
+    public dispose() {
+        this.runtime.dispose();
     }
 
     public verifyCode(query: string): Promise<boolean> {

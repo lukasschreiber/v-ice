@@ -8,13 +8,13 @@ import { QueryCodeGenerator } from "@/query/clients/query_code_generator";
 import { minify } from "terser";
 import * as ambient from "@/query/ambient_functions"
 import { ASTSetNodeInput } from "@/query/builder/ast";
-import { JSHardenedRuntime } from "@/query/clients/javascript/js_hardened_runtime";
 // import { JSSimpleRuntime } from "./js_simple_runtime";
-// import { JSHardenedRuntime } from "./js_hardened_runtime";
+import { JSWorkerRuntime } from "./js_worker_runtime";
+// import { JSSecureRuntime } from "./js_secure_runtime";
 
 export const jsQueryClient = createQueryClient({
     mode: "local",
-    runtime: new JSHardenedRuntime(),
+    runtime: new JSWorkerRuntime(),
     generator: new QueryCodeGenerator({
         transformers: [
             // Equals Operation

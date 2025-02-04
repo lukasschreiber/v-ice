@@ -3,14 +3,15 @@ import { LocalQueryRuntime, QueryFnReturnType } from "../local_query_runtime";
 import { typeRegistry } from "@/data/type_registry";
 
 export class JSSimpleRuntime extends LocalQueryRuntime {
-    execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>> {
+
+    execute(query: string): Promise<QueryFnReturnType<DataTable>> {
         return new Promise((resolve) => {
-            if (source.getColumnCount() === 0 || source.getRowCount() === 0 || query === "") {
+            if (!this.source || this.source.columns.length === 0 || this.source.rows.length === 0 || query === "") {
                 resolve({ targets: {}, edgeCounts: {} });
                 return;
             }
             if (!window.Blockly.typeRegistry) window.Blockly.typeRegistry = typeRegistry
-            const rows = source.getRows()
+            const rows = this.source.rows
 
             try {
                 // we assume that only one source with the name root is present
@@ -18,7 +19,7 @@ export class JSSimpleRuntime extends LocalQueryRuntime {
                 const result: QueryFnReturnType<DataRow[]> = queryFunction(rows)
                 const tables: Record<string, DataTable> = {}
                 for (const [id, rows] of Object.entries(result.targets)) {
-                    tables[id] = DataTable.fromRows(rows, source.getColumnTypes(), source.getColumnNames())
+                    tables[id] = DataTable.fromRows(rows, this.source.columns.map(it => it.type), this.source.columns.map(it => it.name));
                 }
 
                 resolve({ targets: tables, edgeCounts: result.edgeCounts })

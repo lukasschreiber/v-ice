@@ -5,10 +5,14 @@ import variant from "#quickjs"
 
 export const QuickJS = await newQuickJSWASMModuleFromVariant(variant)
 
-export class JSHardenedRuntime extends LocalQueryRuntime {
-    execute(query: string, source: DataTable): Promise<QueryFnReturnType<DataTable>> {
+export class JSSecureRuntime extends LocalQueryRuntime {
+    public initialize(): Promise<void> {
+       return super.initialize();
+    }
+
+    execute(query: string): Promise<QueryFnReturnType<DataTable>> {
         return new Promise(async (resolve) => {
-            if (source.getColumnCount() === 0 || source.getRowCount() === 0 || query === "") {
+            if (!this.source || this.source.columns.length === 0 || this.source.rows.length === 0 || query === "") {
                 resolve({ targets: {}, edgeCounts: {} });
                 return; 
             }
@@ -18,7 +22,7 @@ export class JSHardenedRuntime extends LocalQueryRuntime {
                 const wrappedQuery = `
                     (function() {
                         ${query};
-                        return JSON.stringify(query_root(${JSON.stringify(source.getRows())}));
+                        return JSON.stringify(query_root(${JSON.stringify(this.source.rows)}));
                     })();
                 `;
 
@@ -44,7 +48,7 @@ export class JSHardenedRuntime extends LocalQueryRuntime {
                 const tables: Record<string, DataTable> = {};
 
                 for (const [id, rows] of Object.entries(result.targets)) {
-                    tables[id] = DataTable.fromRows(rows, source.getColumnTypes(), source.getColumnNames());
+                    tables[id] = DataTable.fromRows(rows, this.source.columns.map(it => it.type), this.source.columns.map(it => it.name));
                 }
 
                 vm.dispose();
