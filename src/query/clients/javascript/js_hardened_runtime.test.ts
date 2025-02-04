@@ -1,6 +1,5 @@
 import { describe, expect, test } from "vitest";
 import { JSHardenedRuntime } from "./js_hardened_runtime";
-import "ses"
 // import { DataColumn, DataTable } from "@/data/table";
 // import types from "@/data/types";
 

@@ -6,14 +6,22 @@ export const settingsSlice = createSlice({
     name: "settings",
     initialState: {
         settings: getDefaultSettings(getSettingsDefinition()),
-        debugger: false
+        debugger: {
+            code: false,
+            ast: false,
+            blocklyJson: false,
+            blocklyXml: false,
+        }
     },
     reducers: {
         setSettings: (state, action) => {
             state.settings = action.payload
         },
         setDebugger: (state, action) => {
-            state.debugger = action.payload
+            state.debugger.ast = action.payload.ast
+            state.debugger.blocklyJson = action.payload.blocklyJson
+            state.debugger.blocklyXml = action.payload.blocklyXml
+            state.debugger.code = action.payload.code
         }
     }
 })

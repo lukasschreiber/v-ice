@@ -264,7 +264,7 @@ function nameWithoutNullable(type: IType): string {
 export function describe(type: IType, singular: boolean = true, withArticle: boolean = true): string {
     if (singular) {
         if (type.name === "Null") return `${withArticle ? "a " : ""}missing value`;
-        if (isNullable(type)) return `${describe(removeNullable(type), singular, false)} or a missing value`;
+        if (isNullable(type)) return `${describe(removeNullable(type), singular, withArticle)} or a missing value`;
         if (isUnion(type)) return `either ${type.types.map(t => describe(t, true)).join(" or ")}`;
         if (type.name === "Number") return `${withArticle ? "a " : ""}number`;
         if (type.name === "Timestamp") return `${withArticle ? "a " : ""}timestamp`;

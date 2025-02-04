@@ -1,11 +1,3 @@
-import "ses"
-
-// @ts-ignore
-if (!Object.isFrozen({}.__proto__) && !process.env.NODE_ENV === "test") {
-    lockdown()
-    console.log("Lockdown is enabled")
-}
-
 import "./index.css"
 
 import "@/window"
@@ -131,8 +123,8 @@ export function useGeneratedCode() {
         }
 
         timeoutRef.current = setTimeout(() => {
-            if (!debuggerEnabled) {
-                console.warn("You are trying to access the generated code without the debugger enabled. This may not work because the generated code is only available in debug mode.");
+            if (!debuggerEnabled.code || !debuggerEnabled.ast || !debuggerEnabled.blocklyJson || !debuggerEnabled.blocklyXml) {
+                console.warn("Some debugging options are disabled. The generated code may not be up to date.");
             }
             unsubscribe();
         }, 500);

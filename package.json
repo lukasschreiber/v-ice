@@ -26,8 +26,17 @@
         "demo": "cd demos/%npm_config_demo% && npm run dev -- --host",
         "analyze": "vite-bundle-visualizer -c vite.config.ts"
     },
+    "imports": {
+        "#quickjs": {
+            "types": "@jitl/quickjs-wasmfile-release-sync",
+            "browser": "@jitl/quickjs-singlefile-browser-release-sync",
+            "default": "@jitl/quickjs-wasmfile-release-sync"
+        }
+    },
     "dependencies": {
         "@faker-js/faker": "^9.4.0",
+        "@jitl/quickjs-singlefile-browser-release-sync": "^0.31.0",
+        "@jitl/quickjs-wasmfile-release-sync": "^0.31.0",
         "@reduxjs/toolkit": "^2.2.3",
         "acorn": "^8.11.3",
         "blockly": "^11.1.0",
@@ -37,6 +46,7 @@
         "i18next": "^23.10.1",
         "luxon": "^3.4.4",
         "prettier": "^3.4.2",
+        "quickjs-emscripten-core": "^0.31.0",
         "react": "18.2.0",
         "react-dom": "18.2.0",
         "react-draggable": "^4.4.6",
@@ -48,7 +58,6 @@
         "remark-gfm": "^4.0.0",
         "remark-math": "^6.0.0",
         "reselect": "^5.1.1",
-        "ses": "^1.11.0",
         "terser": "^5.37.0",
         "unist-util-visit": "^5.0.0"
     },
@@ -76,6 +85,7 @@
         "vite-plugin-dts": "^4.4.0",
         "vite-plugin-node-polyfills": "^0.2.0",
         "vite-plugin-svgr": "^4.3.0",
+        "vite-plugin-wasm": "^3.4.1",
         "vitest": "^2.1.8"
     },
     "overrides": {

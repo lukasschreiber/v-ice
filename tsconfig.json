@@ -23,6 +23,7 @@
     "types": ["vite-plugin-svgr/client", "node"],
     "paths": {
       "@/*": ["./src/*"],
+      "#quickjs": ["./node_modules/@jitl/quickjs-wasmfile-release-sync/dist/index.d.ts"]
     }
   },
   "include": [

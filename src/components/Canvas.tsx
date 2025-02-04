@@ -77,7 +77,7 @@ export function Canvas(props: CanvasProps) {
         workspace: false,
         variables: false,
     });
-    const debuggingEnabled = useSelector((state) => state.settings.debugger);
+    const debuggingOptions = useSelector((state) => state.settings.debugger);
     const code = useSelector((state) => state.generatedCode.code);
     const astJson = useSelector((state) => state.generatedCode.astJson);
     const source = useSelector(selectSourceDataTable);
@@ -160,7 +160,7 @@ export function Canvas(props: CanvasProps) {
 
             setFeaturesReady((old) => ({ ...old, workspace: true }));
 
-            if (debuggingEnabled) {
+            if (debuggingOptions.blocklyXml || debuggingOptions.blocklyJson) {
                 let lastWorkspaceState: ISerializedWorkspace | undefined = undefined;
                 workspaceRef.current!.addChangeListener((e) => {
                     if (
@@ -183,14 +183,23 @@ export function Canvas(props: CanvasProps) {
 
                     new Promise<void>((resolve) => {
                         // those dispatches should only be called if the user is interested in the data
-                        dispatch(
-                            setJson(
-                                JSON.stringify(Blockly.serialization.workspaces.save(e.getEventWorkspace_()), null, 2)
-                            )
-                        );
-                        dispatch(
-                            setXml(Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(e.getEventWorkspace_())))
-                        );
+                        if (debuggingOptions.blocklyJson) {
+                            dispatch(
+                                setJson(
+                                    JSON.stringify(
+                                        Blockly.serialization.workspaces.save(e.getEventWorkspace_()),
+                                        null,
+                                        2
+                                    )
+                                )
+                            );
+                        }
+
+                        if (debuggingOptions.blocklyXml) {
+                            dispatch(
+                                setXml(Blockly.Xml.domToPrettyText(Blockly.Xml.workspaceToDom(e.getEventWorkspace_())))
+                            );
+                        }
 
                         resolve();
                     });
@@ -241,7 +250,7 @@ export function Canvas(props: CanvasProps) {
                 return;
 
             const ast = getASTBuilderInstance().build(workspace!);
-            if (queryClient) {
+            if (queryClient && debuggingOptions.code) {
                 queryClient
                     .generateCode(ast ?? "")
                     .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
@@ -255,19 +264,19 @@ export function Canvas(props: CanvasProps) {
 
             const astJsonCode = JSON.stringify(ast, null, 2);
 
-            if (astJson !== astJsonCode) {
+            if (astJson !== astJsonCode && debuggingOptions.ast) {
                 dispatch(setASTJson(astJsonCode));
             }
         }
 
-        if (debuggingEnabled) {
+        if (debuggingOptions.code || debuggingOptions.ast) {
             saveCode();
             workspace.addChangeListener(saveCode);
             return () => workspace.removeChangeListener(saveCode);
         }
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [source, code]);
+    }, [source, code, debuggingOptions]);
 
     useEffect(() => {
         function handleToolboxResize(event: UIEvent) {

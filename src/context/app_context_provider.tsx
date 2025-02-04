@@ -7,10 +7,20 @@ import { HelpProvider } from "../context/manual/manual_context";
 import { setDebugger } from "./settings/settings_slice";
 import React, { useEffect } from "react";
 
-export function ApplicationContextProvider(props: React.ComponentPropsWithoutRef<"div"> & {debug?: boolean}) {
+export function ApplicationContextProvider(props: React.ComponentPropsWithoutRef<"div"> & {debug?: {
+    ast: boolean;
+    blocklyJson: boolean;
+    blocklyXml: boolean;
+    code: boolean;
+}}) {
 
     useEffect(() => {
-        store.dispatch(setDebugger(props.debug ?? false));
+        store.dispatch(setDebugger(props.debug ?? {
+            ast: false,
+            blocklyJson: false,
+            blocklyXml: false,
+            code: false
+        }));
     }, [props.debug]);
 
     return (

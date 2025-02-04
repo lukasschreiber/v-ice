@@ -25,6 +25,7 @@ export class QueryCodeGenerator {
     }
 
     public generateCode(ast: AST): Promise<string> {
+        console.log("generateCode")
         return new Promise((resolve) => {
             const clonedAST: AST = JSON.parse(JSON.stringify(ast))
             // each set can have one or more (named) inputs
