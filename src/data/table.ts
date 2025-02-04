@@ -245,7 +245,7 @@ export class DataTable {
     }
 
     /**
-     * Get a row by index.
+     * Get a row index.
      * @param index Index of the row to get
      * @returns The internal index at the specified positional row index 
      */
