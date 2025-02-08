@@ -13,7 +13,6 @@ import { SettingsModal } from "@/components/SettingsModal";
 import { setBlocklyLocale } from "@/i18n";
 import { setJson, setXml, setCode, setASTJson } from "@/store/code/generated_code_slice";
 import { useDispatch, useSelector } from "@/store/hooks";
-import { NormalizedDataTable } from "@/data/table";
 import { useSettingsHandlers } from "./hooks/useSettingsHandlers";
 import { Blocks } from "@/blocks";
 import { WorkspaceContext } from "@/context/workspace_context";
@@ -43,6 +42,7 @@ import { LocalQueryClient } from "@/query/clients/local_query_client";
 import { NodeBlock } from "@/blocks/extensions/node";
 import { selectSourceDataTable } from "@/store/data/source_table_slice";
 import { setResultTables } from "@/store/data/result_tables_slice";
+import { NormalizedFitleredDataTable } from "@/data/filtered_table";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -224,7 +224,7 @@ export function Canvas(props: CanvasProps) {
                 return;
             }
             const result = await queryClient.execute(code);
-            const normalized: Record<string, NormalizedDataTable> = {};
+            const normalized: Record<string, NormalizedFitleredDataTable> = {};
             for (const [id, table] of Object.entries(result.targets)) {
                 normalized[id] = table.toNormalizedTable();
             }
@@ -240,20 +240,13 @@ export function Canvas(props: CanvasProps) {
             }
         });
 
-        let finishedLoading = false;
-
         function saveCode(e: Blockly.Events.Abstract | null = null) {
             if (
                 (e?.type === Blockly.Events.BLOCK_MOVE &&
                     !(e as Blockly.Events.BlockMove).reason?.includes("connect")) 
                     || e?.type === Blockly.Events.VIEWPORT_CHANGE 
-                    // || (!finishedLoading && e?.type !== Blockly.Events.FINISHED_LOADING)
             )
                 return;
-
-            if (e?.type === Blockly.Events.FINISHED_LOADING) {
-                finishedLoading = true;
-            }
 
             const ast = getASTBuilderInstance().build(workspace!);
             if (queryClient) {

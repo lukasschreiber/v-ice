@@ -9,12 +9,12 @@ import { minify } from "terser";
 import * as ambient from "@/query/ambient_functions"
 import { ASTSetNodeInput } from "@/query/builder/ast";
 // import { JSSimpleRuntime } from "./js_simple_runtime";
-import { JSWorkerRuntime } from "./js_worker_runtime";
-// import { JSSecureRuntime } from "./js_secure_runtime";
+// import { JSWorkerRuntime } from "./js_worker_runtime";
+import { JSSecureRuntime } from "./js_secure_runtime";
 
 export const jsQueryClient = createQueryClient({
     mode: "local",
-    runtime: new JSWorkerRuntime(),
+    runtime: new JSSecureRuntime(),
     generator: new QueryCodeGenerator({
         transformers: [
             // Equals Operation

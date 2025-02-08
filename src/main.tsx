@@ -171,7 +171,7 @@ export function useQuery() {
 
     const getQueryResultById = (id: string) => {
         const normalizedTable = resultTables[id];
-        return normalizedTable ? DataTable.fromNormalizedTable(normalizedTable) : null;
+        return normalizedTable ? querySource.createFilteredView(normalizedTable.indices) : null;
     };
 
     return {

@@ -6,6 +6,7 @@ import { TypePredictor } from "./type_predictor";
 import { InvalidColumnValueAddedError } from "./exception";
 import { IHierarchyDefinition } from "./hierarchy";
 import { EnumDefinition } from "./type_registry";
+import { FilteredDataTable } from "./filtered_table";
 
 export interface NormalizedDataTable {
     columns: {name: string, type: IType}[];
@@ -36,6 +37,33 @@ export interface CsvOptions {
     columnTypes: ColumnTypes
     columnNames: string[]
     encoding: string
+}
+
+export interface DataTableRead {
+    getColumns(): DataColumn<ColumnType>[]
+    getColumn(index: number): DataColumn<ColumnType> | null
+    getColumnByName(name: string): DataColumn<ColumnType> | null
+    getRow(index: number): IndexedDataRow | null
+    getRows(): IndexedDataRow[]
+    getValue(row: number, column: number): ValueOf<ColumnType> | null
+    getRowCount(): number
+    getColumnCount(): number
+    getColumnTypes(): ColumnType[]
+    getColumnNames(): string[]
+    getIndexColumn(): DataColumn<INumberType>
+}
+
+export interface DataTableWrite {
+    addColumn(column: DataColumn<ColumnType>): void
+    removeColumn(index: number): void
+    addRow(row: DataRow): void
+    removeRow(index: number): void
+    clear(): void
+    setColumnTypes(types: (ColumnType | undefined)[]): void
+    setColumnNames(names: (string | undefined)[]): void
+    sort(comparator: ((a: DataRow, b: DataRow) => number)): void
+    sort(column: string, ascending?: boolean): void
+    sort(columns: string[], ascending?: boolean): void
 }
 
 
@@ -88,7 +116,7 @@ export class DataColumn<T extends ColumnType> {
  * The table can be created from a list of columns or a list of rows.
  * When created from a list of rows, the column types can be inferred or explicitly provided.
  */
-export class DataTable {
+export class DataTable implements DataTableRead, DataTableWrite {
     static readonly indexColumnName_ = "index_" // reserved column name for the index column
     private nextIndex = 0
     protected columns_: DataColumn<ColumnType>[] = [];
@@ -473,6 +501,10 @@ export class DataTable {
         }));
 
         return values.map(row => row.join(options_.delimiter)).join(options_.newLine);
+    }
+
+    createFilteredView(indices: number[]): FilteredDataTable {
+        return new FilteredDataTable(this, indices)
     }
 
     /**

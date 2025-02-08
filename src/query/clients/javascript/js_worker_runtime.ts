@@ -1,46 +1,35 @@
-import { DataTable, DataRow } from "@/data/table";
+import { DataTable } from "@/data/table";
 import { LocalQueryRuntime, QueryFnReturnType } from "../local_query_runtime";
-import QueryWorker from "@/workers/js_query_worker?worker";
+import SimpleQueryWorker from "@/query/workers/js_simple_query_worker?worker";
 import { subscribe } from "@/store/subscribe";
+import { FilteredDataTable } from "@/data/filtered_table";
+import { QueryWorkerInterface } from "@/query/workers/query_worker_interface";
 
 export class JSWorkerRuntime extends LocalQueryRuntime {
-    private worker: Worker | null = null;
+    private worker: QueryWorkerInterface | null = null;
 
     public initialize(): Promise<void> {
-        this.worker = new QueryWorker();
+        this.worker = new QueryWorkerInterface(new SimpleQueryWorker());
         subscribe((state) => state.sourceTable, (value) => {
             this.source = value;
-            this.worker?.postMessage({ action: "set_rows", rows: this.source.rows });
+            this.worker?.setRows(value.rows);
         });
 
         return Promise.resolve();
     }
 
-    execute(query: string): Promise<QueryFnReturnType<DataTable>> {
+    execute(query: string): Promise<QueryFnReturnType<FilteredDataTable>> {
         return new Promise((resolve) => {
             if (!this.worker || !this.source || this.source.columns.length === 0 || this.source.rows.length === 0 || query === "") {
                 resolve({ targets: {}, edgeCounts: {} });
                 return;
             }
 
-            this.worker.postMessage({ action: "run_query", query });
+            const table = DataTable.fromNormalizedTable(this.source);
 
-            this.worker.onmessage = (event) => {
-                const result: QueryFnReturnType<DataRow[]> = event.data;
-                const tables: Record<string, DataTable> = {};
-
-                for (const [id, rows] of Object.entries(result.targets)) {
-                    // We should not actually copy the data, we could just pass the indices
-                    tables[id] = DataTable.fromRows(rows, this.source!.columns.map(it => it.type), this.source!.columns.map(it => it.name));
-                }
-
-                resolve({ targets: tables, edgeCounts: result.edgeCounts });
-            };
-
-            this.worker.onerror = (error) => {
-                console.warn(error);
-                resolve({ targets: {}, edgeCounts: {} });
-            };
+            this.worker.runQuery(table, query).then((result) => {
+                resolve(result);
+            });
         });
     }
 }

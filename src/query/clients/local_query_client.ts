@@ -2,7 +2,7 @@ import { QueryClient, QueryClientParams } from "@/query/clients/query_client";
 import { AST } from "../builder/ast";
 import { LocalQueryRuntime, QueryFnReturnType } from "./local_query_runtime";
 import { QueryCodeGenerator } from "./query_code_generator";
-import { DataTable } from "@/data/table";
+import { FilteredDataTable } from "@/data/filtered_table";
 
 
 export interface LocalQueryClientParams extends QueryClientParams<"local"> {
@@ -26,7 +26,7 @@ export class LocalQueryClient extends QueryClient {
         });
     }
 
-    public async execute(query: string): Promise<QueryFnReturnType<DataTable>> {
+    public async execute(query: string): Promise<QueryFnReturnType<FilteredDataTable>> {
         if (!this.initialized) {
             await this.runtime.initialize();
             this.initialized = true;

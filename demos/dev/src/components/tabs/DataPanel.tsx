@@ -13,7 +13,7 @@ export function DataPanel() {
     const [sortBy, setSortBy] = useState("");
     const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
     const [rowsPerPage, setRowsPerPage] = useState(10);
-    const [highlightOnly, setHighlightOnly] = useState(true);
+    const [highlightOnly, setHighlightOnly] = useState(false);
     const [importModalOpen, setImportModalOpen] = useState(false);
     const [importModalFile, setImportModalFile] = useState<File | undefined>(undefined);
     const [selectedTable, setSelectedTable] = useState<DataTableDefinition | undefined>(undefined);

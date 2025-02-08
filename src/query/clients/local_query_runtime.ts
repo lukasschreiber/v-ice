@@ -1,4 +1,5 @@
-import { DataTable, NormalizedDataTable } from "@/data/table";
+import { FilteredDataTable } from "@/data/filtered_table";
+import { NormalizedDataTable } from "@/data/table";
 import { subscribe } from "@/store/subscribe";
 
 export type QueryFnReturnType<T> = {targets: Record<string, T>, edgeCounts: Record<string, number>}
@@ -12,6 +13,6 @@ export abstract class LocalQueryRuntime {
         });
         return Promise.resolve();
     }
-    public abstract execute(query: string): Promise<QueryFnReturnType<DataTable>>
+    public abstract execute(query: string): Promise<QueryFnReturnType<FilteredDataTable>>
     public dispose(): void {}
 }

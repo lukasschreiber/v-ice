@@ -1,64 +1,35 @@
-import { DataTable, DataRow } from "@/data/table";
+import { DataTable } from "@/data/table";
 import { LocalQueryRuntime, QueryFnReturnType } from "../local_query_runtime";
-import { newQuickJSWASMModuleFromVariant } from "quickjs-emscripten-core"
-import variant from "#quickjs"
-
-export const QuickJS = await newQuickJSWASMModuleFromVariant(variant)
+import SecureQueryWorker from "@/query/workers/js_secure_query_worker?worker";
+import { subscribe } from "@/store/subscribe";
+import { FilteredDataTable } from "@/data/filtered_table";
+import { QueryWorkerInterface } from "@/query/workers/query_worker_interface";
 
 export class JSSecureRuntime extends LocalQueryRuntime {
+    private worker: QueryWorkerInterface | null = null;
+
     public initialize(): Promise<void> {
-       return super.initialize();
+        this.worker = new QueryWorkerInterface(new SecureQueryWorker());
+        subscribe((state) => state.sourceTable, (value) => {
+            this.source = value;
+            this.worker?.setRows(value.rows);
+        });
+
+        return Promise.resolve();
     }
 
-    execute(query: string): Promise<QueryFnReturnType<DataTable>> {
-        return new Promise(async (resolve) => {
-            if (!this.source || this.source.columns.length === 0 || this.source.rows.length === 0 || query === "") {
-                resolve({ targets: {}, edgeCounts: {} });
-                return; 
-            }
-
-            try {
-                const vm = QuickJS.newContext();
-                const wrappedQuery = `
-                    (function() {
-                        ${query};
-                        return JSON.stringify(query_root(${JSON.stringify(this.source.rows)}));
-                    })();
-                `;
-
-                const resultHandle = vm.evalCode(wrappedQuery);
-
-                if (resultHandle.error) {
-                    console.warn(resultHandle.error);
-                    resolve({ targets: {}, edgeCounts: {} });
-                    vm.dispose();
-                    return;
-                }
-                
-                const resultJSON = vm.getString(resultHandle.value);
-
-                if (typeof resultJSON !== "string") {
-                    console.warn("Expected JSON string, but got:", typeof resultJSON);
-                    resolve({ targets: {}, edgeCounts: {} });
-                    vm.dispose();
-                    return;
-                }
-
-                const result: QueryFnReturnType<DataRow[]> = JSON.parse(resultJSON);
-                const tables: Record<string, DataTable> = {};
-
-                for (const [id, rows] of Object.entries(result.targets)) {
-                    tables[id] = DataTable.fromRows(rows, this.source.columns.map(it => it.type), this.source.columns.map(it => it.name));
-                }
-
-                vm.dispose();
-                resolve({ targets: tables, edgeCounts: result.edgeCounts });
-                return;
-            } catch (e) {
-                console.warn(e);
+    execute(query: string): Promise<QueryFnReturnType<FilteredDataTable>> {
+        return new Promise((resolve) => {
+            if (!this.worker || !this.source || this.source.columns.length === 0 || this.source.rows.length === 0 || query === "") {
                 resolve({ targets: {}, edgeCounts: {} });
                 return;
             }
+
+            const table = DataTable.fromNormalizedTable(this.source);
+
+            this.worker.runQuery(table, query).then((result) => {
+                resolve(result);
+            });
         });
     }
 }
