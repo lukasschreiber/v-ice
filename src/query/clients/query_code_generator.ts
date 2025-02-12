@@ -1,9 +1,11 @@
-import { AST, ASTNodeKind, ASTNode, isOperationNode, isPrimitiveNode, isSetNode, ASTSetNode, ASTEdge } from "../builder/ast";
+import { AST, ASTNodeKind, ASTNode, isOperationNode, isPrimitiveNode, isSetNode, ASTSetNode, ASTEdge, ASTOperationNode, ASTPrimitiveNode } from "../builder/ast";
 import { TypeChecker } from "@/data/type_checker";
-import { OperationNodeQueryTransformerDefinition, PrimitiveNodeQueryTransformerDefinition, QueryFunctionTransformer, QueryTransformerDefinition, QueryTransformerForNode, SetNodeQueryTransformerDefinition, TransformerKind } from "./query_transformer";
-import types from "@/data/types";
+import { NodeTransformerFn, OperationNodeQueryTransformerDefinition, PrimitiveNodeQueryTransformerDefinition, QueryTransformerDefinition, QueryTransformerFn, QueryTransformerUtils, SetNodeQueryTransformerDefinition, TransformerKind } from "./query_transformer";
+import types, { IType } from "@/data/types";
 import { traverseASTReverse } from "../builder/ast_traverser";
 import { SerializedEdge } from "@/utils/edges";
+import { convertToEvaluatedAST, eAST, isEvaluatedOperationNode, isEvaluatedSetNode } from "../builder/evaluated_ast";
+import { NameManager } from "./query_name_manager";
 
 export interface QueryGeneratorParams {
     transformers: QueryTransformerDefinition[];
@@ -11,22 +13,26 @@ export interface QueryGeneratorParams {
     verifyCode?: (code: string) => Promise<boolean>;
     optimizeCode?: (code: string) => Promise<string>;
     ambientFunctions?: string[];
+    nameManager?: NameManager;
 }
 
 export class QueryCodeGenerator {
     protected transformers: TransformerIndex;
     protected generatedCodeMap: Map<string, string> = new Map()
+    protected nameManager?: NameManager = undefined
 
     constructor(protected params: QueryGeneratorParams) {
         this.transformers = this.buildTransformerIndex(params.transformers);
         this.formatCode = params.formatCode || this.formatCode
         this.optimizeCode = params.optimizeCode || this.optimizeCode
         this.verifyCode = params.verifyCode || this.verifyCode
+        this.nameManager = params.nameManager
     }
 
     public generateCode(ast: AST): Promise<string> {
+        this.nameManager?.reset()
         return new Promise((resolve) => {
-            const clonedAST: AST = JSON.parse(JSON.stringify(ast))
+            const clonedAST: eAST = convertToEvaluatedAST(JSON.parse(JSON.stringify(ast)))
             // each set can have one or more (named) inputs
             // each input is connected to one or more sets and the connection point is specified
             // Each edge count therefore only contains one distint set
@@ -34,11 +40,11 @@ export class QueryCodeGenerator {
             const setMap: Map<string, ASTSetNode> = new Map()
             traverseASTReverse(clonedAST, {
                 visit: (node) => {
-                    if (isSetNode(node)) {
+                    if (isEvaluatedSetNode(node)) {
                         setMap.set(node.attributes.id, node)
                     }
 
-                    if (isSetNode(node) && node.inputs) {
+                    if (isEvaluatedSetNode(node) && node.inputs) {
                         for (const [name, edges] of Object.entries(node.inputs)) {
                             for (const edge of edges) {
                                 edgeSetMap.set(`${edge.connectedSetId}-${edge.connectionPoint ?? "output"}_${node.attributes.id}-${name}`, {
@@ -51,25 +57,33 @@ export class QueryCodeGenerator {
                         }
                     }
 
-                    if (isSetNode(node) && !node.operations) return;
+                    if (isEvaluatedSetNode(node) && !node.operations) return;
 
                     const transformer = this.getTransformerForNode(node)
-                    if (isOperationNode(node)) {
-                        for (const [name, arg] of Object.entries(node.args)) {
-                            // TODO this is really bad
-                            // @ts-ignore
-                            node.args[name] = this.generatedCodeMap.get(this.getNodeHash(arg))
+                    if (isEvaluatedOperationNode(node)) {
+                        const args = typeof node.args === "function" ? node.args(node) : node.args;
+                        for (const [name, arg] of Object.entries(args)) {
+                            // TODO: check why this is an array here
+                            node.evaluatedArgs[name] = this.generatedCodeMap.get(this.getNodeHash(Array.isArray(arg) ? arg[0] : arg)) || ""
                         }
                     }
 
-                    if (isSetNode(node) && node.operations) {
-                        // @ts-ignore
-                        node.operations = node.operations.map(op => {
+                    if (isEvaluatedSetNode(node) && node.operations) {
+                        node.evaluatedOperations = node.operations.map(op => {
                             return this.generatedCodeMap.get(this.getNodeHash(op)) || ""
                         })
                     }
 
-                    this.generatedCodeMap.set(this.getNodeHash(node), transformer(node))
+                    // TODO: This is a huge hack
+                    const nodeClone = JSON.parse(JSON.stringify(node))
+
+                    if (nodeClone.hasOwnProperty("evaluatedOperations")) {
+                        nodeClone.operations = nodeClone.evaluatedOperations
+                    } else if (nodeClone.hasOwnProperty("evaluatedArgs")) {
+                        nodeClone.args = nodeClone.evaluatedArgs
+                    }
+
+                    this.generatedCodeMap.set(this.getNodeHash(node), transformer(nodeClone, this.getQueryTransformerUtils(node.kind, node)))
                 }
             })
 
@@ -120,21 +134,32 @@ export class QueryCodeGenerator {
         }
     }
 
-    private getQueryFunctionTransformer(): QueryFunctionTransformer | undefined {
-        return this.params.transformers.find(def => def.kind === TransformerKind.QueryFunction)?.transformer as QueryFunctionTransformer | undefined
+    private getQueryFunctionTransformer(): QueryTransformerFn | undefined {
+        return this.params.transformers.find(def => def.kind === TransformerKind.QueryFunction)?.transformer as QueryTransformerFn | undefined
     }
 
-    private getTransformerForNode<K extends ASTNodeKind>(node: ASTNode<K>): QueryTransformerForNode {
-        let transformer: QueryTransformerForNode | null = null
+    private getTransformerForNode<K extends ASTNodeKind, N extends ASTNode<K>>(node: N): NodeTransformerFn<K, N> {
+        let transformer: NodeTransformerFn<K, N> | null = null
+
         if (isOperationNode(node)) {
-            const operation = node.operation
-            transformer = this.transformers[ASTNodeKind.Operation][operation]?.find(def => {
-                return Object.entries(node.args).every(([name, _type]) => {
+            const operation = node.operation;
+            const args = typeof node.args === "function" ? node.args(node) : node.args;
+            
+            const filteredTransformers = (this.transformers[ASTNodeKind.Operation][operation]?.filter(def => {
+                return Object.entries(args).every(([name, child]) => {
+                    const defArgs: Record<string, IType> = typeof def.args === "function" ? def.args(node) : def.args;
+                    if (!(name in defArgs)) return false;
                     // TODO: check type compatibility
-                    return name in def.args
-                })
-            })?.transformer || null
-        }
+                    // @ts-ignore
+                    if (!TypeChecker.checkTypeCompatibility(defArgs[name], types.utils.fromString(child.type))) return false;
+                    return true;
+                });
+            }) || []);
+
+            console.log(operation, filteredTransformers);
+            
+            transformer = (filteredTransformers.length > 0 ? filteredTransformers[0].transformer : null) as NodeTransformerFn<K, N> | null;
+        }        
 
         if (isPrimitiveNode(node)) {
             const eligibleTransformers = this.transformers[ASTNodeKind.Primitive].filter(def => {
@@ -142,7 +167,7 @@ export class QueryCodeGenerator {
             })
 
             if (eligibleTransformers.length === 1) {
-                transformer = eligibleTransformers[0].transformer
+                transformer = eligibleTransformers[0].transformer as NodeTransformerFn<K, N>
             }
 
             // if there are multiple transformers that can handle the node, we choose the one with the most specific type, i.e. the one with the least union types or wildcards
@@ -156,13 +181,13 @@ export class QueryCodeGenerator {
 
             if (eligibleTransformers.length > 1) {
                 console.warn(`Multiple transformers found for node: ${JSON.stringify(node)}, kind: ${node.kind} - choosing the one with the most specific type`)
-                transformer = eligibleTransformers[0].transformer
+                transformer = eligibleTransformers[0].transformer as NodeTransformerFn<K, N>
             }
         }
 
         if (isSetNode(node)) {
             let blockName = "operations" in node ? "subset_node" : "inputs" in node ? "target_node" : "source_node"
-            transformer = this.transformers[ASTNodeKind.Set][blockName]?.transformer || null
+            transformer = (this.transformers[ASTNodeKind.Set][blockName]?.transformer || null) as NodeTransformerFn<K, N> | null
         }
 
         if (!transformer) {
@@ -175,6 +200,48 @@ export class QueryCodeGenerator {
         }
 
         return transformer
+    }
+
+    private getQueryTransformerUtils<NodeKind extends ASTNodeKind>(
+        kind: NodeKind,
+        node: ASTNode<NodeKind>
+    ): QueryTransformerUtils<NodeKind> {
+        switch (kind) {
+            case ASTNodeKind.Set:
+                return {
+                    getName: (name: string) => this.getName(name),
+                    useAlias: (astNode: ASTSetNode) => this.getTransformerForNode(astNode)(astNode, this.getQueryTransformerUtils(ASTNodeKind.Set, astNode)),
+                } as QueryTransformerUtils<NodeKind>;
+    
+            case ASTNodeKind.Operation:
+                const opNode = node as ASTOperationNode;
+                const args = typeof opNode.args === "function" ? opNode.args(opNode) : opNode.args;
+                return {
+                    definition: {
+                        // TODO: check for array
+                        args: Object.entries(args).reduce((acc, [name, child]) => {
+                            // @ts-ignore
+                            acc[name] = types.utils.fromString(child.type)
+                            return acc
+                        }, {} as { [key: string]: IType }),
+                    },
+                    getName: (name: string) => this.getName(name),
+                    useAlias: (astNode: ASTOperationNode, _operation: string, _args: { [key: string]: IType }) => this.getTransformerForNode(astNode)(astNode, this.getQueryTransformerUtils(ASTNodeKind.Operation, astNode)),
+                } as unknown as QueryTransformerUtils<NodeKind>;
+    
+            case ASTNodeKind.Primitive:
+                return {
+                    getName: (name: string) => this.getName(name),
+                    useAlias: (astNode: ASTPrimitiveNode, _operation: string, _type: IType) => this.getTransformerForNode(astNode)(astNode, this.getQueryTransformerUtils(ASTNodeKind.Primitive, astNode)),
+                } as QueryTransformerUtils<NodeKind>;
+    
+            default:
+                throw new Error(`Unsupported ASTNodeKind: ${kind}`);
+        }
+    }
+
+    protected getName(name: string): string {
+        return this.nameManager?.getUniqueName(name) || name
     }
 
     protected getNodeHash(node: ASTNode<ASTNodeKind>): string {

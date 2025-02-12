@@ -241,39 +241,37 @@ export function Canvas(props: CanvasProps) {
         });
 
         function saveCode(e: Blockly.Events.Abstract | null = null) {
-            if (
-                (e?.type === Blockly.Events.BLOCK_MOVE &&
-                    !(e as Blockly.Events.BlockMove).reason?.includes("connect")) 
-                    || e?.type === Blockly.Events.VIEWPORT_CHANGE 
-            )
-                return;
+            if (e === null) return;
+            // for now we only update code if the action should be undoable, otherwise it is probably batched
+            if (!e.recordUndo) return;
 
-            const ast = getASTBuilderInstance().build(workspace!);
-            if (queryClient) {
-                queryClient
-                    .generateCode(ast ?? "")
-                    .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
-                    .then((code) => (queryClient as LocalQueryClient).formatCode(code))
-                    .then((code) => {
-                        if (code !== astJson) {
-                            dispatch(setCode(code));
-                        }
-                    });
-            }
+            if (workspace && workspace.getTopBlocks().length > 0) {
+                const ast = getASTBuilderInstance().build(workspace);
+                if (queryClient) {
+                    queryClient
+                        .generateCode(ast ?? "")
+                        .then((code) => (queryClient as LocalQueryClient).optimizeCode(code))
+                        .then((code) => (queryClient as LocalQueryClient).formatCode(code))
+                        .then((code) => {
+                            if (code !== astJson) {
+                                dispatch(setCode(code));
+                            }
+                        });
+                }
 
-            const astJsonCode = JSON.stringify(ast, null, 2);
+                const astJsonCode = JSON.stringify(ast, null, 2);
 
-            if (astJson !== astJsonCode && debuggingOptions.ast) {
-                dispatch(setASTJson(astJsonCode));
+                if (astJson !== astJsonCode && debuggingOptions.ast) {
+                    dispatch(setASTJson(astJsonCode));
+                }
             }
         }
 
-        saveCode();
         workspace.addChangeListener(saveCode);
         return () => workspace.removeChangeListener(saveCode);
 
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [source, code, debuggingOptions]);
+    }, [source, code, debuggingOptions, queryClient]);
 
     useEffect(() => {
         function handleToolboxResize(event: UIEvent) {

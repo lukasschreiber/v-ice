@@ -13,13 +13,15 @@ export enum ASTArgumentKind {
     StatementInput = "StatementInput"
 }
 
+export type ArgumentsDefinitionFn<R, A extends { [key: string]: R }> = (astNode: ASTOperationNode) => A
+
 export interface AST {
     root: ASTSetNode
     sets: ASTSetNode[]
     targets: ASTSetNode[]
 }
 
-export interface ASTNode<K extends ASTNodeKind> {
+export interface ASTNodeBase<K extends ASTNodeKind> {
     kind: K
 }
 
@@ -30,7 +32,7 @@ export interface ASTEdge {
     targetField: string
 }
 
-export interface ASTSetNode extends ASTNode<ASTNodeKind.Set> {
+export interface ASTSetNode extends ASTNodeBase<ASTNodeKind.Set> {
     inputs?: Record<string, ASTSetNodeInput[]>
     operations?: ASTOperationNode[]
     attributes: {
@@ -39,17 +41,19 @@ export interface ASTSetNode extends ASTNode<ASTNodeKind.Set> {
     }
 }
 
-export interface ASTOperationNode extends ASTNode<ASTNodeKind.Operation> {
+export interface ASTOperationNode extends ASTNodeBase<ASTNodeKind.Operation> {
     operation: string
     type: string | null
-    argKinds: Record<string, ASTNodeKind>
-    args: Record<string, ASTOperationNode | ASTPrimitiveNode | ASTOperationNode[]>
+    // argKinds: Record<string, ASTNodeKind>
+    args: Record<string, ASTOperationNode | ASTPrimitiveNode | ASTOperationNode[]> | ArgumentsDefinitionFn<ASTOperationNode | ASTPrimitiveNode | ASTOperationNode[], Record<string, ASTOperationNode | ASTPrimitiveNode | ASTOperationNode[]>>
 }
 
-export interface ASTPrimitiveNode extends ASTNode<ASTNodeKind.Primitive> {
+export interface ASTPrimitiveNode extends ASTNodeBase<ASTNodeKind.Primitive> {
     value: JSONSerializable
     type: string | null
 }
+
+export type ASTNode<K extends ASTNodeKind> = K extends ASTNodeKind.Set ? ASTSetNode : K extends ASTNodeKind.Operation ? ASTOperationNode : ASTPrimitiveNode
 
 export interface ASTSetNodeInput {
     connectedSetId: string
@@ -62,23 +66,23 @@ export interface JSONSerializableRecord {
 }
 export type JSONSerializable = JSONSerializablePrimitive | JSONSerializableRecord | JSONSerializablePrimitive[] | JSONSerializableRecord[]
 
-export function isNodeWithKind<T extends ASTNode<ASTNodeKind>>(node: object): node is T {
+export function isNodeWithKind<T extends ASTNodeBase<ASTNodeKind>>(node: object): node is T {
     return node.hasOwnProperty("kind")
 }
 
-export function isSetNode(node: ASTNode<ASTNodeKind>): node is ASTSetNode {
+export function isSetNode(node: ASTNodeBase<ASTNodeKind>): node is ASTSetNode {
     return node.kind === ASTNodeKind.Set
 }
 
-export function isOperationNode(node: ASTNode<ASTNodeKind>): node is ASTOperationNode {
+export function isOperationNode(node: ASTNodeBase<ASTNodeKind>): node is ASTOperationNode {
     return node.kind === ASTNodeKind.Operation
 }
 
-export function isPrimitiveNode(node: ASTNode<ASTNodeKind>): node is ASTPrimitiveNode {
+export function isPrimitiveNode(node: ASTNodeBase<ASTNodeKind>): node is ASTPrimitiveNode {
     return node.kind === ASTNodeKind.Primitive
 }
 
-export function isASTNode(node: any): node is ASTNode<ASTNodeKind> {
+export function isASTNode(node: any): node is ASTNodeBase<ASTNodeKind> {
     if (node === null || typeof node !== "object") {
         return false
     }
@@ -86,7 +90,7 @@ export function isASTNode(node: any): node is ASTNode<ASTNodeKind> {
     return isOperationNode(node) || isSetNode(node) || isPrimitiveNode(node)
 }
 
-export function isNodeWithType<T extends ASTNode<ASTNodeKind>>(node: T): node is T & { type: string | null } {
+export function isNodeWithType<T extends ASTNodeBase<ASTNodeKind>>(node: T): node is T & { type: string | null } {
     return node.hasOwnProperty("type")
 }
 
@@ -97,33 +101,12 @@ export function createASTNode<
     T extends (K extends ASTNodeKind.Set ? ASTSetNode : K extends ASTNodeKind.Operation ? ASTOperationNode : ASTPrimitiveNode)
 >(
     kind: K,
-    definition: B | null,
+    _definition: B | null,
     attributes: Omit<T, "kind" | "argKinds" | (T extends { type: string | null } ? "type" : never)> & (T extends { type: string | null } ? { type: string | IType | null } : {})
   ): T {
     const type = (attributes as any).type
     if (types.utils.isType(type)) {
         (attributes as any).type = types.utils.toString(type)
-    }
-
-    if (kind === ASTNodeKind.Operation && definition) {
-        const argKinds: Record<string, ASTArgumentKind> = {}
-        for (const line of definition.lines) {
-            for (const arg of line.args) {
-                if (arg.type === "input_statement") {
-                    argKinds[arg.name] = ASTArgumentKind.StatementInput
-                } else if (arg.type.startsWith("field")) {
-                    argKinds[arg.name] = ASTArgumentKind.Field
-                } else if (arg.type.startsWith("input_")) {
-                    argKinds[arg.name] = ASTArgumentKind.Input
-                }
-            }
-        }
-
-        return {
-            kind,
-            argKinds,
-            ...attributes
-        } as unknown as T
     }
    
     return {

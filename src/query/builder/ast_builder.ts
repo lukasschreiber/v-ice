@@ -3,9 +3,10 @@ import { Blocks } from "@/blocks";
 import { bfsWithDependencies } from "@/utils/nodes";
 import { NodeBlock } from "@/blocks/extensions/node";
 import { AnyRegistrableBlock, BlockFieldNames, BlockInputNames, BlockLinesDefinition, ConnectionPointNames, StatementInputTypeNames } from "@/blocks/block_definitions";
-import { AST, ASTNodeKind, ASTOperationNode, ASTPrimitiveNode, ASTSetNode, ASTSetNodeInput, createASTNode } from "./ast";
+import { AST, ASTNodeKind, ASTOperationNode, ASTPrimitiveNode, ASTSetNode, ASTSetNodeInput, createASTNode, isPrimitiveNode } from "./ast";
 import types, { IType } from "@/data/types";
 import { isTypedField } from "@/blocks/fields/field";
+import { traverseAST } from "./ast_traverser";
 
 type BuildFn<B extends Blockly.Block, S extends ScopeASTBuilder<B>, R extends ASTSetNode | ASTOperationNode | ASTPrimitiveNode> = (scope: S) => R
 
@@ -33,6 +34,22 @@ export class ASTBuilder {
         this.definitions[name] = definition
     }
 
+    public isValid(ast: AST): boolean {
+        // every value and type must be defined
+        let valid: boolean = true
+        traverseAST(ast, {
+            visit: node => {
+                if (isPrimitiveNode(node)) {
+                    if (node.value === null || node.type === null) {
+                        valid = false
+                    }
+                }
+            }
+        })
+
+        return valid
+    }
+
     public build(workspace: Blockly.Workspace): AST {
         const root = workspace.getBlocksByType(Blocks.Names.NODE.SOURCE)?.[0]
         if (!root) {
@@ -48,7 +65,7 @@ export class ASTBuilder {
             return this.emptyAST()
         }
 
-        return {
+        const ast: AST = {
             root: {
                 kind: ASTNodeKind.Set,
                 attributes: {
@@ -59,6 +76,12 @@ export class ASTBuilder {
             sets: subsetBlocks.map(block => this.buildASTForNode(block)),
             targets: targetBlocks.map(block => this.buildASTForNode(block))
         }
+
+        if (!this.isValid(ast)) {
+            return this.emptyAST()
+        }
+
+        return ast
     }
 
     public emptyAST(): AST {
@@ -134,7 +157,7 @@ export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegist
         }
 
         let type = isTypedField(field) ? field.getOutputType() : null
-        
+
         if (overrideType) {
             type = types.utils.isType(overrideType) ? overrideType : types.utils.fromString(overrideType)
         }

@@ -1,6 +1,6 @@
 import { createQueryClient } from "@/query/clients/query_client_build";
 import { createOperationTransformer, createPrimitiveTransformer, createQueryFunctionTransformer, createSubsetTransformer } from "@/query/clients/query_transformer";
-import t from "@/data/types"
+import t, { IBooleanType } from "@/data/types"
 import prettier from "prettier";
 import babelParser from "prettier/plugins/babel"
 import estree from "prettier/plugins/estree"
@@ -11,6 +11,7 @@ import { ASTSetNodeInput } from "@/query/builder/ast";
 // import { JSSimpleRuntime } from "./js_simple_runtime";
 // import { JSWorkerRuntime } from "./js_worker_runtime";
 import { JSSecureRuntime } from "./js_secure_runtime";
+import { NameManager } from "../query_name_manager";
 
 export const jsQueryClient = createQueryClient({
     mode: "local",
@@ -20,47 +21,53 @@ export const jsQueryClient = createQueryClient({
             // Equals Operation
             createOperationTransformer({
                 operation: "equals",
-                args: { a: t.union(t.number, t.string, t.boolean), b: t.union(t.number, t.string, t.boolean) },
-                transformer: (astNode) => `(${astNode.args.a} === ${astNode.args.b})`
+                args: { a: t.nullable(t.union(t.number, t.string, t.boolean, t.enum(t.wildcard), t.hierarchy(t.wildcard))), b: t.nullable(t.union(t.number, t.string, t.boolean, t.enum(t.wildcard), t.hierarchy(t.wildcard))) },
+                transformer: (astNode, utils) => {
+                    console.log(utils.definition.args)
+                    return `(${astNode.args.a} === ${astNode.args.b})`
+                }
             }),
             createOperationTransformer({
                 operation: "equals",
-                args: { a: t.list(t.wildcard), b: t.list(t.wildcard) },
+                args: { a: t.nullable(t.list(t.wildcard)), b: t.nullable(t.list(t.wildcard)) },
                 transformer: (astNode) => `(${astNode.args.a}.length === ${astNode.args.b}.length && (${astNode.args.a}).every((v, i) => v === (${astNode.args.b})[i]))`
             }),
             createOperationTransformer({
                 operation: "equals",
-                args: { a: t.struct(t.wildcard), b: t.struct(t.wildcard) },
+                args: { a: t.nullable(t.struct(t.wildcard)), b: t.nullable(t.struct(t.wildcard)) },
                 transformer: (astNode) => `Object.keys(${astNode.args.a}).length === Object.keys(${astNode.args.b}).length && Object.keys(${astNode.args.a}).every(key => (${astNode.args.b}).hasOwnProperty(key) && (${astNode.args.a})[key] === (${astNode.args.b})[key]) && Object.keys(${astNode.args.b}).every(key => (${astNode.args.a}).hasOwnProperty(key) && (${astNode.args.a})[key] === (${astNode.args.b})[key])`
             }),
             createOperationTransformer({
                 operation: "equals",
-                args: { a: t.timestamp, b: t.timestamp },
-                transformer: (astNode) => `compareDates("equals", ${astNode.args.a}, ${astNode.args.b})`
+                args: { a: t.nullable(t.timestamp), b: t.nullable(t.timestamp) },
+                transformer: (astNode) => {
+                    if (astNode.args.a === null || astNode.args.b === null) return `${astNode.args.a} === ${astNode.args.b}`
+                    return `compareDates("equals", ${astNode.args.a}, ${astNode.args.b})`
+                }
             }),
 
             // Matches Operation
             createOperationTransformer({
                 operation: "matches",
-                args: { a: t.struct(t.wildcard), b: t.struct(t.wildcard) },
+                args: { a: t.nullable(t.struct(t.wildcard)), b: t.nullable(t.struct(t.wildcard)) },
                 transformer: (astNode) => `Object.keys(${astNode.args.a}).length >= Object.keys(${astNode.args.b}).length && Object.keys(${astNode.args.b}).every(key => (${astNode.args.a}).hasOwnProperty(key) && (${astNode.args.a})[key] === (${astNode.args.b})[key])`
             }),
             createOperationTransformer({
                 operation: "matches",
-                args: { a: t.hierarchy(t.wildcard), b: t.hierarchy(t.wildcard) },
+                args: { a: t.nullable(t.hierarchy(t.wildcard)), b: t.nullable(t.hierarchy(t.wildcard)), hierarchy: t.string },
                 transformer: (astNode) => `hierarchyEquals(${astNode.args.a}, ${astNode.args.b}, "${astNode.args.hierarchy}")`
             }),
             createOperationTransformer({
                 operation: "matches",
-                args: { a: t.wildcard, b: t.wildcard },
-                // TODO allow the use of different operation handlers e.g. the handler for equals
-                transformer: (astNode) => `(${astNode.args.a} === ${astNode.args.b})`
+                args: { a: t.nullable(t.wildcard), b: t.nullable(t.wildcard) },
+                transformer: (astNode, utils) => utils.useAlias(astNode, "equals", utils.definition.args)
             }),
 
             createOperationTransformer({
                 operation: "fib",
-                args: { n: t.number },
+                args: { n: t.nullable(t.number) },
                 transformer: (astNode) => {
+                    if (astNode.args.n === null) return `0`
                     return `fib(${astNode.args.n})`
                 }
             }),
@@ -222,6 +229,12 @@ export const jsQueryClient = createQueryClient({
                 }
             }),
 
+            createOperationTransformer<{ [key: `OR_STATEMENT_${number}`]: IBooleanType }>({
+                operation: "or",
+                args: (astNode) => Object.values(astNode.args).reduce((acc, _, i) => ({ ...acc, [`OR_STATEMENT_${i}`]: t.boolean }), {}),
+                transformer: (astNode) => `(${Object.values(astNode.args).join(" || ")})`
+            }),
+
             // Primitive Transformers
             createPrimitiveTransformer({
                 type: t.nullable(t.union(t.number, t.boolean, t.timestamp)),
@@ -245,6 +258,7 @@ export const jsQueryClient = createQueryClient({
             }),
             // TODO: check that always the strictest type is used
 
+            // Get Variable Operation
             createOperationTransformer({
                 operation: "get_variable",
                 args: { name: t.string },
@@ -252,7 +266,8 @@ export const jsQueryClient = createQueryClient({
             }),
 
             createSubsetTransformer({
-                transformer: (astNode) => {
+                transformer: (astNode, utils) => {
+                    console.log(utils.getName(`set_${astNode.attributes.name}`))
                     return `function set_${astNode.attributes.name}(source) {
                     return conditionalSplit(source, p => ${astNode.operations?.join(" && ") || "false"});
                 }`
@@ -327,6 +342,23 @@ export const jsQueryClient = createQueryClient({
             }
             return result.code;
         },
-        ambientFunctions: Object.values(ambient).map((fn) => fn.toString())
+        ambientFunctions: Object.values(ambient).map((fn) => fn.toString()),
+        nameManager: new NameManager([
+            ...Object.keys(ambient),
+            "source",
+            "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do",
+            "else", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof",
+            "new", "return", "super", "switch", "this", "throw", "try", "typeof", "var", "void",
+            "while", "with", "yield",
+            "enum",
+            "implements", "interface", "let", "package", "private", "protected", "public", "static",
+            "await",
+            "null", "true", "false",
+            // Magic variable
+            "arguments",
+            // Everything in the current environment (835 items in Chrome,
+            // 104 in Node).
+            ...Object.getOwnPropertyNames(globalThis),
+        ])
     })
 })

@@ -42,7 +42,7 @@ export const LogicOrBlock = createBlock({
     helpUrl: "#logic-or",
     mutator: EitherOrMutator,
     code: (scope) => {
-        // TODO: This only takes the first inner statement because
+        // TODO: This only takes the first inner statement because - what did I want to say here???
 
         const additionalArgs: { [key: string]: any } = {}
         scope.block.getAdditionalOrBranchInputNames().forEach((name, i) => {
