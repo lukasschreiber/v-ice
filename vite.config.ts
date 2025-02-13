@@ -23,7 +23,7 @@ export default mergeConfig(baseConfig, {
                     react: 'React',
                     'react-dom': 'ReactDOM',
                 })
-            ]
+            ],
         }
     },
     server: {

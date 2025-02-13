@@ -335,7 +335,13 @@ export const MathConstantsBlock = createBlock({
     style: "math_blocks",
     helpUrl: "#math-constants",
     code: (scope) => {
-        return scope.buildASTForField("CONSTANT")
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
+            operation: "constant",
+            type: t.number,
+            args: {
+                constant: scope.buildASTForField("CONSTANT"),
+            }
+        })
     }
 })
 

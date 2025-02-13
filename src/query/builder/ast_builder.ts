@@ -156,7 +156,7 @@ export class BlockASTBuilder<L extends BlockLinesDefinition, D extends AnyRegist
             throw ReferenceError(`Field "${name}" doesn't exist on "${this.block.type}"`);
         }
 
-        let type = isTypedField(field) ? field.getOutputType() : null
+        let type = isTypedField(field) ? field.getOutputType() : types.string
 
         if (overrideType) {
             type = types.utils.isType(overrideType) ? overrideType : types.utils.fromString(overrideType)

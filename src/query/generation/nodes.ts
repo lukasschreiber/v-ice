@@ -1,19 +1,7 @@
 import { Blocks } from "@/blocks"
 import { QueryGenerator, queryGenerator } from "../query_generator"
-import { FieldLabelTargetNode } from "@/blocks/fields/field_label_target_node"
 import { NodeBlock } from "@/blocks/extensions/node"
 import { FieldSetSelection } from "@/blocks/fields/field_set_selection"
-
-queryGenerator.registerNodeBlock(Blocks.Names.NODE.SUBSET, (block, generator) => {
-    const name = block.getFieldValue("NAME")
-    const fields = generator.multilineStatementToCode(block, "FILTERS", " && ").trim()
-    const procedureName = generator.getProcedureName(name)
-    generator.registerFunctionName(block.id, procedureName)
-
-    const input = processEdgeConnectionPoint("INPUT", block, generator)
-
-    return { definition: `function ${procedureName}(${generator.PARAM_NAME}) {\n  return conditionalSplit(${generator.PARAM_NAME}, p => ${fields === "" ? "false" : fields});\n}\n`, invocation: `${procedureName}(${input})` }
-})
 
 queryGenerator.registerNodeBlock(Blocks.Names.NODE.SET_ARITHMETIC, (block, generator) => {
     const name = "Subset"
@@ -25,15 +13,6 @@ queryGenerator.registerNodeBlock(Blocks.Names.NODE.SET_ARITHMETIC, (block, gener
     const selection = (block.getField("SELECTION") as FieldSetSelection).getSelection()
 
     return { definition: `function ${procedureName}(left, right) {\n  return setArithmetic(left, right, ${generator.PARAM_NAME}, [${selection.map(it => `"${it}"`).join(", ")}]);\n}\n`, invocation: `${procedureName}(${left}, ${right})` }
-})
-
-queryGenerator.registerNodeBlock(Blocks.Names.NODE.TARGET, (block, generator) => {
-    const label = block.getField("LABEL") as FieldLabelTargetNode
-
-    const procedureName = generator.getProcedureName(label.getName() ?? "")
-    generator.registerFunctionName(block.id, procedureName)
-
-    return { definition: null, invocation: `${processEdgeConnectionPoint("INPUT", block, generator)}` }
 })
 
 function processEdgeConnectionPoint(inputName: string, block: NodeBlock, generator: QueryGenerator): string {

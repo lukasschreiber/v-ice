@@ -27,7 +27,8 @@ function traverseSetNode(node: ASTSetNode, visitor: ASTVisitor): void {
 
 function traverseOperationNode(node: ASTOperationNode, visitor: ASTVisitor): void {
     visitor.visit(node)
-    Object.values(node.args).forEach(arg => {
+    const args = typeof node.args === 'function' ? node.args(node) : node.args
+    Object.values(args).forEach(arg => {
         if (Array.isArray(arg)) {
             arg.forEach(node => {
                 if (isASTNode(node)) {
@@ -56,7 +57,8 @@ function traverseSetNodeReverse(node: ASTSetNode, visitor: ASTVisitor): void {
 }
 
 function traverseOperationNodeReverse(node: ASTOperationNode, visitor: ASTVisitor): void {
-    Object.values(node.args).forEach(arg => {
+    const args = typeof node.args === 'function' ? node.args(node) : node.args
+    Object.values(args).forEach(arg => {
         if (Array.isArray(arg)) {
             arg.forEach(subNode => {
                 if (isASTNode(subNode)) {

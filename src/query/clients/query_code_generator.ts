@@ -98,7 +98,7 @@ export class QueryCodeGenerator {
                     targetField: set.targetField
                 })
             }
-            const queryFunction = this.getQueryFunctionTransformer()?.(clonedAST.root, clonedAST.sets, clonedAST.targets, edgeSetMapResolved)
+            const queryFunction = this.getQueryFunctionTransformer()?.(clonedAST.root, clonedAST.sets, clonedAST.targets, edgeSetMapResolved, this.baseUtils)
             if (queryFunction) {
                 return resolve(`${ambientFunctions}\n\n${sets}\n\n${queryFunction}`)
             }
@@ -202,6 +202,11 @@ export class QueryCodeGenerator {
         return transformer
     }
 
+    private readonly baseUtils = {
+        getName: (id: string) => this.getName(id),
+        createName: (id: string, name: string) => this.createName(id, name),
+    }
+
     private getQueryTransformerUtils<NodeKind extends ASTNodeKind>(
         kind: NodeKind,
         node: ASTNode<NodeKind>
@@ -209,7 +214,7 @@ export class QueryCodeGenerator {
         switch (kind) {
             case ASTNodeKind.Set:
                 return {
-                    getName: (name: string) => this.getName(name),
+                    ...this.baseUtils,
                     useAlias: (astNode: ASTSetNode) => this.getTransformerForNode(astNode)(astNode, this.getQueryTransformerUtils(ASTNodeKind.Set, astNode)),
                 } as QueryTransformerUtils<NodeKind>;
     
@@ -225,13 +230,13 @@ export class QueryCodeGenerator {
                             return acc
                         }, {} as { [key: string]: IType }),
                     },
-                    getName: (name: string) => this.getName(name),
+                    ...this.baseUtils,
                     useAlias: (astNode: ASTOperationNode, _operation: string, _args: { [key: string]: IType }) => this.getTransformerForNode(astNode)(astNode, this.getQueryTransformerUtils(ASTNodeKind.Operation, astNode)),
                 } as unknown as QueryTransformerUtils<NodeKind>;
     
             case ASTNodeKind.Primitive:
                 return {
-                    getName: (name: string) => this.getName(name),
+                    ...this.baseUtils,
                     useAlias: (astNode: ASTPrimitiveNode, _operation: string, _type: IType) => this.getTransformerForNode(astNode)(astNode, this.getQueryTransformerUtils(ASTNodeKind.Primitive, astNode)),
                 } as QueryTransformerUtils<NodeKind>;
     
@@ -240,8 +245,12 @@ export class QueryCodeGenerator {
         }
     }
 
-    protected getName(name: string): string {
-        return this.nameManager?.getUniqueName(name) || name
+    protected createName(id: string, name: string): string {
+        return this.nameManager?.createUniqueName(id, name) || id
+    }
+
+    protected getName(id: string): string {
+        return this.nameManager?.getName(id) || id
     }
 
     protected getNodeHash(node: ASTNode<ASTNodeKind>): string {

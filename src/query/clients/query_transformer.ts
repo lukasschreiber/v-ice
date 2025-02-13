@@ -26,6 +26,7 @@ export interface IQueryTransformerDefinition {
 export interface OperationNodeQueryTransformerDefinition<A extends { [key: string]: IType }> extends IQueryTransformerDefinition {
     kind: ASTNodeKind.Operation
     operation: string,
+    complexity: number,
     args: A | ArgumentsDefinitionFn<IType, A>
     transformer: OperationTransformerFn<A>
 }
@@ -47,9 +48,13 @@ export interface QueryFunctionTransformerDefinition extends IQueryTransformerDef
     transformer: QueryTransformerFn
 }
 
-export interface QueryTransformerUtils<NodeKind extends ASTNodeKind> {
+export interface QueryTransformerBaseUtils {
+    getName: (id: string) => string,
+    createName: (id: string, name: string) => string,
+} 
+
+export interface QueryTransformerUtils<NodeKind extends ASTNodeKind> extends QueryTransformerBaseUtils {
     useAlias: AliasFn<NodeKind>,
-    getName: (name: string) => string
 }
 
 export interface OperationNodeQueryTransformerUtils<A extends { [key: string]: IType }> extends QueryTransformerUtils<ASTNodeKind.Operation> {
@@ -60,7 +65,7 @@ export interface OperationNodeQueryTransformerUtils<A extends { [key: string]: I
 
 export type QueryTransformerDefinition = OperationNodeQueryTransformerDefinition<any> | PrimitiveNodeQueryTransformerDefinition<any> | SetNodeQueryTransformerDefinition | QueryFunctionTransformerDefinition
 
-export type QueryTransformerFn = (source: ASTSetNode, sets: ASTSetNode[], targets: ASTSetNode[], edges: Map<string, ASTEdge>) => string
+export type QueryTransformerFn = (source: ASTSetNode, sets: ASTSetNode[], targets: ASTSetNode[], edges: Map<string, ASTEdge>, utils: QueryTransformerBaseUtils) => string
 
 export type NodeTransformerFn<NodeKind extends ASTNodeKind, Node extends ASTNode<NodeKind>, Utils extends QueryTransformerUtils<NodeKind> = QueryTransformerUtils<NodeKind>> = (astNode: Node, utils: Utils) => string
 export type OperationTransformerFn<A extends { [key: string]: IType }> = NodeTransformerFn<ASTNodeKind.Operation, ASTOperationNode & { args: { [K in keyof A]: A[K] extends INullableType<IType> ? string | null : string } }, OperationNodeQueryTransformerUtils<A>>
