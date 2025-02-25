@@ -1,3 +1,4 @@
+import { useSettings } from "@/main";
 import React from "react";
 
 export function ToolboxButton(props: React.HTMLProps<HTMLDivElement>) {
@@ -10,8 +11,9 @@ export function ToolboxButton(props: React.HTMLProps<HTMLDivElement>) {
 }
 
 export function ToolboxButtonStack(props: React.HTMLProps<HTMLDivElement>) {
+    const { settings } = useSettings();
     return (
-        <div className="absolute z-[999] bottom-0 pt-3 overflow-hidden">
+        <div className={`absolute z-[999] bottom-0 pt-3 overflow-hidden ${settings.toolboxPosition === "left" ? "left-0" : "right-0"}`}>
             <div
                 {...props}
                 className="font-bold flex text-xs items-stretch justify-center shadow-top cursor-pointer"

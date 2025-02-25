@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import { CheckboxSetting, ColorSetting, RangeSetting, defineSettings } from "@/context/settings/settings";
+import { CheckboxSetting, ColorSetting, RangeSetting, SelectSetting, defineSettings } from "@/context/settings/settings";
 
 export interface LayoutSettings {
     // Blockly
@@ -12,6 +12,7 @@ export interface LayoutSettings {
     // Appearance
     disableVisualEffects: CheckboxSetting
     disableLinks: CheckboxSetting
+    toolboxPosition: SelectSetting<"left" | "right">
 }
 
 export function getSettingsDefinition() {
@@ -73,6 +74,16 @@ export function getSettingsDefinition() {
                     label: "Disable Edges",
                     helpText: "Remove all edges between blocks",
                 },
+                toolboxPosition: {
+                    type: "select",
+                    default: "left",
+                    label: "Toolbox Position",
+                    options: [
+                        { label: "Left", value: "left" },
+                        { label: "Right", value: "right" },
+                    ],
+                    helpText: "Change the position of the toolbox",
+                }
             }
         }
     ])

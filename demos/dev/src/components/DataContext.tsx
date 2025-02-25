@@ -1,5 +1,6 @@
 import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
 import { DataColumn, DataTable, useQuery, Types, useWorkspace } from "v-ice";
+import { FilteredDataTable } from "v-ice/dist/data/filtered_table";
 
 Types.registry.registerEnum("Name", {columns: ["Name"]})
 Types.registry.registerEnum("Major", {columns: ["Major"]})
@@ -22,7 +23,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
     const { querySource, getQueryResultById, setQuerySource, addTarget, removeTarget, targets } = useQuery();
     const [dataTables, setDataTables] = useState<DataTableDefinition[]>([]);
     const [sourceName, setSourceName] = useState("Source");
-    const { workspace } = useWorkspace();
+    const { workspace, isInitialized } = useWorkspace();
     const [initialized, setInitialized] = useState(false);
 
     function populateDemoData() {
@@ -54,7 +55,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
         setDataTables([{ name: "Source", type: "SOURCE", immutable: true }, { name: "Target", type: "TARGET", immutable: false, uid: baseTargetId }]);
         setInitialized(true);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [workspace]);
+    }, [workspace, isInitialized]);
 
     function clearData() {
         setQuerySource(DataTable.empty());
@@ -118,7 +119,7 @@ export function DataContextProvider(props: React.ComponentPropsWithoutRef<"div">
 export const DataContext = createContext<{
     source: DataTable;
     sourceName: string
-    getQueryResultById: (id: string) => DataTable | null;
+    getQueryResultById: (id: string) => FilteredDataTable | null;
     setSource: (source: DataTable) => void;
     setSourceName: (sourceName: string) => void;
     reset(): void;

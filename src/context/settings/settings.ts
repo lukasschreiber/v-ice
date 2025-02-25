@@ -5,7 +5,7 @@ import {
 export type LayoutSettings = layout;
 
 export type Settings = { [K in keyof LayoutSettings]: LayoutSettings[K]["default"] };
-type SettingLayoutTypes = "range" | "text" | "checkbox" | "color" | "radio";
+type SettingLayoutTypes = "range" | "text" | "checkbox" | "color" | "radio" | "select";
 
 export interface LayoutGroup {
     settings: Partial<LayoutSettings>;
@@ -44,6 +44,11 @@ export interface RadioSetting extends Setting<string> {
     options: { label: string; value: string }[];
 }
 
+export interface SelectSetting<T extends string> extends Setting<T> {
+    type: "select";
+    options: { label: string; value: T }[];
+}
+
 export function defineSettings(settings: LayoutGroup[]) {
     return settings;
 }
@@ -62,6 +67,10 @@ export function isCheckboxSetting(setting: Setting<unknown>): setting is Checkbo
 
 export function isColorSetting(setting: Setting<unknown>): setting is ColorSetting {
     return setting.type === "color";
+}
+
+export function isSelectSetting<T extends string>(setting: Setting<unknown>): setting is SelectSetting<T> {
+    return setting.type === "select";
 }
 
 export function isRadioSetting(setting: Setting<unknown>): setting is RadioSetting {

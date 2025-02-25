@@ -23,8 +23,7 @@ export const jsQueryClient = createQueryClient({
                 complexity: 1,
                 operation: "equals",
                 args: { a: t.nullable(t.union(t.number, t.string, t.boolean, t.enum(t.wildcard), t.hierarchy(t.wildcard))), b: t.nullable(t.union(t.number, t.string, t.boolean, t.enum(t.wildcard), t.hierarchy(t.wildcard))) },
-                transformer: (astNode, utils) => {
-                    console.log(utils.definition.args)
+                transformer: (astNode) => {
                     return `(${astNode.args.a} === ${astNode.args.b})`
                 }
             }),
@@ -35,7 +34,7 @@ export const jsQueryClient = createQueryClient({
                 transformer: (astNode) => `(${astNode.args.a}.length === ${astNode.args.b}.length && (${astNode.args.a}).every((v, i) => v === (${astNode.args.b})[i]))`
             }),
             createOperationTransformer({
-                complexity: 1,
+                complexity: 2,
                 operation: "equals",
                 args: { a: t.nullable(t.struct(t.wildcard)), b: t.nullable(t.struct(t.wildcard)) },
                 transformer: (astNode) => `Object.keys(${astNode.args.a}).length === Object.keys(${astNode.args.b}).length && Object.keys(${astNode.args.a}).every(key => (${astNode.args.b}).hasOwnProperty(key) && (${astNode.args.a})[key] === (${astNode.args.b})[key]) && Object.keys(${astNode.args.b}).every(key => (${astNode.args.a}).hasOwnProperty(key) && (${astNode.args.a})[key] === (${astNode.args.b})[key])`

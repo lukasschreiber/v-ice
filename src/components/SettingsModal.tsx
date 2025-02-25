@@ -1,7 +1,14 @@
 import { useContext, useEffect, useState } from "react";
 import { DraggableModal, ModalContent, ModalHeader, ModalProps } from "./common/DraggableModal";
 import { SettingsContext } from "@/context/settings/settings_context";
-import { Setting, Settings, isCheckboxSetting, isColorSetting, isRangeSetting } from "@/context/settings/settings";
+import {
+    Setting,
+    Settings,
+    isCheckboxSetting,
+    isColorSetting,
+    isRangeSetting,
+    isSelectSetting,
+} from "@/context/settings/settings";
 import { useTranslation } from "react-i18next";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 
@@ -11,8 +18,8 @@ export function SettingsModal(props: ModalProps) {
     const [activeTab, setActiveTab] = useState(0);
 
     useEffect(() => {
-        if (props.open === true) triggerAction(EvaluationAction.OpenSettings)
-    }, [props.open])
+        if (props.open === true) triggerAction(EvaluationAction.OpenSettings);
+    }, [props.open]);
 
     function renderSettingsInput(setting: Setting<unknown>, key: keyof Settings) {
         if (isRangeSetting(setting)) {
@@ -73,6 +80,29 @@ export function SettingsModal(props: ModalProps) {
                     </span>
                 </div>
             );
+        } else if (isSelectSetting(setting)) {
+            return (
+                <div className="flex flex-col space-y-1">
+                    <label htmlFor={key} className="flex flex-row items-center gap-2">
+                        <span>{setting.label}</span>
+                        <span className="text-sm cursor-pointer" onClick={() => set(key, setting.default)}>
+                            [<span className="underline text-secondary">{setting.default}</span>]
+                        </span>
+                    </label>
+                    <select
+                        id={key}
+                        value={settings[key] as string}
+                        onChange={(e) => set(key, e.target.value)}
+                        className="w-full px-3 py-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                    >
+                        {setting.options.map((option) => (
+                            <option key={option.value} value={option.value}>
+                                {option.label}
+                            </option>
+                        ))}
+                    </select>
+                </div>
+            );
         }
 
         return <div>Nothing</div>;
@@ -86,7 +116,11 @@ export function SettingsModal(props: ModalProps) {
                     <div className="border-0 border-r border-solid border-slate-300">
                         {layout.map((group, index) => {
                             return (
-                                <div className="py-2 px-4 cursor-pointer hover:bg-slate-200/50" key={index} onClick={() => setActiveTab(index)}>
+                                <div
+                                    className="py-2 px-4 cursor-pointer hover:bg-slate-200/50"
+                                    key={index}
+                                    onClick={() => setActiveTab(index)}
+                                >
                                     {group.name}
                                 </div>
                             );
@@ -103,7 +137,10 @@ export function SettingsModal(props: ModalProps) {
                                             .map(([keyString, setting]) => {
                                                 const key = keyString as keyof Settings;
                                                 return (
-                                                    <div key={key} className="border-0 border-b border-slate-300 border-solid pb-2 last-of-type:border-b-0">
+                                                    <div
+                                                        key={key}
+                                                        className="border-0 border-b border-slate-300 border-solid pb-2 last-of-type:border-b-0"
+                                                    >
                                                         {renderSettingsInput(setting, key)}
                                                         {setting.helpText && (
                                                             <div className="text-xs text-slate-500">

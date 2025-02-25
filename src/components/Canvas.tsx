@@ -65,11 +65,11 @@ export function Canvas(props: CanvasProps) {
     const { language, helpUrl, media, width, height, toolbox, queryClient, ...divProps } = props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
-    const { workspaceRef } = useContext(WorkspaceContext);
+    const { workspaceRef, setInitialized } = useContext(WorkspaceContext);
     const [toolboxWidth, setToolboxWidth] = useState(0);
     const { i18n } = useTranslation();
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-    const { settings, set, layout } = useContext(SettingsContext);
+    const { settings, set, layout, isInitialized: settingsIninitialized } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
     const [isLoading, setIsLoading] = useState(true);
     const [featuresReady, setFeaturesReady] = useState<{ toolbox: boolean; workspace: boolean; variables: boolean }>({
@@ -134,7 +134,7 @@ export function Canvas(props: CanvasProps) {
 
     useEffect(() => {
         const div = blocklyDiv.current;
-        if (div) {
+        if (div && settingsIninitialized) {
             // FIXME: this should be done in a better way, but it is needed for the build
             setBlocklyLocale(props.language ?? i18n.language);
 
@@ -151,14 +151,19 @@ export function Canvas(props: CanvasProps) {
                 grid: {
                     spacing: 40,
                 },
+                zoom: {
+                    startScale: settings.zoom,
+                },
                 trashcan: false,
                 toolbox: toolbox ?? DefaultToolbox,
                 maxInstances: {
                     [Blocks.Names.NODE.SOURCE]: 1,
                 },
+                toolboxPosition: settings.toolboxPosition === "left" ? "start" : "end",
             });
 
             setFeaturesReady((old) => ({ ...old, workspace: true }));
+            setInitialized(true);
 
             if (debuggingOptions.blocklyXml || debuggingOptions.blocklyJson) {
                 let lastWorkspaceState: ISerializedWorkspace | undefined = undefined;
@@ -212,7 +217,7 @@ export function Canvas(props: CanvasProps) {
             if (div) div.textContent = "";
         };
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [settingsIninitialized]);
 
     useEffect(() => {
         const workspace = workspaceRef.current;
@@ -293,6 +298,15 @@ export function Canvas(props: CanvasProps) {
         }
     }, [props.theme, workspaceRef.current]);
 
+    useEffect(() => {
+        if (workspaceRef.current) {
+            workspaceRef.current.toolboxPosition = settings.toolboxPosition === "left" ? Blockly.utils.toolbox.Position.LEFT : Blockly.utils.toolbox.Position.RIGHT;
+            workspaceRef.current.resize();
+            // TODO: this does not work yet
+            workspaceRef.current.scrollCenter();
+        }
+    }, [settings.toolboxPosition, workspaceRef.current]);
+
     useSettingsHandlers(workspaceRef, settings);
 
     return (
@@ -305,8 +319,8 @@ export function Canvas(props: CanvasProps) {
                 ref={blocklyDiv}
                 id={"canvas"}
             ></div>
-            <ButtonStack className="absolute bottom-8 right-8 z-[1000]">
-                <Tooltip text="Autocomplete" position="left" className="text-text">
+            <ButtonStack className={`absolute bottom-8 z-[1000] ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}>
+                <Tooltip text="Autocomplete" position={settings.toolboxPosition} className="text-text">
                     <RoundButton
                         disabled={!workspaceRef.current || !QueryMagicWand.canAutoComplete(workspaceRef.current)}
                         onClick={() => {
@@ -319,7 +333,7 @@ export function Canvas(props: CanvasProps) {
                         <MagicWandIcon className="w-5 h-5" />
                     </RoundButton>
                 </Tooltip>
-                <Tooltip text="Zentrieren" position="left" className="text-text">
+                <Tooltip text="Zentrieren" position={settings.toolboxPosition} className="text-text">
                     <RoundButton
                         onClick={() => {
                             workspaceRef.current?.scrollCenter();
@@ -329,7 +343,7 @@ export function Canvas(props: CanvasProps) {
                         <CrosshairIcon className="w-5 h-5" />
                     </RoundButton>
                 </Tooltip>
-                <Tooltip text="Reinzoomen" position="left" className="text-text">
+                <Tooltip text="Reinzoomen" position={settings.toolboxPosition} className="text-text">
                     <RoundButton
                         onClick={() => {
                             set(
@@ -343,7 +357,7 @@ export function Canvas(props: CanvasProps) {
                         <ZoomPlusIcon className="w-5 h-5" />
                     </RoundButton>
                 </Tooltip>
-                <Tooltip text="Rauszoomen" position="left" className="text-text">
+                <Tooltip text="Rauszoomen" position={settings.toolboxPosition} className="text-text">
                     <RoundButton
                         onClick={() => {
                             set(
@@ -359,12 +373,12 @@ export function Canvas(props: CanvasProps) {
                 </Tooltip>
             </ButtonStack>
             <ToolboxButtonStack style={{ width: `${toolboxWidth}px` }}>
-                <Tooltip text="Handbuch" className="text-text">
+                <Tooltip text="Handbuch" className="text-text" position={settings.toolboxPosition === "left" ? "right" : "left"}>
                     <ToolboxButton onClick={() => showHelp("#help-start")}>
                         <BookOpenIcon className="h-6 w-6 text-white" />
                     </ToolboxButton>
                 </Tooltip>
-                <Tooltip text="Einstellungen" className="text-text">
+                <Tooltip text="Einstellungen" className="text-text" position={settings.toolboxPosition === "left" ? "right" : "left"}>
                     <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
                         <SettingsIcon className="h-6 w-6 text-white" />
                     </ToolboxButton>

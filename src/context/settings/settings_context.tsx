@@ -1,4 +1,4 @@
-import { createContext, useEffect } from "react";
+import { createContext, useEffect, useState } from "react";
 import { LayoutGroup, Settings, getDefaultSettings } from "@/context/settings/settings";
 import { useDispatch } from "react-redux";
 import { useSelector } from "@/store/hooks";
@@ -9,6 +9,7 @@ import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 export interface IPublicSettingsContext {
     settings: Settings;
     set<K extends keyof Settings>(key: K, value: Settings[K]): void;
+    isInitialized: boolean;
 }
 
 interface ISettingsContext extends IPublicSettingsContext {
@@ -21,6 +22,7 @@ export const SettingsContext = createContext<ISettingsContext>({
     settings: {} as Settings,
     set: () => {},
     isHidden: () => false,
+    isInitialized: false,
 });
 
 
@@ -31,6 +33,7 @@ export function SettingsProvider(
     const dispatch = useDispatch()
     const settings = useSelector(state => state.settings.settings)
     const LOCAL_STORAGE_KEY = "settings";
+    const [isInitialized, setIsInitialized] = useState(false);
 
     function readSettingsFromLocalstorage(): boolean {
         const entry = window.localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -56,6 +59,12 @@ export function SettingsProvider(
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
+    useEffect(() => {
+        if (!isInitialized && Object.keys(settings).length > 0) {
+            setIsInitialized(true);
+        }
+    }, [settings]);
+
     function set<K extends keyof Settings>(key: K, value: Settings[K]) {
         const newSettings = { ...settings };
         newSettings[key] = value;
@@ -78,7 +87,7 @@ export function SettingsProvider(
     }
 
     return (
-        <SettingsContext.Provider value={{ isHidden, set, settings, layout }}>
+        <SettingsContext.Provider value={{ isHidden, set, settings, layout, isInitialized }}>
             {props.children}
         </SettingsContext.Provider>
     );
