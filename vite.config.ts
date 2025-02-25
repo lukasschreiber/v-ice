@@ -32,5 +32,8 @@ export default mergeConfig(baseConfig, {
                 searchForWorkspaceRoot(process.cwd()),
             ],
         }
+    },
+    worker: {
+        format: 'es',
     }
 })

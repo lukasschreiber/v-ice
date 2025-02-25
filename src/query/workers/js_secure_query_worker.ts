@@ -4,79 +4,81 @@ import { BaseWorker } from "./js_base_query_worker";
 import { QuickJSContext, QuickJSHandle, newQuickJSWASMModuleFromVariant } from "quickjs-emscripten-core"
 import variant from "#quickjs"
 
-const QuickJS = await newQuickJSWASMModuleFromVariant(variant)
+(async () => {
 
-class SecureQueryWorker extends BaseWorker {
-    private vm: QuickJSContext
-    private disposables: QuickJSHandle[] = []
+    const QuickJS = await newQuickJSWASMModuleFromVariant(variant)
 
-    constructor() {
-        super()
-        this.vm = QuickJS.newContext()
-    }
+    class SecureQueryWorker extends BaseWorker {
+        private vm: QuickJSContext
+        private disposables: QuickJSHandle[] = []
 
-    private marshal(value: unknown): QuickJSHandle {
-        switch (typeof value) {
-            case "boolean": {
-                return value ? this.vm.true : this.vm.false;
-            }
-            case "number": {
-                const handle = this.vm.newNumber(value);
-                this.disposables.push(handle);
-                return handle;
-            }
-            case "string": {
-                const handle = this.vm.newString(value);
-                this.disposables.push(handle);
-                return handle;
-            }
-            case "undefined": {
-                return this.vm.undefined;
-            }
-            case "object": {
-                if (value === null) {
-                    return this.vm.null;
-                } else if (Array.isArray(value)) {
-                    const array = this.vm.newArray();
-                    this.disposables.push(array);
-                    value.forEach((item, index) => {
-                        this.vm.setProp(array, index, this.marshal(item));
-                    });
-                    return array;
-                } else {
-                    const object = this.vm.newObject();
-                    this.disposables.push(object);
-                    for (const [key, val] of Object.entries(value)) {
-                        this.vm.setProp(object, this.marshal(key), this.marshal(val));
+        constructor() {
+            super()
+            this.vm = QuickJS.newContext()
+        }
+
+        private marshal(value: unknown): QuickJSHandle {
+            switch (typeof value) {
+                case "boolean": {
+                    return value ? this.vm.true : this.vm.false;
+                }
+                case "number": {
+                    const handle = this.vm.newNumber(value);
+                    this.disposables.push(handle);
+                    return handle;
+                }
+                case "string": {
+                    const handle = this.vm.newString(value);
+                    this.disposables.push(handle);
+                    return handle;
+                }
+                case "undefined": {
+                    return this.vm.undefined;
+                }
+                case "object": {
+                    if (value === null) {
+                        return this.vm.null;
+                    } else if (Array.isArray(value)) {
+                        const array = this.vm.newArray();
+                        this.disposables.push(array);
+                        value.forEach((item, index) => {
+                            this.vm.setProp(array, index, this.marshal(item));
+                        });
+                        return array;
+                    } else {
+                        const object = this.vm.newObject();
+                        this.disposables.push(object);
+                        for (const [key, val] of Object.entries(value)) {
+                            this.vm.setProp(object, this.marshal(key), this.marshal(val));
+                        }
+                        return object;
                     }
-                    return object;
+                }
+                default: {
+                    throw new Error(`Unsupported type: ${typeof value}`);
                 }
             }
-            default: {
-                throw new Error(`Unsupported type: ${typeof value}`);
+        }
+
+        private dispose() {
+            this.disposables.forEach(handle => handle.alive && handle.dispose());
+            this.disposables = [];
+        }
+
+        protected override setRows(rows: DataRow[]) {
+            this.dispose();
+            this.vm.setProp(this.vm.global, "rows", this.marshal(rows));
+        }
+
+        protected runQuery(query: string) {
+            if (!this.rows) {
+                console.warn("Rows are not initialized.");
+                self.postMessage({ targets: {}, edgeCounts: {} });
+                return;
             }
-        }
-    }
 
-    private dispose() {
-        this.disposables.forEach(handle => handle.alive && handle.dispose());
-        this.disposables = [];
-    }
-
-    protected override setRows(rows: DataRow[]) {
-        this.dispose();
-        this.vm.setProp(this.vm.global, "rows", this.marshal(rows));
-    }
-
-    protected runQuery(query: string) {
-        if (!this.rows) {
-            console.warn("Rows are not initialized.");
-            self.postMessage({ targets: {}, edgeCounts: {} });
-            return;
-        }
-    
-        try {
-            const wrappedQuery = `
+            try {
+                const wrappedQuery = `
                 (function() {
                     ${query};
                     const result = query_root(rows);
@@ -91,32 +93,35 @@ class SecureQueryWorker extends BaseWorker {
                     });
                 })();
             `;
-    
-            const resultHandle = this.vm.evalCode(wrappedQuery);
 
-            if (resultHandle.error) {
-                console.warn(resultHandle.error);
+                const resultHandle = this.vm.evalCode(wrappedQuery);
+
+                if (resultHandle.error) {
+                    console.warn(resultHandle.error);
+                    self.postMessage({ targets: {}, edgeCounts: {} });
+                    return;
+                }
+
+                const resultJSON = this.vm.getString(resultHandle.value);
+
+                if (typeof resultJSON !== "string") {
+                    console.warn("Expected JSON string, but got:", typeof resultJSON);
+                    self.postMessage({ targets: {}, edgeCounts: {} });
+                    return;
+                }
+
+                const output: QueryFnReturnType<number[]> = JSON.parse(resultJSON);
+                self.postMessage(output);
+                return;
+            } catch (e) {
+                console.warn(e);
                 self.postMessage({ targets: {}, edgeCounts: {} });
                 return;
             }
-    
-            const resultJSON = this.vm.getString(resultHandle.value);
-    
-            if (typeof resultJSON !== "string") {
-                console.warn("Expected JSON string, but got:", typeof resultJSON);
-                self.postMessage({ targets: {}, edgeCounts: {} });
-                return;
-            }
-    
-            const output: QueryFnReturnType<number[]> = JSON.parse(resultJSON);
-            self.postMessage(output);
-            return;
-        } catch (e) {
-            console.warn(e);
-            self.postMessage({ targets: {}, edgeCounts: {} });
-            return;
         }
-    }    
-}
+    }
 
-new SecureQueryWorker();
+    new SecureQueryWorker();
+
+}
+)();
