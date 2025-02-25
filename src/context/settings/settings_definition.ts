@@ -83,6 +83,7 @@ export function getSettingsDefinition() {
                         { label: "Right", value: "right" },
                     ],
                     helpText: "Change the position of the toolbox",
+                    hidden: true
                 }
             }
         }

@@ -59,6 +59,7 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     toolbox?: ToolboxDefinition;
     queryClient?: QueryClient;
     theme?: Blockly.Theme;
+    toolboxPosition?: "left" | "right";
 };
 
 export function Canvas(props: CanvasProps) {
@@ -159,7 +160,7 @@ export function Canvas(props: CanvasProps) {
                 maxInstances: {
                     [Blocks.Names.NODE.SOURCE]: 1,
                 },
-                toolboxPosition: settings.toolboxPosition === "left" ? "start" : "end",
+                toolboxPosition: props.toolboxPosition ? props.toolboxPosition : settings.toolboxPosition === "left" ? "start" : "end",
             });
 
             setFeaturesReady((old) => ({ ...old, workspace: true }));

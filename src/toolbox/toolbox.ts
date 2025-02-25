@@ -26,6 +26,8 @@ export class ContinuousToolbox extends Blockly.Toolbox {
     override init() {
         super.init();
 
+        this.toolboxPosition = Blockly.TOOLBOX_AT_RIGHT
+
         const flyout = this.getFlyout();
         if (flyout) {
             this.contents_.forEach((item) => {
