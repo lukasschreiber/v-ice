@@ -1,6 +1,6 @@
 import { Canvas, DataTable, Evaluation, useQuery, useWorkspace } from "v-ice";
 import { useEffect, useRef, useState } from "react";
-import { Table } from "v-ice-commons";
+import { Table } from "@v-ice/commons";
 import { IEvaluationData, IEvaluationInteractiveStage } from "../../assets/data/evaluations";
 import { Button } from "../common/Button";
 import { useEvaluationState } from "../store/useEvaluationHook";

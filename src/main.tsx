@@ -287,6 +287,8 @@ export { Toolbox, Blocks, Evaluation, Extensions, Mutators, Types, createBlock }
 export {
     DataTable,
     DataColumn,
+    type DataTableRead,
+    type DataTableWrite,
     type DataRow,
     type CsvOptions,
     type IndexedDataRow,

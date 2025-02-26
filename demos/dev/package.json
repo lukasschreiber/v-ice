@@ -1,5 +1,5 @@
 {
-  "name": "@nephro-react/demo-dev",
+  "name": "@v-ice/demo-dev",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -15,8 +15,8 @@
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-resizable-panels": "^2.1.7",
-    "v-ice": "file:../../",
-    "v-ice-commons": "file:../../commons"
+    "v-ice": "workspace:^",
+    "@v-ice/commons": "workspace:^"
   },
   "devDependencies": {
     "@types/node": "^20.14.11",

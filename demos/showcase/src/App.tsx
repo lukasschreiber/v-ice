@@ -1,6 +1,6 @@
 import { Canvas, DataTable, useQuery, useWorkspace, ISerializedWorkspace, TableSaveFile } from "v-ice";
 import { useEffect, useRef, useState } from "react";
-import { Table } from "v-ice-commons";
+import { Table } from "@v-ice/commons";
 import evaluationJson from "../assets/data/presentation_rheuma.json";
 import { Button } from "./Button";
 import { showNotification } from "@/store/notifications/notification_emitter";

@@ -1,10 +1,10 @@
-import { DataTable, IType, Types, ValueOf } from "v-ice";
+import { DataTable, DataTableRead, IType, Types, ValueOf } from "v-ice";
 import React from "react";
 import { DateTime } from "luxon";
 
 export function Table(
     props: React.HTMLProps<HTMLTableElement> & {
-        dataTable: DataTable;
+        dataTable: DataTableRead;
         highlightedRows?: number[];
         page: number;
         rowsPerPage: number;

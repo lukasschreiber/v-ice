@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from "react";
 import { ISerializedWorkspace, useWorkspace } from "v-ice";
-import { useLocalStorage } from "v-ice-commons";
+import { useLocalStorage } from "@v-ice/commons";
 import { DataContext } from "./DataContext";
 
 export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>) {

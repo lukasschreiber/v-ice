@@ -14,8 +14,8 @@ export class FilteredDataTable implements DataTableRead {
         this.filteredIndices = filteredIndices;
     }
 
-    getColumns(): DataColumn<ColumnType>[] {
-        return this.originalTable.getColumns();
+    getColumns(showIndex: boolean): DataColumn<ColumnType>[] {
+        return this.originalTable.getColumns(showIndex);
     }
 
     getColumn(index: number): DataColumn<ColumnType> | null {

@@ -1,5 +1,5 @@
-import { DataTable, IndexedDataRow } from "v-ice";
-import { Table } from "v-ice-commons";
+import { DataTable, DataTableRead, IndexedDataRow } from "v-ice";
+import { Table } from "@v-ice/commons";
 import { Button } from "../Button";
 import { useContext, useState, useEffect, useMemo, useRef } from "react";
 import { DataContext, DataTableDefinition } from "../DataContext";
@@ -17,7 +17,7 @@ export function DataPanel() {
     const [importModalOpen, setImportModalOpen] = useState(false);
     const [importModalFile, setImportModalFile] = useState<File | undefined>(undefined);
     const [selectedTable, setSelectedTable] = useState<DataTableDefinition | undefined>(undefined);
-    const [currentTable, setCurrentTable] = useState<DataTable>(new DataTable());
+    const [currentTable, setCurrentTable] = useState<DataTableRead>(new DataTable());
     const [newTarget, setNewTarget] = useState<DataTableDefinition>({ name: "", type: "TARGET", immutable: false });
     const fileInputRef = useRef<HTMLInputElement>(null);
 

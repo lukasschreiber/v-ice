@@ -1,11 +1,11 @@
 {
-    "name": "v-ice-commons",
+    "name": "@v-ice/commons",
     "private": true,
     "version": "0.0.0",
     "type": "module",
-    "main": "dist/filters-commons.js",
+    "main": "dist/index.js",
     "types": "dist/main.d.ts",
-    "module": "./dist/filters-commons.js",
+    "module": "./dist/index.js",
     "source": "./src/main.ts",
     "files": [
         "dist",
@@ -26,7 +26,7 @@
         "luxon": "^3.4.4",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
-        "v-ice": "file:../"
+        "v-ice": "workspace:^"
     },
     "devDependencies": {
         "@types/node": "^20.14.2",

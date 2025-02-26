@@ -1,5 +1,5 @@
 {
-  "name": "@nephro-react/demo-showcase",
+  "name": "@v-ice/demo-showcase",
   "private": true,
   "version": "0.0.0",
   "type": "module",
@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "v-ice": "file:../../",
-    "v-ice-commons": "file:../../commons",
+    "v-ice": "workspace:^",
+    "@v-ice/commons": "workspace:^",
     "react": "^18.2.0",
     "react-dom": "^18.2.0"
   },

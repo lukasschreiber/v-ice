@@ -1,6 +1,6 @@
 import { useContext, useRef, useState } from "react";
 import { useWorkspace, WorkspacePreview } from "v-ice";
-import { Button } from "v-ice-commons";
+import { Button } from "@v-ice/commons";
 import { Accordion } from "../Accordion";
 import { StoreWorkspaceContext } from "../StoreWorkspaceContext";
 import { DataContext } from "../DataContext";

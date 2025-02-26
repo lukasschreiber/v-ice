@@ -1,0 +1,8 @@
+packages:
+  - "."
+  - "commons"
+  - "demos/analysis"
+  - "demos/basic"
+  - "demos/dev"
+  - "demos/evaluation"
+  - "demos/showcase"

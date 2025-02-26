@@ -40,7 +40,7 @@ export interface CsvOptions {
 }
 
 export interface DataTableRead {
-    getColumns(): DataColumn<ColumnType>[]
+    getColumns(showIndex: boolean): DataColumn<ColumnType>[]
     getColumn(index: number): DataColumn<ColumnType> | null
     getColumnByName(name: string): DataColumn<ColumnType> | null
     getRow(index: number): IndexedDataRow | null

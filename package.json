@@ -90,5 +90,15 @@
     },
     "overrides": {
         "vite": "^6.0.7"
+    },
+    "pnpm": {
+        "ignoredBuiltDependencies": [
+            "esbuild",
+            "sqlite3"
+        ],
+        "onlyBuiltDependencies": [
+            "esbuild",
+            "sqlite3"
+        ]
     }
 }

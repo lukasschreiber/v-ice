@@ -43,6 +43,7 @@ import { NodeBlock } from "@/blocks/extensions/node";
 import { selectSourceDataTable } from "@/store/data/source_table_slice";
 import { setResultTables } from "@/store/data/result_tables_slice";
 import { NormalizedFitleredDataTable } from "@/data/filtered_table";
+import { Settings } from "@/context/settings/settings";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -59,11 +60,11 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     toolbox?: ToolboxDefinition;
     queryClient?: QueryClient;
     theme?: Blockly.Theme;
-    toolboxPosition?: "left" | "right";
+    initialSettings?: Partial<Settings>;
 };
 
 export function Canvas(props: CanvasProps) {
-    const { language, helpUrl, media, width, height, toolbox, queryClient, ...divProps } = props;
+    const { language, theme, helpUrl, media, width, height, toolbox, queryClient, initialSettings, ...divProps } = props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
     const { workspaceRef, setInitialized } = useContext(WorkspaceContext);
@@ -137,7 +138,7 @@ export function Canvas(props: CanvasProps) {
         const div = blocklyDiv.current;
         if (div && settingsIninitialized) {
             // FIXME: this should be done in a better way, but it is needed for the build
-            setBlocklyLocale(props.language ?? i18n.language);
+            setBlocklyLocale(language ?? i18n.language);
 
             workspaceRef.current = Blockly.inject(div, {
                 plugins: {
@@ -147,7 +148,7 @@ export function Canvas(props: CanvasProps) {
                     blockDragger: BlockDragger,
                 },
                 media: media || "https://blockly-demo.appspot.com/static/media/",
-                theme: props.theme ?? LightTheme,
+                theme: theme ?? LightTheme,
                 renderer: Renderer.name,
                 grid: {
                     spacing: 40,
@@ -160,7 +161,7 @@ export function Canvas(props: CanvasProps) {
                 maxInstances: {
                     [Blocks.Names.NODE.SOURCE]: 1,
                 },
-                toolboxPosition: props.toolboxPosition ? props.toolboxPosition : settings.toolboxPosition === "left" ? "start" : "end",
+                // toolboxPosition: (toolboxPosition ?? "left") ? "start" : "end",
             });
 
             setFeaturesReady((old) => ({ ...old, workspace: true }));
@@ -280,14 +281,16 @@ export function Canvas(props: CanvasProps) {
     }, [source, code, debuggingOptions, queryClient]);
 
     useEffect(() => {
-        function handleToolboxResize(event: UIEvent) {
-            setToolboxWidth((event.target as HTMLElement).querySelector(".blocklyToolboxDiv")?.clientWidth ?? 0);
+        function handleToolboxResize() {
+            const toolboxDiv = blocklyDiv.current?.querySelector<HTMLDivElement>(".blocklyToolboxDiv");
+            setToolboxWidth(toolboxDiv?.clientWidth ?? 0);
         }
 
         const div = blocklyDiv.current;
         if (div) {
             setToolboxWidth(div.querySelector(".blocklyToolboxDiv")?.clientWidth ?? 0);
             div.addEventListener("resize", handleToolboxResize);
+            handleToolboxResize();
         }
 
         return () => div?.removeEventListener("resize", handleToolboxResize);
@@ -295,19 +298,10 @@ export function Canvas(props: CanvasProps) {
 
     useEffect(() => {
         if (workspaceRef.current) {
-            setTheme(workspaceRef.current, props.theme ?? LightTheme);
+            setTheme(workspaceRef.current, theme ?? LightTheme);
         }
-    }, [props.theme, workspaceRef.current]);
-
-    useEffect(() => {
-        if (workspaceRef.current) {
-            workspaceRef.current.toolboxPosition = settings.toolboxPosition === "left" ? Blockly.utils.toolbox.Position.LEFT : Blockly.utils.toolbox.Position.RIGHT;
-            workspaceRef.current.resize();
-            // TODO: this does not work yet
-            workspaceRef.current.scrollCenter();
-        }
-    }, [settings.toolboxPosition, workspaceRef.current]);
-
+    }, [theme, workspaceRef.current]);
+    
     useSettingsHandlers(workspaceRef, settings);
 
     return (

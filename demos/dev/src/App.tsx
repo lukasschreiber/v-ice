@@ -3,7 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 import { Tabs, Tab } from "./components/tabs/Tabs";
 import { Code } from "./components/Code";
 import { DataPanel } from "./components/tabs/DataPanel";
-import { Button, useLocalStorage } from "v-ice-commons";
+import { Button, useLocalStorage } from "@v-ice/commons";
 import { MiscPanel } from "./components/tabs/MiscPanel";
 import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ToolboxPanel } from "./components/tabs/ToolboxPanel";
