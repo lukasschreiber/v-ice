@@ -1,5 +1,5 @@
 import { ColumnType, DataColumn, DataTable } from "@/data/table";
-import { MatcherState } from "@vitest/expect/dist";
+import { MatcherState } from "@vitest/expect";
 
 export function toEqualColumns(this: MatcherState, received: DataTable, columns: DataColumn<ColumnType>[]) {
     const receivedColumns = [];

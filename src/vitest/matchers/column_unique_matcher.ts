@@ -1,5 +1,5 @@
 import { ColumnType, DataColumn } from "@/data/table";
-import { MatcherState } from "@vitest/expect/dist";
+import { MatcherState } from "@vitest/expect";
 
 export function toBeUnique(this: MatcherState, received: DataColumn<ColumnType>) {
     const seenValues = new Set();
