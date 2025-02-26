@@ -77,7 +77,7 @@ export function isRadioSetting(setting: Setting<unknown>): setting is RadioSetti
     return setting.type === "radio";
 }
 
-export function getDefaultSettings(layout: LayoutGroup[]): Settings {
+export function getDefaultSettings(layout: LayoutGroup[], overrides: Partial<Settings> = {}): Settings {
     const defaultSettings: Partial<Settings> = {};
 
     for (const group of layout) {
@@ -89,7 +89,9 @@ export function getDefaultSettings(layout: LayoutGroup[]): Settings {
                 >((accumulator, current) => {
                     const value = group.settings[current];
                     if (value === undefined) return accumulator;
-                    accumulator.push([current, value.default]);
+                    const override = overrides[current];
+                    const defaultValue = override === undefined ? value.default : override;
+                    accumulator.push([current, defaultValue]);
                     return accumulator;
                 }, [])
             ) as Settings

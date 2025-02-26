@@ -4,7 +4,7 @@ import { useLocalStorage } from "@v-ice/commons";
 import { DataContext } from "./DataContext";
 
 export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>) {
-    const { workspace, load, save } = useWorkspace();
+    const { workspace, load, save, isInitialized: workspaceIsInitialized } = useWorkspace();
 
     const [savedCurrentWorkspace, setSavedCurrentWorkspace] = useLocalStorage<ISerializedWorkspace | null>(
         "dev-saved-current-workspace",
@@ -22,12 +22,14 @@ export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>
     );
 
     useEffect(() => {
+        console.log("savedCurrentDataSetName", dataIsInitialized);
         if (
             workspace &&
             savedCurrentWorkspace &&
             workspace.getAllBlocks().length === 0 &&
             !initialized &&
-            dataIsInitialized
+            dataIsInitialized &&
+            workspaceIsInitialized
         ) {
             if (savedCurrentDataSetName === sourceName) {
                 load(savedCurrentWorkspace);
@@ -42,7 +44,7 @@ export function StoreWorkspaceContextProvider(props: React.PropsWithChildren<{}>
                 setSavedCurrentDataSetName(sourceName);
             });
         }
-    }, [workspace, dataIsInitialized, sourceName]);
+    }, [workspace, dataIsInitialized, sourceName, workspaceIsInitialized]);
 
     return (
         <StoreWorkspaceContext.Provider value={{ savedCurrentWorkspace, setSavedCurrentWorkspace, savedWorkspaces, setSavedWorkspaces, savedCurrentDataSetName, setSavedCurrentDataSetName }}>

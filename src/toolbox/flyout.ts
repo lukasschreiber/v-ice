@@ -55,6 +55,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         });
 
         this.autoClose = false;
+
     }
 
     override init(targetWorkspace: Blockly.WorkspaceSvg): void {
@@ -304,6 +305,11 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         );
 
         this.stepScrollAnimation_();
+    }
+
+    updateToolboxPosition(position: Blockly.utils.toolbox.Position) {
+        this.toolboxPosition_ = position;
+        this.position();
     }
 
     /**

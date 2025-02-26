@@ -310,6 +310,7 @@ export {
     type ITimestampType,
     type ValueOf,
 } from "@/data/types";
+export { FilteredDataTable } from "@/data/filtered_table";
 export { type ISerializedWorkspace } from "./serializer";
 export { type ToolboxDefinition, type FlyoutItemInfo, type BlockInfo } from "blockly/core/utils/toolbox";
 export { BlockPreview } from "@/components/common/BlockPreview";

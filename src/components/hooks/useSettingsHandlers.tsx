@@ -1,4 +1,6 @@
 import { Settings } from '@/context/settings/settings';
+import { ContinuousFlyout } from '@/toolbox/flyout';
+import { ContinuousToolbox } from '@/toolbox/toolbox';
 import * as Blockly from 'blockly/core';
 import { useEffect } from 'react';
 
@@ -35,4 +37,26 @@ export function useSettingsHandlers(workspaceRef: React.MutableRefObject<Blockly
                 block.render();
             });
     }, [settings.snapToGrid, workspaceRef]);
+
+    useEffect(() => {
+        const workspace = workspaceRef.current;
+        if(!workspace) return;
+
+        const newToolboxPosition = settings.toolboxPosition === "left" ? Blockly.TOOLBOX_AT_LEFT : Blockly.TOOLBOX_AT_RIGHT;
+        // if (workspace.toolboxPosition === newToolboxPosition) return;
+
+        workspace.toolboxPosition = newToolboxPosition;
+
+        const toolbox = workspace.getToolbox() as ContinuousToolbox | null
+        
+        if (!toolbox) return;
+        toolbox.updateToolboxPosition(newToolboxPosition);
+
+        const flyout = toolbox.getFlyout() as ContinuousFlyout | null;
+        if (!flyout) return;
+        flyout.updateToolboxPosition(newToolboxPosition);
+
+        workspace.resize();
+        workspace.scrollCenter();
+    }, [settings.toolboxPosition, workspaceRef]);
 }

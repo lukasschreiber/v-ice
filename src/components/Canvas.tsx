@@ -44,6 +44,7 @@ import { selectSourceDataTable } from "@/store/data/source_table_slice";
 import { setResultTables } from "@/store/data/result_tables_slice";
 import { NormalizedFitleredDataTable } from "@/data/filtered_table";
 import { Settings } from "@/context/settings/settings";
+import { createPortal } from "react-dom";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -64,14 +65,21 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
 };
 
 export function Canvas(props: CanvasProps) {
-    const { language, theme, helpUrl, media, width, height, toolbox, queryClient, initialSettings, ...divProps } = props;
+    const { language, theme, helpUrl, media, width, height, toolbox, queryClient, initialSettings, ...divProps } =
+        props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
     const { workspaceRef, setInitialized } = useContext(WorkspaceContext);
     const [toolboxWidth, setToolboxWidth] = useState(0);
     const { i18n } = useTranslation();
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
-    const { settings, set, layout, isInitialized: settingsIninitialized } = useContext(SettingsContext);
+    const {
+        settings,
+        set,
+        layout,
+        isInitialized: settingsIninitialized,
+        setInitialSettings,
+    } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
     const [isLoading, setIsLoading] = useState(true);
     const [featuresReady, setFeaturesReady] = useState<{ toolbox: boolean; workspace: boolean; variables: boolean }>({
@@ -84,6 +92,10 @@ export function Canvas(props: CanvasProps) {
     const astJson = useSelector((state) => state.generatedCode.astJson);
     const source = useSelector(selectSourceDataTable);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        setInitialSettings(initialSettings ?? {});
+    }, [initialSettings, setInitialSettings]);
 
     useEffect(() => {
         setHelpUrl(helpUrl ?? null);
@@ -161,7 +173,7 @@ export function Canvas(props: CanvasProps) {
                 maxInstances: {
                     [Blocks.Names.NODE.SOURCE]: 1,
                 },
-                // toolboxPosition: (toolboxPosition ?? "left") ? "start" : "end",
+                toolboxPosition: settings.toolboxPosition === "left" ? "start" : "end",
             });
 
             setFeaturesReady((old) => ({ ...old, workspace: true }));
@@ -301,7 +313,7 @@ export function Canvas(props: CanvasProps) {
             setTheme(workspaceRef.current, theme ?? LightTheme);
         }
     }, [theme, workspaceRef.current]);
-    
+
     useSettingsHandlers(workspaceRef, settings);
 
     return (
@@ -314,7 +326,9 @@ export function Canvas(props: CanvasProps) {
                 ref={blocklyDiv}
                 id={"canvas"}
             ></div>
-            <ButtonStack className={`absolute bottom-8 z-[1000] ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}>
+            <ButtonStack
+                className={`absolute bottom-8 z-[1000] ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
+            >
                 <Tooltip text="Autocomplete" position={settings.toolboxPosition} className="text-text">
                     <RoundButton
                         disabled={!workspaceRef.current || !QueryMagicWand.canAutoComplete(workspaceRef.current)}
@@ -368,18 +382,29 @@ export function Canvas(props: CanvasProps) {
                 </Tooltip>
             </ButtonStack>
             <ToolboxButtonStack style={{ width: `${toolboxWidth}px` }}>
-                <Tooltip text="Handbuch" className="text-text" position={settings.toolboxPosition === "left" ? "right" : "left"}>
+                <Tooltip
+                    text="Handbuch"
+                    className="text-text"
+                    position={settings.toolboxPosition === "left" ? "right" : "left"}
+                >
                     <ToolboxButton onClick={() => showHelp("#help-start")}>
                         <BookOpenIcon className="h-6 w-6 text-white" />
                     </ToolboxButton>
                 </Tooltip>
-                <Tooltip text="Einstellungen" className="text-text" position={settings.toolboxPosition === "left" ? "right" : "left"}>
+                <Tooltip
+                    text="Einstellungen"
+                    className="text-text"
+                    position={settings.toolboxPosition === "left" ? "right" : "left"}
+                >
                     <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
                         <SettingsIcon className="h-6 w-6 text-white" />
                     </ToolboxButton>
                 </Tooltip>
             </ToolboxButtonStack>
-            <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />
+            {createPortal(
+                <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />,
+                document.body
+            )}
         </div>
     );
 }

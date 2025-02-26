@@ -26,8 +26,6 @@ export class ContinuousToolbox extends Blockly.Toolbox {
     override init() {
         super.init();
 
-        this.toolboxPosition = Blockly.TOOLBOX_AT_RIGHT
-
         const flyout = this.getFlyout();
         if (flyout) {
             this.contents_.forEach((item) => {
@@ -104,6 +102,35 @@ export class ContinuousToolbox extends Blockly.Toolbox {
 
     override refreshSelection() {
         this.getFlyout()?.show(this.getInitialFlyoutContents_());
+    }
+
+    updateToolboxPosition(position: Blockly.utils.toolbox.Position) {
+        this.toolboxPosition = position;
+        this.position();
+    }
+
+    override position(): void {
+        super.position();
+        const toolboxDiv = this.HtmlDiv
+        if (!toolboxDiv) return
+
+        if (this.isHorizontal()) {
+            if (this.toolboxPosition === Blockly.utils.toolbox.Position.TOP) {
+                toolboxDiv.style.top = '0';
+                toolboxDiv.style.bottom = '';
+            } else {
+                toolboxDiv.style.top = '';
+                toolboxDiv.style.bottom = '0';
+            }
+        } else {
+            if (this.toolboxPosition === Blockly.utils.toolbox.Position.LEFT) {
+                toolboxDiv.style.left = '0';
+                toolboxDiv.style.right = '';
+            } else {
+                toolboxDiv.style.left = '';
+                toolboxDiv.style.right = '0';
+            }
+        }
     }
 
     override updateFlyout_(_oldItem: ISelectableToolboxItem | null, newItem: ISelectableToolboxItem | null) {

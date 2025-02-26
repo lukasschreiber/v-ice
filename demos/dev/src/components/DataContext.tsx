@@ -1,6 +1,5 @@
 import { Dispatch, SetStateAction, createContext, useEffect, useState } from "react";
-import { DataColumn, DataTable, useQuery, Types, useWorkspace } from "v-ice";
-import { FilteredDataTable } from "v-ice/dist/data/filtered_table";
+import { DataColumn, DataTable, useQuery, Types, useWorkspace, FilteredDataTable } from "v-ice";
 
 Types.registry.registerEnum("Name", {columns: ["Name"]})
 Types.registry.registerEnum("Major", {columns: ["Major"]})

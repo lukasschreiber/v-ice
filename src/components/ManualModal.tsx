@@ -3,7 +3,7 @@ import { createPortal } from "react-dom";
 import { ManualPage } from "./ManualPage";
 import { useTranslation } from "react-i18next";
 
-export function HelpModal(props: ModalProps) {
+export function ManualModal(props: ModalProps) {
     const {t} = useTranslation();
     return createPortal(
         <DraggableModal {...props} className="top-16 right-24 max-h-[700px] min-h-[700px] min-w-[600px]">

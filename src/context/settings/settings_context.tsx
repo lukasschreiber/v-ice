@@ -15,6 +15,7 @@ export interface IPublicSettingsContext {
 interface ISettingsContext extends IPublicSettingsContext {
     layout: LayoutGroup[];
     isHidden<K extends keyof Settings>(key: K): boolean;
+    setInitialSettings(settings: Partial<Settings>): void;
 }
 
 export const SettingsContext = createContext<ISettingsContext>({
@@ -23,8 +24,13 @@ export const SettingsContext = createContext<ISettingsContext>({
     set: () => {},
     isHidden: () => false,
     isInitialized: false,
+    setInitialSettings: () => {},
 });
 
+interface PersistedSettings {
+    settings: Settings;
+    modified: boolean;
+}
 
 export function SettingsProvider(
     props: React.ComponentPropsWithoutRef<"div">
@@ -33,31 +39,37 @@ export function SettingsProvider(
     const dispatch = useDispatch()
     const settings = useSelector(state => state.settings.settings)
     const LOCAL_STORAGE_KEY = "settings";
+    const [initialSettings, setInitialSettings] = useState<Partial<Settings>>({});
     const [isInitialized, setIsInitialized] = useState(false);
 
-    function readSettingsFromLocalstorage(): boolean {
+    function readSettingsFromLocalstorage(): [exists: boolean, modified: boolean] {
         const entry = window.localStorage.getItem(LOCAL_STORAGE_KEY);
-        if (entry === null) return false;
-        dispatch(setSettings(JSON.parse(entry) as Settings))
-        return true;
+        if (entry === null) return [false, false];
+        const { settings, modified } = JSON.parse(entry) as PersistedSettings;
+        dispatch(setSettings(settings));
+        return [true, modified];
     }
 
-    function writeSettingsToLocalstorage(settings: Settings) {
-        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(settings));
+    function writeSettingsToLocalstorage(settings: Settings, modified = false) {
+        const entry: PersistedSettings = { settings, modified };
+        window.localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(entry));
     }
 
     useEffect(() => {
-        dispatch(setSettings(getDefaultSettings(layout)))
-        if (!readSettingsFromLocalstorage()) {
-            writeSettingsToLocalstorage(settings);
+        const defaultSettings = getDefaultSettings(layout, initialSettings);
+        dispatch(setSettings(defaultSettings))
+        const [exists, modified] = readSettingsFromLocalstorage();
+        if (!exists || !modified) {
+            writeSettingsToLocalstorage(defaultSettings);
         }
 
         window.addEventListener("storage", (event: StorageEvent) => {
             if (event.key !== LOCAL_STORAGE_KEY || event.newValue === null) return;
-            setSettings(JSON.parse(event.newValue) as Settings);
+            const entry = JSON.parse(event.newValue) as PersistedSettings;
+            dispatch(setSettings(entry.settings));
         });
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [initialSettings]);
 
     useEffect(() => {
         if (!isInitialized && Object.keys(settings).length > 0) {
@@ -68,7 +80,7 @@ export function SettingsProvider(
     function set<K extends keyof Settings>(key: K, value: Settings[K]) {
         const newSettings = { ...settings };
         newSettings[key] = value;
-        writeSettingsToLocalstorage(newSettings);
+        writeSettingsToLocalstorage(newSettings, true);
 
         if (key === "zoom") {
             triggerAction(EvaluationAction.ChangeZoom, { zoom: value as number });
@@ -87,7 +99,7 @@ export function SettingsProvider(
     }
 
     return (
-        <SettingsContext.Provider value={{ isHidden, set, settings, layout, isInitialized }}>
+        <SettingsContext.Provider value={{ isHidden, set, settings, layout, isInitialized, setInitialSettings }}>
             {props.children}
         </SettingsContext.Provider>
     );

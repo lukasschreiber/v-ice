@@ -66,6 +66,9 @@ function App() {
                         toolbox={toolbox}
                         theme={themeName === "light" ? Themes.LightTheme : Themes.DarkTheme}
                         queryClient={Clients[queryClient as keyof typeof Clients]}
+                        initialSettings={{
+                            toolboxPosition: "right"
+                        }}
                     />
                 </Panel>
                 <PanelResizeHandle />

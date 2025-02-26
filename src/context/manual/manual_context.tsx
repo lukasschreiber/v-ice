@@ -1,7 +1,7 @@
 import { createContext, useState, PropsWithChildren, useContext, useEffect } from "react";
 import { WorkspaceContext } from "@/context/workspace_context";
 import { createPortal } from "react-dom";
-import { HelpModal } from "@/components/ManualModal";
+import { ManualModal } from "@/components/ManualModal";
 import emitter from "./manual_emitter";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 
@@ -58,7 +58,7 @@ export const HelpProvider = (props: PropsWithChildren) => {
         <HelpContext.Provider value={{ openHelp, closeHelp, activePage, setHelpUrl, helpUrl }}>
             {props.children}
             {createPortal(
-                <HelpModal open={open} onClose={() => closeHelp()} />,
+                <ManualModal open={open} onClose={() => closeHelp()} />,
                 workspaceRef.current?.getInjectionDiv() ?? document.body
             )}
         </HelpContext.Provider>
