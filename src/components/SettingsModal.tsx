@@ -13,7 +13,7 @@ import { useTranslation } from "react-i18next";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
 
 export function SettingsModal(props: ModalProps) {
-    const { settings, layout, isHidden, set } = useContext(SettingsContext);
+    const { settings, layout, isHidden, set, defaultSettings } = useContext(SettingsContext);
     const { t } = useTranslation();
     const [activeTab, setActiveTab] = useState(0);
 
@@ -29,8 +29,8 @@ export function SettingsModal(props: ModalProps) {
                         <span>
                             {setting.label} - {(settings[key] as number).toFixed(2)}
                         </span>
-                        <span className="text-sm cursor-pointer" onClick={() => set(key, setting.default)}>
-                            [<span className="underline text-secondary">{setting.default}</span>]
+                        <span className="text-sm cursor-pointer" onClick={() => set(key, defaultSettings[key])}>
+                            [<span className="underline text-secondary">{defaultSettings[key]}</span>]
                         </span>
                     </label>
                     <div className="flex flex-row text-xs items-center w-full text-slate-500 gap-1">
@@ -75,8 +75,8 @@ export function SettingsModal(props: ModalProps) {
                             set(key, e.target.value);
                         }}
                     />
-                    <span className="text-sm cursor-pointer" onClick={() => set(key, setting.default)}>
-                        [<span className="underline text-secondary">{setting.default}</span>]
+                    <span className="text-sm cursor-pointer" onClick={() => set(key, defaultSettings[key])}>
+                        [<span className="underline text-secondary">{defaultSettings[key]}</span>]
                     </span>
                 </div>
             );
@@ -85,8 +85,8 @@ export function SettingsModal(props: ModalProps) {
                 <div className="flex flex-col space-y-1">
                     <label htmlFor={key} className="flex flex-row items-center gap-2">
                         <span>{setting.label}</span>
-                        <span className="text-sm cursor-pointer" onClick={() => set(key, setting.default)}>
-                            [<span className="underline text-secondary">{setting.default}</span>]
+                        <span className="text-sm cursor-pointer" onClick={() => set(key, defaultSettings[key])}>
+                            [<span className="underline text-secondary">{defaultSettings[key]}</span>]
                         </span>
                     </label>
                     <select

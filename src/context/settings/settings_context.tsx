@@ -15,11 +15,13 @@ interface ISettingsContext extends IPublicSettingsContext {
     layout: LayoutGroup[];
     isHidden<K extends keyof Settings>(key: K): boolean;
     setInitialSettings(settings: Partial<Settings>): void;
+    defaultSettings: Settings;
 }
 
 export const SettingsContext = createContext<ISettingsContext>({
     layout: [],
     settings: {} as Settings,
+    defaultSettings: {} as Settings,
     set: () => {},
     isHidden: () => false,
     isInitialized: false,
@@ -40,6 +42,7 @@ export function SettingsProvider(
     const LOCAL_STORAGE_KEY = "settings";
     const [initialSettings, setInitialSettings] = useState<Partial<Settings>>({});
     const [isInitialized, setIsInitialized] = useState(false);
+    const [defaultSettings, setDefaultSettings] = useState<Settings>({} as Settings);
 
     function readSettingsFromLocalstorage(): [exists: boolean, modified: boolean] {
         const entry = window.localStorage.getItem(LOCAL_STORAGE_KEY);
@@ -57,6 +60,7 @@ export function SettingsProvider(
     useEffect(() => {
         const defaultSettings = getDefaultSettings(layout, initialSettings);
         dispatch(setSettings(defaultSettings))
+        setDefaultSettings(defaultSettings);
         const [exists, modified] = readSettingsFromLocalstorage();
         if (!exists || !modified) {
             writeSettingsToLocalstorage(defaultSettings);
@@ -98,7 +102,7 @@ export function SettingsProvider(
     }
 
     return (
-        <SettingsContext.Provider value={{ isHidden, set, settings, layout, isInitialized, setInitialSettings }}>
+        <SettingsContext.Provider value={{ isHidden, set, settings, layout, isInitialized, setInitialSettings, defaultSettings }}>
             {props.children}
         </SettingsContext.Provider>
     );
