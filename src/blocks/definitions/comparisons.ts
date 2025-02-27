@@ -3,6 +3,7 @@ import t from "@/data/types"
 import { Blocks } from "@/blocks";
 import { DynamicInputTypesMutator } from "../mutators/dynamic_input_types";
 import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
+import { HasVariableMutator } from "../mutators/has_variable";
 
 export const EqualsWithinBlock = createBlock({
     id: Blocks.Names.COMPARISON.EQUALS_WITHIN,
@@ -392,6 +393,37 @@ export const IsNullBlock = createBlock({
             type: t.boolean,
             args: {
                 a: scope.buildASTForInput("A")
+            }
+        })
+    }
+})
+
+export const HasVariableValueBlock = createBlock({
+    id: Blocks.Names.VARIABLE.HAS,
+    lines: [
+        {
+            text: "%{BKY_HAS_VALUE} %1",
+            args: [
+                {
+                    type: 'field_dynamic_dropdown',
+                    name: 'VAR',
+                    options: [
+                        ["", ""],
+                    ],
+                },
+            ]
+        }
+    ] as const,
+    connectionType: ConnectionType.BOOLEAN,
+    style: "variable_blocks",
+    helpUrl: "#variables",
+    mutator: HasVariableMutator,
+    code: (scope) => {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
+            operation: "has_variable",
+            type: t.boolean,
+            args: {
+                name: createASTNode(ASTNodeKind.Primitive, null, { value: scope.getFieldValue("VAR"), type: t.string }),
             }
         })
     }

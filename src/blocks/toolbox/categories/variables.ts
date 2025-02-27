@@ -26,13 +26,6 @@ export class Variables {
             fields: {}
         })
 
-        flyoutInfoList.push({
-            kind: "block",
-            type: Blocks.Names.VARIABLE.HAS,
-            gap: "24",
-            fields: {}
-        })
-
         return flyoutInfoList;
     }
 

@@ -4,7 +4,7 @@ import { Nodes } from "./categories/nodes";
 import { DateTime } from "luxon";
 import { defineBlock, defineCategory, defineToolbox } from "./toolbox_definition";
 import { FibBlock, MathBinaryOperationBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock, NumberBlock } from "../definitions/math";
-import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "../definitions/comparisons";
+import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, HasVariableValueBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "../definitions/comparisons";
 import { ListAnyAllBlock, ListArithmeticBlock, ListContainsBlock, ListEqualsBlock, ListLengthBlock } from "../definitions/lists";
 import { ProperySelectBlock } from "../definitions/structs";
 import { LogicNotBlock, LogicOrBlock } from "../definitions/logic";
@@ -86,6 +86,9 @@ export const DefaultToolbox = defineToolbox([
         defineBlock(IsNullBlock).withCondition((_workspace, table) => {
             return !table.some(col => col.type.nullable)
         }),
+        defineBlock(HasVariableValueBlock).withCondition((_workspace, table) => {
+            return !table.some(col => col.type.nullable)
+        })
     ]
     ),
     defineCategory("%{BKY_ARITHMETIC}", "math_category").withBlocks([
