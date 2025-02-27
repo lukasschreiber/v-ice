@@ -124,6 +124,8 @@
         "of": "of",
         "is_null": "is null",
 
+        "has_value": "has value for",
+
         "notification_self_connect": "Ein Knoten kann nicht mit sich selbst verbunden werden!",
         "notification_input_to_input": "Ein Input kann nicht mit einem anderen Input verbunden werden!",
         "notification_output_to_output": "Ein Output kann nicht mit einem anderen Output verbunden werden!",

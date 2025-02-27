@@ -415,6 +415,12 @@ export const jsQueryClient = createQueryClient({
                 args: { name: t.string },
                 transformer: (astNode) => `source.map(column => column["${astNode.args.name.replaceAll("\"", "")}"])`
             }),
+            createOperationTransformer({
+                complexity: 1,
+                operation: "has_variable",
+                args: { name: t.string },
+                transformer: (astNode) => `p.hasOwnProperty("${astNode.args.name.replaceAll("\"", "")}") && p["${astNode.args.name.replaceAll("\"", "")}"] !== null && p["${astNode.args.name.replaceAll("\"", "")}"] !== undefined`
+            }),
 
             createSubsetTransformer({
                 transformer: (astNode, utils) => {

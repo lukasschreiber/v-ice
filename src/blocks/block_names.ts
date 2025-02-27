@@ -39,6 +39,7 @@ const VARIABLE = {
     GET_COLUMN: "variable_get_column",
     GET: "variable_get",
     LOCAL_GET: "local_variable_get",
+    HAS: "variable_has",
 } as const;
 
 const NODE = {

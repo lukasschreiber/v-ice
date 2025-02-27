@@ -1,5 +1,5 @@
 import { Blocks } from "@/blocks";
-import { createBlock } from "@/blocks/block_definitions";
+import { ConnectionType, createBlock } from "@/blocks/block_definitions";
 import t from "@/data/types"
 import { ScopedExtension } from "../extensions/scoped";
 import { LocalVariableMutator } from "../mutators/local_variable";
@@ -8,6 +8,7 @@ import { ColumnSelectMutator } from "../mutators/column_select";
 import { FieldVariable } from "../fields/field_variable";
 import { ASTNodeKind, createASTNode } from "@/query/builder/ast";
 import { FieldTypeLabel } from "../fields/field_type_label";
+import { HasVariableMutator } from "../mutators/has_variable";
 
 export const ColumnSelectBlock = createBlock({
     id: Blocks.Names.VARIABLE.GET_COLUMN,
@@ -109,6 +110,37 @@ export const LocalVariableBlock = createBlock({
             type: scope.getField<FieldTypeLabel>("TYPE").getType() ?? null,
             args: {
                 name: createASTNode(ASTNodeKind.Primitive, null, { value: scope.getFieldValue("LABEL"), type: t.string }),
+            }
+        })
+    }
+})
+
+export const HasVariableValueBlock = createBlock({
+    id: Blocks.Names.VARIABLE.HAS,
+    lines: [
+        {
+            text: "%{BKY_HAS_VALUE} %1",
+            args: [
+                {
+                    type: 'field_dynamic_dropdown',
+                    name: 'VAR',
+                    options: [
+                        ["", ""],
+                    ],
+                },
+            ]
+        }
+    ] as const,
+    connectionType: ConnectionType.BOOLEAN,
+    style: "variable_blocks",
+    helpUrl: "#variables",
+    mutator: HasVariableMutator,
+    code: (scope) => {
+        return createASTNode(ASTNodeKind.Operation, scope.definition, {
+            operation: "has_variable",
+            type: t.boolean,
+            args: {
+                name: createASTNode(ASTNodeKind.Primitive, null, { value: scope.getFieldValue("VAR"), type: t.string }),
             }
         })
     }
