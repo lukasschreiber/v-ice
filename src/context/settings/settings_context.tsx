@@ -1,7 +1,6 @@
 import { createContext, useEffect, useState } from "react";
 import { LayoutGroup, Settings, getDefaultSettings } from "@/context/settings/settings";
-import { useDispatch } from "react-redux";
-import { useSelector } from "@/store/hooks";
+import { useDispatch, useSelector } from "@/store/hooks";
 import { setSettings } from "@/context/settings/settings_slice";
 import { getSettingsDefinition } from "@/context/settings/settings_definition";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
