@@ -90,7 +90,7 @@ import { RegistrableExtension } from "@/blocks/block_extensions";
 import { RegistrableMutator } from "./blocks/block_mutators";
 import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox";
 import { jsQueryClient } from "./query/clients/javascript/js_query_client";
-import { selectSourceDataTable, setSourceTable } from "./store/data/source_table_slice";
+import { selectSourceDataTable, setInitialized, setSourceTable } from "./store/data/source_table_slice";
 import { subscribe } from "./store/subscribe";
 export { LogLevel } from "@/utils/logger";
 
@@ -195,6 +195,7 @@ export function useQuery() {
         getQueryResultById,
         querySource: querySource,
         setQuerySource: (source: DataTable) => {
+            dispatch(setInitialized(false));
             dispatch(setSourceTable(source.toNormalizedTable()));
         },
         addTarget: (name: string, id: string) => {

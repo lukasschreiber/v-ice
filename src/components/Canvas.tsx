@@ -46,6 +46,7 @@ import { NormalizedFitleredDataTable } from "@/data/filtered_table";
 import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
 import { warn } from "@/utils/logger";
+import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -67,8 +68,19 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
 };
 
 export function Canvas(props: CanvasProps) {
-    const { language, theme, helpUrl, media, width, height, toolbox, queryClient, initialSettings, settingsVisibility, ...divProps } =
-        props;
+    const {
+        language,
+        theme,
+        helpUrl,
+        media,
+        width,
+        height,
+        toolbox,
+        queryClient,
+        initialSettings,
+        settingsVisibility,
+        ...divProps
+    } = props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
     const { workspaceRef, setInitialized } = useContext(WorkspaceContext);
@@ -86,10 +98,16 @@ export function Canvas(props: CanvasProps) {
     } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
     const [isLoading, setIsLoading] = useState(true);
-    const [featuresReady, setFeaturesReady] = useState<{ toolbox: boolean; workspace: boolean; variables: boolean }>({
+    const [featuresReady, setFeaturesReady] = useState<{
+        toolbox: boolean;
+        workspace: boolean;
+        variables: boolean;
+        persistedWorkspace: boolean;
+    }>({
         toolbox: false,
         workspace: false,
         variables: false,
+        persistedWorkspace: false,
     });
     const debuggingOptions = useSelector((state) => state.settings.debugger);
     const code = useSelector((state) => state.generatedCode.code);
@@ -149,6 +167,12 @@ export function Canvas(props: CanvasProps) {
         workspaceRef.current?.refreshToolboxSelection();
         setFeaturesReady((old) => ({ ...old, toolbox: true }));
     }, [toolbox]);
+
+    const { isWorkspaceLoaded } = useWorkspacePersister();
+
+    useEffect(() => {
+        setFeaturesReady((old) => ({ ...old, persistedWorkspace: isWorkspaceLoaded }));
+    }, [isWorkspaceLoaded]);
 
     useEffect(() => {
         setIsLoading(!Object.keys(featuresReady).every((key) => featuresReady[key as keyof typeof featuresReady]));
@@ -399,15 +423,17 @@ export function Canvas(props: CanvasProps) {
                         <BookOpenIcon className="h-6 w-6 text-white" />
                     </ToolboxButton>
                 </Tooltip>
-                {Object.keys(settings).some(p => !isHidden(p as keyof LayoutSettings)) && <Tooltip
-                    text="Einstellungen"
-                    className="text-text"
-                    position={settings.toolboxPosition === "left" ? "right" : "left"}
-                >
-                    <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
-                        <SettingsIcon className="h-6 w-6 text-white" />
-                    </ToolboxButton>
-                </Tooltip>}
+                {Object.keys(settings).some((p) => !isHidden(p as keyof LayoutSettings)) && (
+                    <Tooltip
+                        text="Einstellungen"
+                        className="text-text"
+                        position={settings.toolboxPosition === "left" ? "right" : "left"}
+                    >
+                        <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
+                            <SettingsIcon className="h-6 w-6 text-white" />
+                        </ToolboxButton>
+                    </Tooltip>
+                )}
             </ToolboxButtonStack>
             {createPortal(
                 <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />,

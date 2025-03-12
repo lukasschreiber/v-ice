@@ -20,6 +20,9 @@ importers:
       '@reduxjs/toolkit':
         specifier: ^2.2.3
         version: 2.6.0(react-redux@9.2.0(@types/react@18.3.18)(react@18.2.0)(redux@5.0.1))(react@18.2.0)
+      '@v-ice/commons':
+        specifier: workspace:^
+        version: link:commons
       acorn:
         specifier: ^8.11.3
         version: 8.14.0
