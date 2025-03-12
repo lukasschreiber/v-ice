@@ -1,6 +1,7 @@
 import { FilteredDataTable } from "@/data/filtered_table";
 import { DataRow, DataTable } from "@/data/table";
-import { QueryFnReturnType } from "../query_runner";
+
+export type QueryFnReturnType<T> = {targets: Record<string, T>, edgeCounts: Record<string, number>}
 
 export enum QueryWorkerAction {
     SetRows = "set_rows",

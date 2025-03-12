@@ -15,15 +15,32 @@ export class FilteredDataTable implements DataTableRead {
     }
 
     getColumns(showIndex: boolean): DataColumn<ColumnType>[] {
-        return this.originalTable.getColumns(showIndex);
+        return this.originalTable.getColumns(showIndex).map((column) => {
+            const newColumn = column.clone();
+            newColumn.values = newColumn.values.filter((_, i) => this.filteredIndices.includes(i));
+            return newColumn;
+        });
     }
 
     getColumn(index: number): DataColumn<ColumnType> | null {
-        return this.originalTable.getColumn(index);
+        const newColumn = this.originalTable.getColumn(index)?.clone();
+        if (!newColumn) {
+            return null;
+        }
+
+        newColumn.values = newColumn.values.filter((_, i) => this.filteredIndices.includes(i));
+        return newColumn;
     }
 
     getColumnByName(name: string): DataColumn<ColumnType> | null {
-        return this.originalTable.getColumnByName(name);
+        const column = this.originalTable.getColumnByName(name);
+        if (!column) {
+            return null;
+        }
+
+        const newColumn = column.clone();
+        newColumn.values = newColumn.values.filter((_, i) => this.filteredIndices.includes(i));
+        return newColumn;
     }
 
     getRow(index: number): IndexedDataRow | null {

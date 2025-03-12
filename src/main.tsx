@@ -63,7 +63,7 @@ import "@/connection_checker";
 
 export * from "@/query/query_generator";
 
-import { useContext, useRef } from "react";
+import { useCallback, useContext, useRef } from "react";
 import { IPublicSettingsContext, SettingsContext } from "@/context/settings/settings_context";
 import { ApplicationContextProvider } from "@/context/app_context_provider";
 import { Canvas as CanvasElement } from "@/components/Canvas";
@@ -92,6 +92,7 @@ import { CompleteToolbox } from "./blocks/toolbox/complete_toolbox";
 import { jsQueryClient } from "./query/clients/javascript/js_query_client";
 import { selectSourceDataTable, setSourceTable } from "./store/data/source_table_slice";
 import { subscribe } from "./store/subscribe";
+export { LogLevel } from "@/utils/logger";
 
 /**
  * The main component for the Blockly editor. This component should be wrapped in a `VICEProvider`.
@@ -185,10 +186,10 @@ export function useQuery() {
 
     const resultTables = useSelector((state) => state.resultTables);
 
-    const getQueryResultById = (id: string) => {
+    const getQueryResultById = useCallback((id: string) => {
         const normalizedTable = resultTables[id];
         return normalizedTable ? querySource.createFilteredView(normalizedTable.indices) : null;
-    };
+    }, [querySource, resultTables]);
 
     return {
         getQueryResultById,
