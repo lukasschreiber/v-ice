@@ -34,7 +34,7 @@ export function useWorkspacePersister() {
             setInitialized(true);
         }
 
-        if (workspaceRef.current) {
+        if (workspaceRef.current && settings.saveWorkspace && settings.persistenceKey && settings.persistenceKey.length > 0 && initialized) {
             workspaceRef.current.addChangeListener(() => {
                 setSavedWorkspace(workspaceRef.current ? serializeWorkspace(workspaceRef.current) : null);
             });

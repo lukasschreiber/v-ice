@@ -146,7 +146,7 @@ export function SettingsModal(props: ModalProps) {
                             );
                         })}
                     </div>
-                    <div className="py-2 px-4 min-h-[360px]">
+                    <div className="py-2 px-4 min-h-[360px] max-h-[360px] overflow-y-auto w-full">
                         {layout.map((group, index) => {
                             return (
                                 <div key={index} className={activeTab === index ? "block" : "hidden"}>

@@ -53,7 +53,9 @@ export function SettingsProvider(
         const entry = window.localStorage.getItem(LOCAL_STORAGE_KEY);
         if (entry === null) return [false, false];
         const { settings, modified } = JSON.parse(entry) as PersistedSettings;
-        dispatch(setSettings(settings));
+        const mergedSettings = { ...defaultSettings, ...settings };
+
+        dispatch(setSettings(mergedSettings));
         return [true, modified];
     }
 

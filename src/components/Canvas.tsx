@@ -361,80 +361,102 @@ export function Canvas(props: CanvasProps) {
             <ButtonStack
                 className={`absolute bottom-8 z-[1000] ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
             >
-                <Tooltip text="Autocomplete" position={settings.toolboxPosition} className="text-text">
-                    <RoundButton
-                        disabled={!workspaceRef.current || !QueryMagicWand.canAutoComplete(workspaceRef.current)}
-                        onClick={() => {
-                            triggerAction(EvaluationAction.UseMagicWand, {
-                                workspaceState: serializeWorkspace(workspaceRef.current!),
-                            });
-                            QueryMagicWand.autoComplete(workspaceRef.current!);
-                        }}
-                    >
-                        <MagicWandIcon className="w-5 h-5" />
-                    </RoundButton>
-                </Tooltip>
-                <Tooltip text="Zentrieren" position={settings.toolboxPosition} className="text-text">
-                    <RoundButton
-                        onClick={() => {
-                            workspaceRef.current?.scrollCenter();
-                            triggerAction(EvaluationAction.UseCenterButton);
-                        }}
-                    >
-                        <CrosshairIcon className="w-5 h-5" />
-                    </RoundButton>
-                </Tooltip>
-                <Tooltip text="Reinzoomen" position={settings.toolboxPosition} className="text-text">
-                    <RoundButton
-                        onClick={() => {
-                            set(
-                                "zoom",
-                                Math.min(settings.zoom + 0.1, layout.find((g) => g.settings.zoom)!.settings.zoom!.max)
-                            );
-                            triggerAction(EvaluationAction.UseZoomInButton);
-                        }}
-                        disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.max}
-                    >
-                        <ZoomPlusIcon className="w-5 h-5" />
-                    </RoundButton>
-                </Tooltip>
-                <Tooltip text="Rauszoomen" position={settings.toolboxPosition} className="text-text">
-                    <RoundButton
-                        onClick={() => {
-                            set(
-                                "zoom",
-                                Math.max(settings.zoom - 0.1, layout.find((g) => g.settings.zoom)!.settings.zoom!.min)
-                            );
-                            triggerAction(EvaluationAction.UseZoomOutButton);
-                        }}
-                        disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.min}
-                    >
-                        <ZoomMinusIcon className="w-5 h-5" />
-                    </RoundButton>
-                </Tooltip>
-            </ButtonStack>
-            <ToolboxButtonStack style={{ width: `${toolboxWidth}px` }}>
-                <Tooltip
-                    text="Handbuch"
-                    className="text-text"
-                    position={settings.toolboxPosition === "left" ? "right" : "left"}
-                >
-                    <ToolboxButton onClick={() => showHelp("#help-start")}>
-                        <BookOpenIcon className="h-6 w-6 text-white" />
-                    </ToolboxButton>
-                </Tooltip>
-                {Object.keys(settings).some((p) => !isHidden(p as keyof LayoutSettings)) && (
-                    <Tooltip
-                        text="Einstellungen"
-                        className="text-text"
-                        position={settings.toolboxPosition === "left" ? "right" : "left"}
-                    >
-                        <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
-                            <SettingsIcon className="h-6 w-6 text-white" />
-                        </ToolboxButton>
+                {settings.showAutocomplete && (
+                    <Tooltip text="Autocomplete" position={settings.toolboxPosition} className="text-text">
+                        <RoundButton
+                            disabled={!workspaceRef.current || !QueryMagicWand.canAutoComplete(workspaceRef.current)}
+                            onClick={() => {
+                                triggerAction(EvaluationAction.UseMagicWand, {
+                                    workspaceState: serializeWorkspace(workspaceRef.current!),
+                                });
+                                QueryMagicWand.autoComplete(workspaceRef.current!);
+                            }}
+                        >
+                            <MagicWandIcon className="w-5 h-5" />
+                        </RoundButton>
                     </Tooltip>
                 )}
-            </ToolboxButtonStack>
+                {settings.showCenterControl && (
+                    <Tooltip text="Zentrieren" position={settings.toolboxPosition} className="text-text">
+                        <RoundButton
+                            onClick={() => {
+                                workspaceRef.current?.scrollCenter();
+                                triggerAction(EvaluationAction.UseCenterButton);
+                            }}
+                        >
+                            <CrosshairIcon className="w-5 h-5" />
+                        </RoundButton>
+                    </Tooltip>
+                )}
+                {settings.showZoomControls && (
+                    <>
+                        <Tooltip text="Reinzoomen" position={settings.toolboxPosition} className="text-text">
+                            <RoundButton
+                                onClick={() => {
+                                    set(
+                                        "zoom",
+                                        Math.min(
+                                            settings.zoom + 0.1,
+                                            layout.find((g) => g.settings.zoom)!.settings.zoom!.max
+                                        )
+                                    );
+                                    triggerAction(EvaluationAction.UseZoomInButton);
+                                }}
+                                disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.max}
+                            >
+                                <ZoomPlusIcon className="w-5 h-5" />
+                            </RoundButton>
+                        </Tooltip>
+                        <Tooltip text="Rauszoomen" position={settings.toolboxPosition} className="text-text">
+                            <RoundButton
+                                onClick={() => {
+                                    set(
+                                        "zoom",
+                                        Math.max(
+                                            settings.zoom - 0.1,
+                                            layout.find((g) => g.settings.zoom)!.settings.zoom!.min
+                                        )
+                                    );
+                                    triggerAction(EvaluationAction.UseZoomOutButton);
+                                }}
+                                disabled={settings.zoom === layout.find((g) => g.settings.zoom)!.settings.zoom!.min}
+                            >
+                                <ZoomMinusIcon className="w-5 h-5" />
+                            </RoundButton>
+                        </Tooltip>
+                    </>
+                )}
+            </ButtonStack>
+            {(settings.showManual || settings.showSettings) && (
+                <ToolboxButtonStack style={{ width: `${toolboxWidth}px` }}>
+                    {settings.showManual && (
+                        <Tooltip
+                            text="Handbuch"
+                            className="text-text"
+                            position={settings.toolboxPosition === "left" ? "right" : "left"}
+                        >
+                            <ToolboxButton onClick={() => showHelp("#help-start")}>
+                                <BookOpenIcon className="h-6 w-6 text-white" />
+                            </ToolboxButton>
+                        </Tooltip>
+                    )}
+                    {Object.keys(settings).some((p) => !isHidden(p as keyof LayoutSettings)) &&
+                        settings.showSettings && (
+                            <Tooltip
+                                text="Einstellungen"
+                                className="text-text"
+                                position={settings.toolboxPosition === "left" ? "right" : "left"}
+                            >
+                                <ToolboxButton
+                                    onClick={() => setSettingsModalOpen((old) => !old)}
+                                    className="bg-primary-400"
+                                >
+                                    <SettingsIcon className="h-6 w-6 text-white" />
+                                </ToolboxButton>
+                            </Tooltip>
+                        )}
+                </ToolboxButtonStack>
+            )}
             {createPortal(
                 <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />,
                 document.body

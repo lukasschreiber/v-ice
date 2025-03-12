@@ -13,6 +13,11 @@ export interface LayoutSettings {
     disableVisualEffects: CheckboxSetting
     disableLinks: CheckboxSetting
     toolboxPosition: SelectSetting<"left" | "right">
+    showZoomControls: CheckboxSetting
+    showCenterControl: CheckboxSetting
+    showAutocomplete: CheckboxSetting
+    showSettings: CheckboxSetting
+    showManual: CheckboxSetting
 
     // Persistence
     saveWorkspace: CheckboxSetting
@@ -87,7 +92,38 @@ export function getSettingsDefinition() {
                         { label: "Right", value: "right" },
                     ],
                     helpText: "Change the position of the toolbox",
+                },
+                showZoomControls: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Zoom Controls",
+                    helpText: "Show the zoom controls",
+                },
+                showCenterControl: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show the Center Button",
+                    helpText: "Show the center control",
+                },
+                showAutocomplete: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Autocomplete",
+                    helpText: "Show the autocomplete dropdown",
+                },
+                showSettings: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Settings",
+                    helpText: "Show the settings button",
+                },
+                showManual: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Manual",
+                    helpText: "Show the manual button",
                 }
+
             }
         },
         {
