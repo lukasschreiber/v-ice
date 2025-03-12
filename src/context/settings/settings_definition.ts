@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import { CheckboxSetting, ColorSetting, RangeSetting, SelectSetting, defineSettings } from "@/context/settings/settings";
+import { CheckboxSetting, ColorSetting, RangeSetting, SelectSetting, TextSetting, defineSettings } from "@/context/settings/settings";
 
 export interface LayoutSettings {
     // Blockly
@@ -13,6 +13,10 @@ export interface LayoutSettings {
     disableVisualEffects: CheckboxSetting
     disableLinks: CheckboxSetting
     toolboxPosition: SelectSetting<"left" | "right">
+
+    // Persistence
+    saveWorkspace: CheckboxSetting
+    persistenceKey: TextSetting
 }
 
 export function getSettingsDefinition() {
@@ -83,6 +87,23 @@ export function getSettingsDefinition() {
                         { label: "Right", value: "right" },
                     ],
                     helpText: "Change the position of the toolbox",
+                }
+            }
+        },
+        {
+            name: "Persistence",
+            settings: {
+                saveWorkspace: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Save Workspace",
+                    helpText: "Save the workspace to local storage",
+                },
+                persistenceKey: {
+                    type: "text",
+                    default: "vice-workspace",
+                    label: "Persistence Key",
+                    helpText: "Change the key used to save the workspace",
                 }
             }
         }

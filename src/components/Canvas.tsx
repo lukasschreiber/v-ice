@@ -43,7 +43,7 @@ import { NodeBlock } from "@/blocks/extensions/node";
 import { selectSourceDataTable } from "@/store/data/source_table_slice";
 import { setResultTables } from "@/store/data/result_tables_slice";
 import { NormalizedFitleredDataTable } from "@/data/filtered_table";
-import { Settings } from "@/context/settings/settings";
+import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
 import { warn } from "@/utils/logger";
 
@@ -63,10 +63,11 @@ export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     queryClient?: QueryClient;
     theme?: Blockly.Theme;
     initialSettings?: Partial<Settings>;
+    settingsVisibility?: Partial<Record<keyof Settings, boolean>>;
 };
 
 export function Canvas(props: CanvasProps) {
-    const { language, theme, helpUrl, media, width, height, toolbox, queryClient, initialSettings, ...divProps } =
+    const { language, theme, helpUrl, media, width, height, toolbox, queryClient, initialSettings, settingsVisibility, ...divProps } =
         props;
 
     const blocklyDiv = createRef<HTMLDivElement>();
@@ -78,8 +79,10 @@ export function Canvas(props: CanvasProps) {
         settings,
         set,
         layout,
+        isHidden,
         isInitialized: settingsIninitialized,
         setInitialSettings,
+        overrideVisibility,
     } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
     const [isLoading, setIsLoading] = useState(true);
@@ -97,6 +100,10 @@ export function Canvas(props: CanvasProps) {
     useEffect(() => {
         setInitialSettings(initialSettings ?? {});
     }, [initialSettings, setInitialSettings]);
+
+    useEffect(() => {
+        overrideVisibility(settingsVisibility ?? {});
+    }, [settingsVisibility, overrideVisibility]);
 
     useEffect(() => {
         setHelpUrl(helpUrl ?? null);
@@ -392,7 +399,7 @@ export function Canvas(props: CanvasProps) {
                         <BookOpenIcon className="h-6 w-6 text-white" />
                     </ToolboxButton>
                 </Tooltip>
-                <Tooltip
+                {Object.keys(settings).some(p => !isHidden(p as keyof LayoutSettings)) && <Tooltip
                     text="Einstellungen"
                     className="text-text"
                     position={settings.toolboxPosition === "left" ? "right" : "left"}
@@ -400,7 +407,7 @@ export function Canvas(props: CanvasProps) {
                     <ToolboxButton onClick={() => setSettingsModalOpen((old) => !old)} className="bg-primary-400">
                         <SettingsIcon className="h-6 w-6 text-white" />
                     </ToolboxButton>
-                </Tooltip>
+                </Tooltip>}
             </ToolboxButtonStack>
             {createPortal(
                 <SettingsModal open={settingsModalOpen} onClose={() => setSettingsModalOpen(false)} />,
