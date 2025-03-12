@@ -7,6 +7,7 @@ import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance"
 import { BlockASTBuilder, NodeBlockASTBuilder } from "@/query/builder/ast_builder"
 import { ASTOperationNode, ASTPrimitiveNode, ASTSetNode } from "@/query/builder/ast"
 import { BlocklyTranslationKeys } from "@/i18n"
+import { debug } from "@/utils/logger"
 
 // This is needed because currently blockly defines BlockDefinition as any, see this Github Issue:
 // https://github.com/google/blockly/issues/6828
@@ -42,7 +43,7 @@ export function registerBlock<Es extends RegistrableExtension[], M extends Regis
         },
     }
 
-    console.log("Registering block", definition.id)
+    debug("Registering block", definition.id).addVariable("ID", definition.id).addVariable("Definition", definition).log()
     Blockly.Blocks[definition.id] = blockDefinition
 }
 

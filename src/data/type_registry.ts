@@ -3,13 +3,14 @@ import { Hierarchy, IHierarchyDefinition } from "./hierarchy";
 import { DataTable, SerializedTable } from "./table";
 import types, { IType } from "./types";
 import { TypeChecker } from "./type_checker";
+import { debug } from "@/utils/logger";
 
 export class TypeRegistry {
     private hierarchies: Map<string, Hierarchy> = new Map();
     private enums: Map<string, EnumDefinition> = new Map();
 
     public registerHierarchy(type: string, hierarchy: IHierarchyDefinition) {
-        console.log(`TypeRegistry.registerHierarchy: ${type}`);
+        debug(`TypeRegistry.registerHierarchy: ${type}`).addVariable("Hierarchy", type).log();
         this.hierarchies.set(type, new Hierarchy(hierarchy, type));
     }
 
@@ -22,7 +23,7 @@ export class TypeRegistry {
     }
 
     public registerEnum(type: string, definition: EnumDefinition) {
-        // console.log(`TypeRegistry.registerEnum: ${type}`);
+        debug(`TypeRegistry.registerEnum: ${type}`).addVariable("Enum", type).log();
         this.enums.set(type, definition);
     }
 
@@ -122,7 +123,7 @@ export class TypeRegistry {
     }
 
     static init() {
-        console.log("TypeRegistry.init");
+        debug("TypeRegistry.init").log();
         const typeRegistry = new TypeRegistry();
 
         return typeRegistry;

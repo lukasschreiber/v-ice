@@ -1,3 +1,4 @@
+import { debug } from "@/utils/logger";
 import * as Blockly from "blockly/core"
 
 /**
@@ -32,7 +33,7 @@ export abstract class BlockExtension<T extends Blockly.Block> {
         const outerThis = this
         if (Blockly.Extensions.isRegistered(this.name)) Blockly.Extensions.unregister(this.name);
 
-        console.log("Registering extension", this.name)
+        debug("Registering extension", this.name).addVariable("Name", this.name).log()
 
         Blockly.Extensions.register(
             this.name,

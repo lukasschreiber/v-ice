@@ -155,8 +155,6 @@ export class QueryCodeGenerator {
                     return true;
                 });
             }) || []);
-
-            console.log(operation, filteredTransformers);
             
             transformer = (filteredTransformers.length > 0 ? filteredTransformers[0].transformer : null) as NodeTransformerFn<K, N> | null;
         }        

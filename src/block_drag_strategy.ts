@@ -209,8 +209,6 @@ export class BlockDragStrategy implements Blockly.IDragStrategy {
             this.connectionCandidate = null;
 
             // we want to find the closest connection to the dragging block, no matter if it is compatible or not
-            // const localConns = this.getLocalConnections(draggingBlock);
-            // console.log("warning: no candidate found", localConns.length)
             return;
         }
         const candidate =

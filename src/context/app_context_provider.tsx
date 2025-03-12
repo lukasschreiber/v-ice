@@ -7,6 +7,7 @@ import { HelpProvider } from "../context/manual/manual_context";
 import { setDebugger } from "./settings/settings_slice";
 import React, { useEffect } from "react";
 import { ApplicationContext } from "@/store/hooks";
+import { LogLevel } from "@/utils/logger";
 
 export function ApplicationContextProvider(
     props: React.ComponentPropsWithoutRef<"div"> & {
@@ -16,6 +17,7 @@ export function ApplicationContextProvider(
             blocklyXml: boolean;
             code: boolean;
         };
+        logLevel?: LogLevel;
     }
 ) {
     useEffect(() => {
@@ -26,10 +28,11 @@ export function ApplicationContextProvider(
                     blocklyJson: false,
                     blocklyXml: false,
                     code: false,
+                    logLevel: props.logLevel ?? LogLevel.INFO,
                 }
             )
         );
-    }, [props.debug]);
+    }, [props.debug, props.logLevel]);
 
     return (
         <Provider store={store} context={ApplicationContext}>

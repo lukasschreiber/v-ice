@@ -45,13 +45,14 @@ import { setResultTables } from "@/store/data/result_tables_slice";
 import { NormalizedFitleredDataTable } from "@/data/filtered_table";
 import { Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
+import { warn } from "@/utils/logger";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
 try {
     Blockly.blockRendering.register(Renderer.name, Renderer);
 } catch (e) {
-    console.log("Renderer has already been registered");
+    warn("Renderer has already been registered").log();
 }
 
 export type CanvasProps = React.HTMLProps<HTMLDivElement> & {

@@ -45,10 +45,8 @@ export class TypedConnectionChecker extends Blockly.ConnectionChecker {
 
         // BEGIN: Input/Output Check
         if (a.type === Blockly.INPUT_VALUE && b.type === Blockly.OUTPUT_VALUE) {
-            // console.log("Checking connection between", checkOne, checkTwo);
             return TypeChecker.checkTypeCompatibility(t.utils.fromString(checkOne), t.utils.fromString(checkTwo));
         } else if (a.type === Blockly.OUTPUT_VALUE && b.type === Blockly.INPUT_VALUE) {
-            // console.log("Checking connection between", checkTwo, checkOne);
             return TypeChecker.checkTypeCompatibility(t.utils.fromString(checkTwo), t.utils.fromString(checkOne));
         }
         // END: Input/Output Check
