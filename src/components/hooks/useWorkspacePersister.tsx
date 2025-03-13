@@ -33,13 +33,27 @@ export function useWorkspacePersister() {
             // in that case we do not have to do anything and are ready
             setInitialized(true);
         }
+    }, [
+        workspaceRef,
+        isWorkspaceInitialized,
+        settings.saveWorkspace,
+        settings.persistenceKey,
+        isSourceTableInitialized,
+    ]);
 
-        if (workspaceRef.current && settings.saveWorkspace && settings.persistenceKey && settings.persistenceKey.length > 0 && initialized) {
+    useEffect(() => {
+        if (
+            workspaceRef.current &&
+            settings.saveWorkspace &&
+            settings.persistenceKey &&
+            settings.persistenceKey.length > 0 &&
+            initialized
+        ) {
             workspaceRef.current.addChangeListener(() => {
                 setSavedWorkspace(workspaceRef.current ? serializeWorkspace(workspaceRef.current) : null);
             });
         }
-    }, [workspaceRef, isWorkspaceInitialized, settings.saveWorkspace, settings.persistenceKey, isSourceTableInitialized]);
+    }, [workspaceRef, settings.saveWorkspace, settings.persistenceKey, initialized]);
 
     return { isWorkspaceLoaded: initialized };
 }
