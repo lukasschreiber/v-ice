@@ -9,15 +9,24 @@ export class EdgeDrawer {
     protected edge_: Edge
 
     protected readonly markerId_: string = "marker"
-    protected readonly defaultWidth_: number = 5
     protected readonly linkRoot_: SVGGElement
     protected edgePath_: SVGPathElement | null = null
-    protected pathWidth_: number = this.defaultWidth_
+    protected pathWidth_: number
     protected colorClass_: string = "stroke-green-500/40"
+    protected edgeKind_: string = "curved"
+    protected edgeLineCap_: string = "round"
+    protected edgeMinWidth_: number = 5
+    protected edgeMaxWidth_: number = 20
 
     constructor(edge: Edge, linkRoot: SVGGElement) {
         this.edge_ = edge
         this.linkRoot_ = linkRoot
+
+        const settings = store.getState().settings.settings
+        this.edgeKind_ = settings.edgeKind
+        this.edgeLineCap_ = settings.edgeLineCap
+        this.edgeMinWidth_ = settings.edgeMinWidth
+        this.edgeMaxWidth_ = settings.edgeMaxWidth + settings.edgeMinWidth
 
         if (this.edge_.sourceBlock && this.edge_.targetBlock && this.edge_.sourceField && this.edge_.targetField) {
             const counts = store.getState().edgeCounts.counts
@@ -25,18 +34,20 @@ export class EdgeDrawer {
             const maxCount = Math.max(...Object.values(counts))
             const minCount = 0
             if (currentCount !== undefined && currentCount !== 0) {
-                this.pathWidth_ = Math.max(5, Math.min(20, Math.round((currentCount - minCount) / (maxCount - minCount) * 20)))
+                this.pathWidth_ = Math.max(this.edgeMinWidth_, Math.min(this.edgeMaxWidth_, Math.round((currentCount - minCount) / (maxCount - minCount) * this.edgeMaxWidth_)))
                 const isNegative = this.edge_.sourceField.getConnectionType() === NodeConnectionType.NEGATIVE || this.edge_.targetField.getConnectionType() === NodeConnectionType.NEGATIVE
                 this.colorClass_ = isNegative ? "stroke-red-500/40" : "stroke-green-500/40"
             } else {
-                this.pathWidth_ = this.defaultWidth_
+                this.pathWidth_ = this.edgeMinWidth_
                 this.colorClass_ = "stroke-slate-500/20"
             }
+        } else {
+            this.pathWidth_ = this.edgeMinWidth_
         }
     }
 
-    protected drawEdge_(from: {x: number, y: number}, to: {x: number, y: number}, blockId: string, connectionId: string, className: string = "") {
-        if(!this.edge_.sourceField || !this.edge_.sourceBlock) return
+    protected drawEdge_(from: { x: number, y: number }, to: { x: number, y: number }, blockId: string, connectionId: string, className: string = "") {
+        if (!this.edge_.sourceField || !this.edge_.sourceBlock) return
 
         const controlPointXDistance = Math.min(Math.max(Math.abs(to.x - from.x), 100), 150)
 
@@ -49,15 +60,26 @@ export class EdgeDrawer {
                 "data-connection": connectionId,
                 "class": `${className} hover:cursor-pointer`,
                 "stroke-width": this.pathWidth_,
+                "stroke-linecap": this.edgeLineCap_,
                 "fill": "none",
-                "d": Blockly.utils.svgPaths.moveTo(from.x, from.y) + Blockly.utils.svgPaths.curve("C", [
-                    Blockly.utils.svgPaths.point(isOriginAlignedLeft ? from.x - controlPointXDistance : from.x + controlPointXDistance, from.y),
-                    Blockly.utils.svgPaths.point(isOriginAlignedLeft ? to.x + controlPointXDistance : to.x - controlPointXDistance, to.y),
-                    Blockly.utils.svgPaths.point(to.x, to.y),
-                ])
+                "d": this.getEdgePath(from, to, controlPointXDistance, isOriginAlignedLeft)
             },
-            this.linkRoot_ 
+            this.linkRoot_
         )
+    }
+
+    getEdgePath(from: { x: number, y: number }, to: { x: number, y: number }, controlPointXDistance: number, isOriginAlignedLeft: boolean) {
+        if (this.edgeKind_ === "curved") {
+            return Blockly.utils.svgPaths.moveTo(from.x, from.y) + Blockly.utils.svgPaths.curve("C", [
+                Blockly.utils.svgPaths.point(isOriginAlignedLeft ? from.x - controlPointXDistance : from.x + controlPointXDistance, from.y),
+                Blockly.utils.svgPaths.point(isOriginAlignedLeft ? to.x + controlPointXDistance : to.x - controlPointXDistance, to.y),
+                Blockly.utils.svgPaths.point(to.x, to.y),
+            ])
+        } else if (this.edgeKind_ === "straight") {
+            return Blockly.utils.svgPaths.moveTo(from.x, from.y) + Blockly.utils.svgPaths.lineTo(to.x - from.x, to.y - from.y)
+        }
+
+        throw new Error("Invalid edge kind")
     }
 
     drawMarker(mouseEvent: MouseEvent) {
@@ -75,7 +97,7 @@ export class EdgeDrawer {
             mouseXY.x = (mouseXY.x - absoluteMetrics.left - workspace.scrollX) / workspace.scale
             mouseXY.y = (mouseXY.y - absoluteMetrics.top - workspace.scrollY) / workspace.scale
 
-            if(target && target instanceof FieldEdgeConnection) {
+            if (target && target instanceof FieldEdgeConnection) {
                 mouseXY.x = target.getEdgeXY().x
                 mouseXY.y = target.getEdgeXY().y
             }
@@ -85,19 +107,19 @@ export class EdgeDrawer {
     }
 
     draw() {
-        if(!this.edge_.sourceField || !this.edge_.sourceBlock) return
+        if (!this.edge_.sourceField || !this.edge_.sourceBlock) return
 
         if (this.edge_.sourceBlock.shouldDrawEdges() && this.edge_.targetBlock && this.edge_.targetField && this.edge_.sourceField.name) {
             const connectionId = getEdgeId(this.edge_)
             this.linkRoot_.querySelectorAll(`[data-connection="${connectionId}"]`).forEach((element) => element.remove())
 
             this.drawEdge_(this.edge_.sourceField.getEdgeXY(), this.edge_.targetField.getEdgeXY(), this.edge_.sourceBlock.id, connectionId, this.colorClass_)
-         
+
             // TODO: move to gesture
             this.edgePath_!.addEventListener("click", () => {
-                if(!this.edge_.sourceField || !this.edge_.sourceBlock) return
+                if (!this.edge_.sourceField || !this.edge_.sourceBlock) return
 
-                if(this.edge_.targetBlock && this.edge_.targetField?.name && this.edge_.sourceField.name) {
+                if (this.edge_.targetBlock && this.edge_.targetField?.name && this.edge_.sourceField.name) {
                     store.dispatch(setEdgeEditMarker({
                         sourceBlockId: this.edge_.sourceBlock.id,
                         sourceName: this.edge_.sourceField.name,

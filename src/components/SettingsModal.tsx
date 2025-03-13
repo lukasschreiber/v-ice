@@ -29,7 +29,7 @@ export function SettingsModal(props: ModalProps) {
                 <div className="flex flex-col">
                     <label htmlFor={key} className="flex flex-row items-center gap-2">
                         <span>
-                            {setting.label} - {(settings[key] as number).toFixed(2)}
+                            {setting.label} - {((settings[key] ?? setting.default) as number).toFixed(2)}
                         </span>
                         <span className="text-sm cursor-pointer" onClick={() => set(key, defaultSettings[key])}>
                             [<span className="underline text-secondary">{defaultSettings[key]}</span>]

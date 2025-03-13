@@ -12,6 +12,10 @@ export interface LayoutSettings {
     // Appearance
     disableVisualEffects: CheckboxSetting
     disableLinks: CheckboxSetting
+    edgeKind: SelectSetting<"straight" | "curved">
+    edgeLineCap: SelectSetting<"round" | "square" | "butt">
+    edgeMinWidth: RangeSetting
+    edgeMaxWidth: RangeSetting
     toolboxPosition: SelectSetting<"left" | "right">
     showZoomControls: CheckboxSetting
     showCenterControl: CheckboxSetting
@@ -93,6 +97,45 @@ export function getSettingsDefinition() {
                         { label: "Right", value: "right" },
                     ],
                     helpText: "Change the position of the toolbox",
+                },
+                edgeKind: {
+                    type: "select",
+                    default: "curved",
+                    label: "Edge Kind",
+                    options: [
+                        { label: "Curved", value: "curved" },
+                        { label: "Straight", value: "straight" },
+                    ],
+                    helpText: "Change the kind of edges between blocks",
+                },
+                edgeLineCap: {
+                    type: "select",
+                    default: "butt",
+                    label: "Edge Line Cap",
+                    options: [
+                        { label: "Round", value: "round" },
+                        { label: "Square", value: "square" },
+                        { label: "Butt", value: "butt" },
+                    ],
+                    helpText: "Change the line cap of the edges",
+                },
+                edgeMinWidth: {
+                    type: "range",
+                    default: 5,
+                    label: "Edge Min Width",
+                    min: 1,
+                    max: 20,
+                    stepSize: 1,
+                    helpText: "Change the minimum width of the edges",
+                },
+                edgeMaxWidth: {
+                    type: "range",
+                    default: 20,
+                    label: "Edge Max Width",
+                    min: 1,
+                    max: 30,
+                    stepSize: 1,
+                    helpText: "The difference between the min and max width",
                 },
                 showZoomControls: {
                     type: "checkbox",

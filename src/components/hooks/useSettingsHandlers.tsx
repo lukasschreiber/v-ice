@@ -84,4 +84,8 @@ export function useSettingsHandlers(
             document.head.appendChild(style);
         }
     }, [workspaceRef, settings.disableLinks]);
+
+    useEffect(() => {
+        workspaceRef.current?.render();
+    }, [workspaceRef, settings.edgeKind, settings.edgeLineCap, settings.edgeMaxWidth, settings.edgeMinWidth]);
 }
