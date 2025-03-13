@@ -16,52 +16,80 @@ import { BlockInfoWidget } from "./BlockInfoWidget";
 declare global {
     namespace JSX {
         interface IntrinsicElements {
-            blockpreview: {data: {block: GenericBlockDefinition}}
-            typeicon: {data: {type: string}}
-            inlineblockpreview: {data: {block: GenericBlockDefinition, text: string}}
-            anchor: {id: string}
-            infobox: {data: {type: InfoBoxType}}
-            blockinfowidget: {data: {type: string}}
+            blockpreview: { data: { block: GenericBlockDefinition } };
+            typeicon: { data: { type: string } };
+            inlineblockpreview: { data: { block: GenericBlockDefinition; text: string } };
+            anchor: { id: string };
+            infobox: { data: { type: InfoBoxType } };
+            blockinfowidget: { data: { type: string } };
         }
     }
 }
 
 interface MarkdownViewProps extends HTMLProps<HTMLDivElement> {
     markdown: string;
+    externalWindowRef?: React.RefObject<WindowProxy>;
 }
 
 export function MarkdownView(props: MarkdownViewProps) {
     const markdownContainerRef = React.useRef<HTMLDivElement>(null);
     return (
         <Markdown
-            remarkPlugins={[gfm, directive, blockPreviewDirective, typeIconDirective, inlineBlockPreviewDirective, anchorDirective, infoBoxDirective, blockInfoWidgetDirective]}
+            remarkPlugins={[
+                gfm,
+                directive,
+                blockPreviewDirective,
+                typeIconDirective,
+                inlineBlockPreviewDirective,
+                anchorDirective,
+                infoBoxDirective,
+                blockInfoWidgetDirective,
+            ]}
             className={"markdown-body px-2 !bg-transparent"}
-            components={{ 
+            components={{
                 /* eslint-disable @typescript-eslint/no-unused-vars */
                 img: ({ node, ...props }) => <MediaView {...props} />,
                 a: ({ node, href, ...props }) => {
                     if (href?.startsWith("#")) {
-                        return <a {...props} onClick={() => showHelp(href)} className="hover:!underline !text-[#0969da] cursor-pointer" />
+                        return (
+                            <a
+                                {...props}
+                                onClick={() => showHelp(href)}
+                                className="hover:!underline !text-[#0969da] cursor-pointer"
+                            />
+                        );
                     }
-                    return <a {...props} href={href}/>
+                    return <a {...props} href={href} />;
                 },
                 blockpreview: ({ data }) => {
-                    return <BlockPreview block={data.block} lazyLoadParentRef={markdownContainerRef} />
+                    return (
+                        <BlockPreview
+                            block={data.block}
+                            lazyLoadParentRef={markdownContainerRef}
+                            externalWindowRef={props.externalWindowRef}
+                        />
+                    );
                 },
                 typeicon: ({ data }) => {
-                    return <TypeIconPreview type={data.type} />
+                    return <TypeIconPreview type={data.type} />;
                 },
                 inlineblockpreview: ({ data }) => {
-                    return <BlockInlinePreview text={data.text} block={data.block} />
+                    return (
+                        <BlockInlinePreview
+                            text={data.text}
+                            block={data.block}
+                            externalWindowRef={props.externalWindowRef}
+                        />
+                    );
                 },
                 anchor: ({ node, ...props }) => {
-                    return <a id={props.id}></a>
+                    return <a id={props.id}></a>;
                 },
                 infobox: ({ node, data, ...props }) => {
-                    return <InfoBox type={data.type} {...props} />
+                    return <InfoBox type={data.type} {...props} />;
                 },
                 blockinfowidget: ({ data }) => {
-                    return <BlockInfoWidget type={data.type} />
+                    return <BlockInfoWidget type={data.type} />;
                 },
                 /* eslint-enable @typescript-eslint/no-unused-vars */
             }}
@@ -71,40 +99,39 @@ export function MarkdownView(props: MarkdownViewProps) {
     );
 }
 
-export const InvariantMarkdownView: React.FC<MarkdownViewProps> = memo(({markdown}) => {
-    return <MarkdownView markdown={markdown} />
+export const InvariantMarkdownView: React.FC<MarkdownViewProps> = memo(({ markdown, externalWindowRef }) => {
+    return <MarkdownView markdown={markdown} externalWindowRef={externalWindowRef} />;
 });
 
 function anchorDirective() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (tree: any) => {
-        visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
-            if (node.name === 'anchor') {
+        visit(tree, ["textDirective", "leafDirective", "containerDirective"], (node) => {
+            if (node.name === "anchor") {
                 const data = node.attributes || {};
-                node.type = 'anchor';
-                node.data = {hName: 'anchor', hProperties: {id: data.id}};
+                node.type = "anchor";
+                node.data = { hName: "anchor", hProperties: { id: data.id } };
             }
         });
     };
-
 }
 
 function blockPreviewDirective() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (tree: any) => {
-        visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
-            if (node.name === 'block-preview') {
+        visit(tree, ["textDirective", "leafDirective", "containerDirective"], (node) => {
+            if (node.name === "block-preview") {
                 const data = node.attributes || {};
                 // Ensure fields and inputs are parsed as JSON if they are strings
-                if (typeof data.block === 'string') {
+                if (typeof data.block === "string") {
                     try {
                         data.block = JSON.parse(data.block.replace(/'/g, '"'));
                     } catch (e) {
-                        console.error('Invalid JSON for block', e);
+                        console.error("Invalid JSON for block", e);
                     }
                 }
-                node.type = 'block-preview';
-                node.data = { hName: 'blockpreview', hProperties: { data } };
+                node.type = "block-preview";
+                node.data = { hName: "blockpreview", hProperties: { data } };
             }
         });
     };
@@ -113,19 +140,19 @@ function blockPreviewDirective() {
 function inlineBlockPreviewDirective() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (tree: any) => {
-        visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
-            if (node.name === 'inline-block-preview') {
+        visit(tree, ["textDirective", "leafDirective", "containerDirective"], (node) => {
+            if (node.name === "inline-block-preview") {
                 const data = node.attributes || {};
                 // Ensure fields and inputs are parsed as JSON if they are strings
-                if (typeof data.block === 'string') {
+                if (typeof data.block === "string") {
                     try {
                         data.block = JSON.parse(data.block.replace(/'/g, '"'));
                     } catch (e) {
-                        console.error('Invalid JSON for block', e);
+                        console.error("Invalid JSON for block", e);
                     }
                 }
-                node.type = 'inline-block-preview';
-                node.data = { hName: 'inlineblockpreview', hProperties: { data } };
+                node.type = "inline-block-preview";
+                node.data = { hName: "inlineblockpreview", hProperties: { data } };
             }
         });
     };
@@ -134,11 +161,11 @@ function inlineBlockPreviewDirective() {
 function typeIconDirective() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (tree: any) => {
-        visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
-            if (node.name === 'type-icon') {
+        visit(tree, ["textDirective", "leafDirective", "containerDirective"], (node) => {
+            if (node.name === "type-icon") {
                 const data = node.attributes || {};
-                node.type = 'type-icon';
-                node.data = { hName: 'typeicon', hProperties: { data } };
+                node.type = "type-icon";
+                node.data = { hName: "typeicon", hProperties: { data } };
             }
         });
     };
@@ -147,11 +174,11 @@ function typeIconDirective() {
 function infoBoxDirective() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (tree: any) => {
-        visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
-            if (node.name === 'info-box') {
+        visit(tree, ["textDirective", "leafDirective", "containerDirective"], (node) => {
+            if (node.name === "info-box") {
                 const data = node.attributes || {};
-                node.type = 'infobox';
-                node.data = { hName: 'infobox', hProperties: { data } };
+                node.type = "infobox";
+                node.data = { hName: "infobox", hProperties: { data } };
             }
         });
     };
@@ -160,11 +187,11 @@ function infoBoxDirective() {
 function blockInfoWidgetDirective() {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     return (tree: any) => {
-        visit(tree, ['textDirective', 'leafDirective', 'containerDirective'], (node) => {
-            if (node.name === 'blockinfo') {
+        visit(tree, ["textDirective", "leafDirective", "containerDirective"], (node) => {
+            if (node.name === "blockinfo") {
                 const data = node.attributes || {};
-                node.type = 'blockinfowidget';
-                node.data = { hName: 'blockinfowidget', hProperties: { data } };
+                node.type = "blockinfowidget";
+                node.data = { hName: "blockinfowidget", hProperties: { data } };
             }
         });
     };

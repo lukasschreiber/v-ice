@@ -5,8 +5,9 @@ import { Renderer } from "@/renderer/renderer";
 import { Blocks } from "@/blocks";
 import { LightTheme } from "@/themes/themes";
 import types from "@/data/types";
+import { injectAcrossDocuments } from "@/blockly_inject_across_documents";
 
-export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadParentRef?: React.RefObject<HTMLElement> }) {
+export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadParentRef?: React.RefObject<HTMLElement>, externalWindowRef?: React.RefObject<WindowProxy> }) {
     const div = useRef<HTMLDivElement>(null);
     const observer = useRef<IntersectionObserver | null>(null);
     const workspaceRef = useRef<Blockly.WorkspaceSvg | null>(null);
@@ -18,8 +19,10 @@ export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadPar
                 return;
             }
 
+            const doc = props.externalWindowRef?.current?.document || document
+
             if (!workspaceRef.current) {
-                workspaceRef.current = Blockly.inject(div.current, {
+                workspaceRef.current = injectAcrossDocuments(div.current, doc, {
                     readOnly: true,
                     theme: LightTheme,
                     renderer: Renderer.name,

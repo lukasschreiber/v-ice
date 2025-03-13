@@ -3,9 +3,11 @@ import { useRef, useState } from "react";
 import { BlockPreview } from "./BlockPreview";
 import { createPortal } from "react-dom";
 
-export function BlockInlinePreview(props: { block: GenericBlockDefinition; text: string }) {
+export function BlockInlinePreview(props: { block: GenericBlockDefinition; text: string, externalWindowRef?: React.RefObject<WindowProxy> }) {
     const [isHovered, setIsHovered] = useState(false);
     const inlineElementRef = useRef<HTMLSpanElement>(null);
+
+    const doc = props.externalWindowRef?.current?.document || document;
 
     return (
         <span
@@ -38,7 +40,7 @@ export function BlockInlinePreview(props: { block: GenericBlockDefinition; text:
                             </div>
                         </div>
                     </div>,
-                    document.body
+                    doc.body
                 )}
         </span>
     );

@@ -16,8 +16,11 @@ function hexToRgb(hex: string, seperator: string = " "): string {
 
 }
 
+export const ROOT_VARIABLE_STYLESHEET_ID = "root-variable-stylesheet"
+
 function setColorVariables(colors: ColorsLike) {
     const stylesheet = document.createElement("style")
+    stylesheet.id = ROOT_VARIABLE_STYLESHEET_ID
     stylesheet.innerHTML = `
     :root {
         ${Object.entries(flattenColorsLikeObject(colors)).map(([name, color]) => {

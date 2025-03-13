@@ -18,6 +18,7 @@ export interface LayoutSettings {
     showAutocomplete: CheckboxSetting
     showSettings: CheckboxSetting
     showManual: CheckboxSetting
+    allowManualToPopout: CheckboxSetting
 
     // Persistence
     saveWorkspace: CheckboxSetting
@@ -122,8 +123,13 @@ export function getSettingsDefinition() {
                     default: true,
                     label: "Show Manual",
                     helpText: "Show the manual button",
-                }
-
+                },
+                allowManualToPopout: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Allow Manual to Popout",
+                    helpText: "Allow the manual to popout into a new window",
+                },
             }
         },
         {

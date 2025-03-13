@@ -13,9 +13,9 @@ interface BreadCrumb {
     href: string;
 }
 
-export function ManualPage() {
+export function ManualPage(props: {externalWindowRef?: React.RefObject<WindowProxy>}) {
     const { i18n } = useTranslation();
-    const { activePage } = useHelp();
+    const { activePage, setActivePage } = useHelp();
     const [hoveredBreadCrumbElement, setHoveredBreadCrumbElement] = useState<HTMLElement | null>(null);
     const scrollContainerRef = useRef<HTMLDivElement>(null);
     const breadCrumbContainerRef = useRef<HTMLDivElement>(null);
@@ -23,9 +23,11 @@ export function ManualPage() {
     
     const helpMarkdown = useMemo(() => getManualMarkdown(i18n.language), [i18n.language]);
 
+    const doc = props.externalWindowRef?.current?.document ?? document;
+
     useEffect(() => {
         if (activePage) {
-            const element = document.getElementById(activePage.slice(1));
+            const element = doc.getElementById(activePage.slice(1));
             if (element) {
                 element.scrollIntoView({ behavior: "instant" });
             }
@@ -70,7 +72,7 @@ export function ManualPage() {
                         .join("");
 
                     if (!heading.querySelector("a[id]")) {
-                        const anchor = document.createElement("a");
+                        const anchor = doc.createElement("a");
                         anchor.id = text.toLowerCase().replace(/\s/g, "-") ?? "";
                         heading.appendChild(anchor);
                     }
@@ -85,6 +87,7 @@ export function ManualPage() {
                 }
             }
 
+            setActivePage(null);
             setBreadCrumbs(breadCrumbs);
         };
 
@@ -127,13 +130,14 @@ export function ManualPage() {
                 })}
             </div>
             <div className="p-2 overflow-auto overflow-x-hidden" id="help-start" ref={scrollContainerRef}>
-                <InvariantMarkdownView markdown={helpMarkdown} />
+                <InvariantMarkdownView markdown={helpMarkdown} externalWindowRef={props.externalWindowRef} />
             </div>
+            
             {hoveredBreadCrumbElement &&
                 hoveredBreadCrumbElement.offsetWidth !== hoveredBreadCrumbElement.scrollWidth &&
                 createPortal(
                     <div
-                        className="absolute z-[100000] bg-white border border-gray-200 shadow-lg rounded-md px-1"
+                        className="absolute z-[100004] bg-white border border-gray-200 shadow-lg rounded-md px-1"
                         style={{
                             top: `${
                                 hoveredBreadCrumbElement.getBoundingClientRect().top +
@@ -144,7 +148,7 @@ export function ManualPage() {
                     >
                         {hoveredBreadCrumbElement.textContent}
                     </div>,
-                    document.body
+                    doc.body
                 )}
         </>
     );
