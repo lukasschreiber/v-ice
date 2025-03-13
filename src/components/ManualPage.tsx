@@ -7,6 +7,7 @@ import { showHelp } from "@/context/manual/manual_emitter";
 import ChevronRightIcon from "@/assets/ChevronRightIcon.svg?react";
 import { createPortal } from "react-dom";
 import { getManualMarkdown } from "@/context/manual/manual_loader";
+import { Layer } from "@/utils/zindex";
 
 interface BreadCrumb {
     text: string;
@@ -137,8 +138,9 @@ export function ManualPage(props: {externalWindowRef?: React.RefObject<WindowPro
                 hoveredBreadCrumbElement.offsetWidth !== hoveredBreadCrumbElement.scrollWidth &&
                 createPortal(
                     <div
-                        className="absolute z-[100004] bg-white border border-gray-200 shadow-lg rounded-md px-1"
+                        className="absolute bg-white border border-gray-200 shadow-lg rounded-md px-1"
                         style={{
+                            zIndex: Layer.Tooltips,
                             top: `${
                                 hoveredBreadCrumbElement.getBoundingClientRect().top +
                                 hoveredBreadCrumbElement.getBoundingClientRect().height

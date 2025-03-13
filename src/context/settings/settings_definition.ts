@@ -12,7 +12,7 @@ export interface LayoutSettings {
     // Appearance
     disableVisualEffects: CheckboxSetting
     disableLinks: CheckboxSetting
-    edgeKind: SelectSetting<"straight" | "curved">
+    edgeKind: SelectSetting<"straight" | "curved" | "elbow">
     edgeLineCap: SelectSetting<"round" | "square" | "butt">
     edgeMinWidth: RangeSetting
     edgeMaxWidth: RangeSetting
@@ -105,6 +105,7 @@ export function getSettingsDefinition() {
                     options: [
                         { label: "Curved", value: "curved" },
                         { label: "Straight", value: "straight" },
+                        { label: "Elbow", value: "elbow" },
                     ],
                     helpText: "Change the kind of edges between blocks",
                 },

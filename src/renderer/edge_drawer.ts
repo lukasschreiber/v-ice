@@ -77,6 +77,12 @@ export class EdgeDrawer {
             ])
         } else if (this.edgeKind_ === "straight") {
             return Blockly.utils.svgPaths.moveTo(from.x, from.y) + Blockly.utils.svgPaths.lineTo(to.x - from.x, to.y - from.y)
+        } else if (this.edgeKind_ === "elbow") {
+            const elbowDistance = Math.abs(to.x - from.x) / 2
+            return Blockly.utils.svgPaths.moveTo(from.x, from.y) +
+            Blockly.utils.svgPaths.lineOnAxis("H", isOriginAlignedLeft ? from.x - elbowDistance : from.x + elbowDistance) +
+            Blockly.utils.svgPaths.lineOnAxis("V", to.y) +
+            Blockly.utils.svgPaths.lineOnAxis("H", to.x);
         }
 
         throw new Error("Invalid edge kind")

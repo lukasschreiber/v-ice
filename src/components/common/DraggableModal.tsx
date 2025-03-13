@@ -2,6 +2,7 @@ import React, { createRef, useContext } from "react";
 import Draggable from "react-draggable";
 import CloseIcon from "@/assets/CloseIcon.svg?react";
 import { SettingsContext } from "@/context/settings/settings_context";
+import { Layer } from "@/utils/zindex";
 
 export type ModalProps = React.HTMLProps<HTMLDivElement> & { open: boolean; onClose?: () => void};
 
@@ -56,9 +57,10 @@ export function DraggableModal(props: ModalProps) {
                 {...props}
                 className={`${
                     props.open === true ? "block" : "hidden"
-                } absolute z-[100003] shadow-lg border-slate-300 border rounded-md max-w-md flex flex-col overflow-hidden ${
+                } absolute shadow-lg border-slate-300 border rounded-md max-w-md flex flex-col overflow-hidden ${
                     props.className
                 }`}
+                style={{ zIndex: Layer.Modals }}
             >
                 <div
                     className={`absolute top-0 bottom-0 left-0 right-0 -z-10 ${

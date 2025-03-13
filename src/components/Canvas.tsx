@@ -47,6 +47,8 @@ import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
 import { warn } from "@/utils/logger";
 import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
+import { SearchForm } from "./SearchForm";
+import { Layer } from "@/utils/zindex";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -358,8 +360,10 @@ export function Canvas(props: CanvasProps) {
                 ref={blocklyDiv}
                 id={"canvas"}
             ></div>
+            {/* <SearchForm /> */}
             <ButtonStack
-                className={`absolute bottom-8 z-[1000] ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
+                className={`absolute bottom-8 ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
+                style={{ zIndex: Layer.FloatingButtons }}
             >
                 {settings.showAutocomplete && (
                     <Tooltip text="Autocomplete" position={settings.toolboxPosition} className="text-text">

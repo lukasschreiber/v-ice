@@ -1,3 +1,4 @@
+import { Layer } from "@/utils/zindex";
 import { useEffect, useState } from "react";
 
 export function LoadingOverlay(props: { isLoading: boolean }) {
@@ -18,7 +19,8 @@ export function LoadingOverlay(props: { isLoading: boolean }) {
 
   return (
     <div
-      className={`absolute inset-0 z-[100000] flex items-center bg-white justify-center transition-opacity duration-250 ${
+    style={{ zIndex: Layer.Loading}}
+      className={`absolute inset-0 flex items-center bg-white justify-center transition-opacity duration-250 ${
         props.isLoading ? "opacity-100" : "opacity-0"
       }`}
     >

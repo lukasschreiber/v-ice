@@ -1,3 +1,4 @@
+import { Layer } from "@/utils/zindex";
 import { HTMLProps, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
@@ -25,7 +26,7 @@ export function Tooltip(
                 createPortal(
                     <div
                         ref={tooltipRef}
-                        className={`absolute bg-white border border-gray-300 px-1 py-1/2 rounded-md shadow-lg z-[100006] -translate-y-1/2 ${position === "left" ? "-translate-x-[100%]" : ""} ${className}`}
+                        className={`absolute bg-white border border-gray-300 px-1 py-1/2 rounded-md shadow-lg -translate-y-1/2 ${position === "left" ? "-translate-x-[100%]" : ""} ${className}`}
                         style={{
                             top: `${
                                 targetRef.current.getBoundingClientRect().top +
@@ -39,6 +40,7 @@ export function Tooltip(
                             }px`,
                             userSelect: "none",
                             pointerEvents: "none",
+                            zIndex: Layer.Tooltips,
                         }}
                     >
                         {text}
