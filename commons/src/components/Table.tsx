@@ -103,7 +103,7 @@ export function Table(
                         >
                             {headers.map((col, colIndex) => (
                                 <td key={`${row[DataTable.indexColumnName_]}_${colIndex}`} className="px-2 py-1 whitespace-nowrap align-top">
-                                    {formatTableCell(col.values[row[DataTable.indexColumnName_]], col.type)}
+                                    {formatTableCell(dataTable.getValue(row[DataTable.indexColumnName_], colIndex), col.type)}
                                 </td>
                             ))}
                         </tr>
