@@ -1,5 +1,6 @@
 import { QueryClient, QueryClientParams } from "@/query/clients/query_client";
 import { AST } from "../builder/ast";
+import { info } from "@/utils/logger";
 
 export interface RemoteQueryClientParams extends QueryClientParams<"remote"> {
     mode: "remote";
@@ -22,7 +23,7 @@ export class RemoteQueryClient extends QueryClient {
     }
 
     public async execute(query: string): Promise<any> {
-        console.log("Remote query client querying: ", query);
+        info("Remote query client querying: ", query).addVariable("Endpoint", this.endpoint).log();
         return "Remote query result";
     }
 

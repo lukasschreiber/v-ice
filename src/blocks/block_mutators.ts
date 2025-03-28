@@ -1,5 +1,6 @@
 import * as Blockly from "blockly/core"
 import { BlockExtension, MixinProperties } from "./block_extensions"
+import { debug } from "@/utils/logger"
 
 /**
  * A block mutator that can be registered with Blockly.
@@ -79,7 +80,7 @@ export abstract class BlockMutator<T extends Blockly.Block, S = {}> extends Bloc
     public register(): void {
         if (Blockly.Extensions.isRegistered(this.name)) Blockly.Extensions.unregister(this.name);
 
-        console.log("Registering mutator", this.name)
+        debug("Registering mutator", this.name).addVariable("Name", this.name).log()
         // we do not use the extensionFunction here because we cannot mixin properties directly
         Blockly.Extensions.registerMutator(
             this.name,

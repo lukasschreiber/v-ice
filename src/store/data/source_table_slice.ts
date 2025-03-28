@@ -9,8 +9,9 @@ const sourceTableSlice = createSlice({
     initialState: {
         columns: [],
         rows: [],
-        index: []
-    } as NormalizedDataTable,
+        index: [],
+        initialized: false
+    } as NormalizedDataTable & { initialized: boolean },
     reducers: {
         addSourceColumn: (state, action: PayloadAction<{name: string, type: IType}>) => {
             state.columns.push(action.payload);
@@ -36,11 +37,15 @@ const sourceTableSlice = createSlice({
             state.columns = columns;
             state.index = index;
             state.rows = rows;
+            state.initialized = true;
+        },
+        setInitialized: (state, action: PayloadAction<boolean>) => {
+            state.initialized = action.payload;
         }
     }
 });
 
-export const { addSourceColumn, addSourceRow, updateSourceCell, removeSourceRow, setSourceTable } = sourceTableSlice.actions;
+export const { addSourceColumn, addSourceRow, updateSourceCell, removeSourceRow, setSourceTable, setInitialized } = sourceTableSlice.actions;
 export default sourceTableSlice.reducer;
 
 const selectRawSourceTable = (state: RootState) => state.sourceTable;

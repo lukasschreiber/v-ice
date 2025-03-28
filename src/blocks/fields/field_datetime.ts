@@ -6,6 +6,7 @@ import { IconFactory } from "../icon_factory";
 import { DateTimeGranularity, DateTimeGranularityFormat, DateTimeGranularityFormats, DateTimeGranularityLabels, maskFormatString, parseDate } from "@/utils/datetime";
 import { TypedField } from "./field";
 import types from "@/data/types";
+import { debug } from "@/utils/logger";
 
 export class FieldDateTime extends FieldTextInput implements TypedField {
     protected dateTime_: DateTime | null = null;
@@ -76,7 +77,7 @@ export class FieldDateTime extends FieldTextInput implements TypedField {
 
     private dropdownShow(newValue: string | null) {
         if (this.formatGranularity_ === null || this.format_ === null || this.maskedEntries_ === null || (newValue === null && this.dateTime_ === null)) {
-            console.log("returning dropdown show", "format", this.format_, "maskedEntries", this.maskedEntries_, "formatGranularity", this.formatGranularity_, "newValue", newValue, "dateTime", this.dateTime_?.toISO(), "validDate", this.validDate_, "value", this.value_)
+            debug("Returning in dropdown show").addVariables({"format": this.format_, "maskedEntries": this.maskedEntries_, "formatGranularity": this.formatGranularity_, "newValue": newValue, "dateTime": this.dateTime_?.toISO(), "validDate": this.validDate_, "value": this.value_}).log()
             Blockly.DropDownDiv.hideIfOwner(this, true);
             Blockly.WidgetDiv.getDiv()?.querySelector("input")?.focus();
             return;
@@ -106,7 +107,7 @@ export class FieldDateTime extends FieldTextInput implements TypedField {
         const style = this.constants_!.getBlockStyle(this.sourceBlock_!.getStyleName());
 
         if (this.format_ === null || this.maskedEntries_ === null || this.formatGranularity_ === null || (newValue === null && this.dateTime_ === null)) {
-            console.log("returning dropdown container", "format", this.format_, "maskedEntries", this.maskedEntries_, "formatGranularity", this.formatGranularity_, "newValue", newValue, "dateTime", this.dateTime_?.toISO(), "validDate", this.validDate_, "value", this.value_)
+            debug("returning dropdown container").addVariables({"format": this.format_, "maskedEntries": this.maskedEntries_, "formatGranularity": this.formatGranularity_, "newValue": newValue, "dateTime": this.dateTime_?.toISO(), "validDate": this.validDate_, "value": this.value_}).log()
             return this.dropdownContainer_;
         }
         

@@ -2,10 +2,13 @@ import { GenericBlockDefinition } from "@/blocks/toolbox/toolbox_definition";
 import { useRef, useState } from "react";
 import { BlockPreview } from "./BlockPreview";
 import { createPortal } from "react-dom";
+import { Layer } from "@/utils/zindex";
 
-export function BlockInlinePreview(props: { block: GenericBlockDefinition; text: string }) {
+export function BlockInlinePreview(props: { block: GenericBlockDefinition; text: string, externalWindowRef?: React.RefObject<WindowProxy> }) {
     const [isHovered, setIsHovered] = useState(false);
     const inlineElementRef = useRef<HTMLSpanElement>(null);
+
+    const doc = props.externalWindowRef?.current?.document || document;
 
     return (
         <span
@@ -23,8 +26,9 @@ export function BlockInlinePreview(props: { block: GenericBlockDefinition; text:
                 createPortal(
                     <div className="markdown-body">
                         <div
-                            className={`absolute z-[100004] w-fit py-1 top-0 left-0`}
+                            className={`absolute w-fit py-1 top-0 left-0`}
                             style={{
+                                zIndex: Layer.Tooltips,
                                 transform: `translate(
                                     ${inlineElementRef.current!.getBoundingClientRect().left}px, 
                                     ${
@@ -38,7 +42,7 @@ export function BlockInlinePreview(props: { block: GenericBlockDefinition; text:
                             </div>
                         </div>
                     </div>,
-                    document.body
+                    doc.body
                 )}
         </span>
     );

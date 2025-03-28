@@ -2,6 +2,7 @@ import { DateTime } from "luxon";
 import { typeRegistry } from "./type_registry";
 import { IEventType, IHierarchyType, IIntervalType, UnionType, ValueOf } from "./types";
 import t, { IBooleanType, IEnumType, IListType, INumberType, IStringType, IStructType, IType, StructFields } from "./types";
+import { error } from "@/utils/logger";
 
 export class TypeChecker {
     protected static checkTypeInternal<T extends IType>(type: T, value: unknown | undefined | null): value is ValueOf<T> {
@@ -47,7 +48,7 @@ export class TypeChecker {
             return { valid: true }
         } catch (e) {
             if (e instanceof Error) {
-                console.log(e.stack)
+                error(e.stack).log()
                 return { valid: false, reason: e.message }
             }
             return { valid: false }

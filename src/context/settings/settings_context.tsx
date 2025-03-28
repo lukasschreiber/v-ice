@@ -11,10 +11,13 @@ export interface IPublicSettingsContext {
     isInitialized: boolean;
 }
 
+export type VisibilityOverrides = { [key in keyof Settings]?: boolean };
+
 interface ISettingsContext extends IPublicSettingsContext {
     layout: LayoutGroup[];
     isHidden<K extends keyof Settings>(key: K): boolean;
     setInitialSettings(settings: Partial<Settings>): void;
+    overrideVisibility(visibilityOverrides: VisibilityOverrides): void;
     defaultSettings: Settings;
 }
 
@@ -26,6 +29,7 @@ export const SettingsContext = createContext<ISettingsContext>({
     isHidden: () => false,
     isInitialized: false,
     setInitialSettings: () => {},
+    overrideVisibility: () => {},
 });
 
 interface PersistedSettings {
@@ -42,13 +46,16 @@ export function SettingsProvider(
     const LOCAL_STORAGE_KEY = "settings";
     const [initialSettings, setInitialSettings] = useState<Partial<Settings>>({});
     const [isInitialized, setIsInitialized] = useState(false);
+    const [visibilityOverrides, setVisibilityOverrides] = useState<VisibilityOverrides>({});
     const [defaultSettings, setDefaultSettings] = useState<Settings>({} as Settings);
 
     function readSettingsFromLocalstorage(): [exists: boolean, modified: boolean] {
         const entry = window.localStorage.getItem(LOCAL_STORAGE_KEY);
         if (entry === null) return [false, false];
         const { settings, modified } = JSON.parse(entry) as PersistedSettings;
-        dispatch(setSettings(settings));
+        const mergedSettings = { ...defaultSettings, ...settings };
+
+        dispatch(setSettings(mergedSettings));
         return [true, modified];
     }
 
@@ -95,6 +102,7 @@ export function SettingsProvider(
     }
 
     function isHidden<K extends keyof Settings>(key: K): boolean {
+        if (visibilityOverrides[key] !== undefined && visibilityOverrides[key] === false) return true;
         const setting = layout.find((group) => Object.keys(group.settings).includes(key))?.settings[key];
         if (setting === undefined) return false;
         if (typeof setting.hidden === "function") return setting.hidden(settings);
@@ -102,7 +110,7 @@ export function SettingsProvider(
     }
 
     return (
-        <SettingsContext.Provider value={{ isHidden, set, settings, layout, isInitialized, setInitialSettings, defaultSettings }}>
+        <SettingsContext.Provider value={{ isHidden, set, settings, layout, isInitialized, setInitialSettings, defaultSettings, overrideVisibility: setVisibilityOverrides }}>
             {props.children}
         </SettingsContext.Provider>
     );

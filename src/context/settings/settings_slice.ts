@@ -1,6 +1,7 @@
 import { createSlice } from "@reduxjs/toolkit";
 import { getDefaultSettings } from "@/context/settings/settings";
 import { getSettingsDefinition } from "@/context/settings/settings_definition";
+import { LogLevel } from "@/utils/logger";
 
 export const settingsSlice = createSlice({
     name: "settings",
@@ -11,6 +12,7 @@ export const settingsSlice = createSlice({
             ast: false,
             blocklyJson: false,
             blocklyXml: false,
+            logLevel: LogLevel.INFO 
         }
     },
     reducers: {
@@ -22,6 +24,7 @@ export const settingsSlice = createSlice({
             state.debugger.blocklyJson = action.payload.blocklyJson
             state.debugger.blocklyXml = action.payload.blocklyXml
             state.debugger.code = action.payload.code
+            state.debugger.logLevel = action.payload.logLevel
         }
     }
 })

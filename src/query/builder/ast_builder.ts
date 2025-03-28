@@ -7,6 +7,7 @@ import { AST, ASTNodeKind, ASTOperationNode, ASTPrimitiveNode, ASTSetNode, ASTSe
 import types, { IType } from "@/data/types";
 import { isTypedField } from "@/blocks/fields/field";
 import { traverseAST } from "./ast_traverser";
+import { debug } from "@/utils/logger";
 
 type BuildFn<B extends Blockly.Block, S extends ScopeASTBuilder<B>, R extends ASTSetNode | ASTOperationNode | ASTPrimitiveNode> = (scope: S) => R
 
@@ -21,7 +22,7 @@ export class ASTBuilder {
             throw new Error(`Node ${name} already registered`)
         }
 
-        console.log("Registering node", name)
+        debug("Registering AST Node", name).addVariable("Name", name).log()
         this.nodeSnippets[name] = builder
         this.definitions[name] = definition
     }

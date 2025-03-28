@@ -30,7 +30,6 @@ export class ListAnyAllMutator extends BlockMutator<Blockly.BlockSvg & ListAnyAl
 
     @BlockMutator.mixin
     updateType(this: Blockly.BlockSvg & ListAnyAllBlock): void {
-        // console.log("set type", this.variableType, this.getInput("LIST")?.connection?.targetConnection?.getCheck(), this.getInput("LIST")?.connection?.isConnected())
         const connectedBlock = this.getInput("LIST")?.connection?.targetBlock()
         if (!connectedBlock) return
 
@@ -49,7 +48,6 @@ export class ListAnyAllMutator extends BlockMutator<Blockly.BlockSvg & ListAnyAl
 
             // if the local variable is connected to a list, we update the type
             if (local) {
-                // console.log(local.type)
                 const oldParentBlock = local.outputConnection.targetBlock()
                 const oldParentInput = oldParentBlock?.inputList.find(input => input.connection === local.outputConnection.targetConnection)
 

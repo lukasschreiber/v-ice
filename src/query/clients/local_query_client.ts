@@ -3,6 +3,7 @@ import { AST } from "../builder/ast";
 import { LocalQueryRuntime, QueryFnReturnType } from "./local_query_runtime";
 import { QueryCodeGenerator } from "./query_code_generator";
 import { FilteredDataTable } from "@/data/filtered_table";
+import { debug } from "@/utils/logger";
 
 
 export interface LocalQueryClientParams extends QueryClientParams<"local"> {
@@ -32,7 +33,11 @@ export class LocalQueryClient extends QueryClient {
             this.initialized = true;
         }
 
-        return this.runtime.execute(query);
+        const result = await this.runtime.execute(query);
+
+        debug("Executed a query in", this.constructor.name).addVariable("query", query).addVariable("result", result).log();
+
+        return result;
     }
 
     public dispose() {

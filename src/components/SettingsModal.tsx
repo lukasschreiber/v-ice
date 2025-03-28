@@ -2,12 +2,14 @@ import { useContext, useEffect, useState } from "react";
 import { DraggableModal, ModalContent, ModalHeader, ModalProps } from "./common/DraggableModal";
 import { SettingsContext } from "@/context/settings/settings_context";
 import {
+    LayoutSettings,
     Setting,
     Settings,
     isCheckboxSetting,
     isColorSetting,
     isRangeSetting,
     isSelectSetting,
+    isTextSetting,
 } from "@/context/settings/settings";
 import { useTranslation } from "react-i18next";
 import { EvaluationAction, triggerAction } from "@/evaluation_emitter";
@@ -27,7 +29,7 @@ export function SettingsModal(props: ModalProps) {
                 <div className="flex flex-col">
                     <label htmlFor={key} className="flex flex-row items-center gap-2">
                         <span>
-                            {setting.label} - {(settings[key] as number).toFixed(2)}
+                            {setting.label} - {((settings[key] ?? setting.default) as number).toFixed(2)}
                         </span>
                         <span className="text-sm cursor-pointer" onClick={() => set(key, defaultSettings[key])}>
                             [<span className="underline text-secondary">{defaultSettings[key]}</span>]
@@ -103,6 +105,24 @@ export function SettingsModal(props: ModalProps) {
                     </select>
                 </div>
             );
+        } else if (isTextSetting(setting)) {
+            return (
+                <div className="flex flex-col">
+                    <label htmlFor={key} className="flex flex-row items-center gap-2">
+                        <span>{setting.label}</span>
+                        <span className="text-sm cursor-pointer" onClick={() => set(key, defaultSettings[key])}>
+                            [<span className="underline text-secondary">{defaultSettings[key]}</span>]
+                        </span>
+                    </label>
+                    <input
+                        type="text"
+                        id={key}
+                        value={settings[key] as string}
+                        onChange={(e) => set(key, e.target.value)}
+                        className="w-full px-3 py-1 border border-gray-300 rounded-sm focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 bg-white text-gray-900"
+                    />
+                </div>
+            );
         }
 
         return <div>Nothing</div>;
@@ -114,7 +134,7 @@ export function SettingsModal(props: ModalProps) {
             <ModalContent>
                 <div className="flex flex-row">
                     <div className="border-0 border-r border-solid border-slate-300">
-                        {layout.map((group, index) => {
+                        {layout.filter(group => Object.keys(group.settings).some(p => !isHidden(p as keyof LayoutSettings))).map((group, index) => {
                             return (
                                 <div
                                     className="py-2 px-4 cursor-pointer hover:bg-slate-200/50"
@@ -126,7 +146,7 @@ export function SettingsModal(props: ModalProps) {
                             );
                         })}
                     </div>
-                    <div className="py-2 px-4 min-h-[350px]">
+                    <div className="py-2 px-4 min-h-[360px] max-h-[360px] overflow-y-auto w-full">
                         {layout.map((group, index) => {
                             return (
                                 <div key={index} className={activeTab === index ? "block" : "hidden"}>

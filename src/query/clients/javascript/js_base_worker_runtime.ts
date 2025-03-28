@@ -3,6 +3,7 @@ import { LocalQueryRuntime, QueryFnReturnType } from "../local_query_runtime";
 import { subscribe } from "@/store/subscribe";
 import { FilteredDataTable } from "@/data/filtered_table";
 import { QueryWorkerInterface } from "@/query/workers/query_worker_interface";
+import { debug } from "@/utils/logger";
 
 export class JSBaseWorkerRuntime extends LocalQueryRuntime {
     private worker: QueryWorkerInterface;
@@ -15,6 +16,7 @@ export class JSBaseWorkerRuntime extends LocalQueryRuntime {
     public initialize(): Promise<void> {
         subscribe((state) => state.sourceTable, (value) => {
             this.source = value;
+            debug("Updated source table in", this.constructor.name).addVariable("Number of Rows", value.rows.length).addVariable("Structure", value.columns).log();
             this.worker.setRows(value.rows);
         });
 
