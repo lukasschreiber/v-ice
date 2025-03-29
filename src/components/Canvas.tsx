@@ -7,7 +7,6 @@ import { ContinuousFlyout } from "@/toolbox/flyout";
 import { ContinuousToolbox } from "@/toolbox/toolbox";
 import { DefaultToolbox } from "@/blocks/toolbox/default_toolbox";
 import { useTranslation } from "react-i18next";
-import { BlockDragger } from "@/renderer/block_dragger";
 import { SettingsContext } from "@/context/settings/settings_context";
 import { SettingsModal } from "@/components/SettingsModal";
 import { setBlocklyLocale } from "@/i18n";
@@ -47,8 +46,10 @@ import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
 import { warn } from "@/utils/logger";
 import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
-import { SearchForm } from "./SearchForm";
+// import { SearchForm } from "./SearchForm";
 import { Layer } from "@/utils/zindex";
+import { VariablesOverlay } from "./VariablesOverlay";
+import { FullScreenBlockDragger } from "@/renderer/full_screen_block_dragger";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -191,7 +192,7 @@ export function Canvas(props: CanvasProps) {
                     toolbox: ContinuousToolbox,
                     flyoutsVerticalToolbox: ContinuousFlyout,
                     metricsManager: ContinuousMetrics,
-                    blockDragger: BlockDragger,
+                    blockDragger: FullScreenBlockDragger,
                 },
                 media: media || "https://blockly-demo.appspot.com/static/media/",
                 theme: theme ?? LightTheme,
@@ -209,6 +210,8 @@ export function Canvas(props: CanvasProps) {
                 },
                 toolboxPosition: settings.toolboxPosition === "left" ? "start" : "end",
             });
+
+            div.dataset.workspaceId = workspaceRef.current.id;
 
             setFeaturesReady((old) => ({ ...old, workspace: true }));
             setInitialized(true);
@@ -361,6 +364,7 @@ export function Canvas(props: CanvasProps) {
                 id={"canvas"}
             ></div>
             {/* <SearchForm /> */}
+            <VariablesOverlay />
             <ButtonStack
                 className={`absolute bottom-8 ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
                 style={{ zIndex: Layer.FloatingButtons }}

@@ -78,7 +78,7 @@ import {
     defineToolbox,
     defineBlock,
     defineCategory,
-    blockDefinitionToBlock,
+    blockDefinitionToBlockState,
     blockToBlockDefinition,
 } from "./blocks/toolbox/toolbox_definition";
 import emitter, { EvaluationAction } from "./evaluation_emitter";
@@ -229,7 +229,7 @@ const Toolbox = {
         Empty: defineToolbox([]),
     },
     utils: {
-        blockDefinitionToBlock,
+        blockDefinitionToBlockState,
         blockToBlockDefinition,
     },
 };

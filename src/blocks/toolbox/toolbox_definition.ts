@@ -151,12 +151,16 @@ export function blockToBlockDefinition(block: Blockly.serialization.blocks.State
     }
 }
 
-export function blockDefinitionToBlock(block: GenericBlockDefinition): Blockly.serialization.blocks.State {
+export function blockDefinitionToBlock(block: GenericBlockDefinition, workspace: Blockly.WorkspaceSvg): Blockly.BlockSvg {
+    return Blockly.serialization.blocks.append(blockDefinitionToBlockState(block), workspace, { recordUndo: false }) as Blockly.BlockSvg
+}
+
+export function blockDefinitionToBlockState(block: GenericBlockDefinition): Blockly.serialization.blocks.State {
     const inputs: { [key: string]: Blockly.serialization.blocks.ConnectionState } | undefined = block.inputs ? Object.entries(block.inputs).map(([name, input]) => {
         return {
             [name]: {
-                shadow: input.shadow ? blockDefinitionToBlock(input.shadow) as Blockly.serialization.blocks.State : undefined,
-                block: input.block ? blockDefinitionToBlock(input.block) as Blockly.serialization.blocks.State : undefined
+                shadow: input.shadow ? blockDefinitionToBlockState(input.shadow) as Blockly.serialization.blocks.State : undefined,
+                block: input.block ? blockDefinitionToBlockState(input.block) as Blockly.serialization.blocks.State : undefined
             }
         }
     }).reduce((acc, input) => {
@@ -179,8 +183,8 @@ export function blockDefinitionToBlock(block: GenericBlockDefinition): Blockly.s
         inputs,
         extraState: block.extraState,
         next: block.next ? {
-            shadow: block.next.shadow ? blockDefinitionToBlock(block.next.shadow) : undefined,
-            block: block.next.block ? blockDefinitionToBlock(block.next.block) : undefined
+            shadow: block.next.shadow ? blockDefinitionToBlockState(block.next.shadow) : undefined,
+            block: block.next.block ? blockDefinitionToBlockState(block.next.block) : undefined
         } : undefined
     }
 }

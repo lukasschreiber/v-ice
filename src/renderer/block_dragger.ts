@@ -6,7 +6,7 @@ import * as Blockly from "blockly/core";
 export class BlockDragger extends Blockly.dragging.Dragger {
 
     override onDrag(e: PointerEvent, delta: Blockly.utils.Coordinate): void {
-        super.onDrag(e, delta)
+        super.onDrag(e, delta);
 
         const target = this.draggable;
         const targetField = getFieldFromEvent(e, this.workspace);

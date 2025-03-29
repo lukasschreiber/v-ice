@@ -1,4 +1,4 @@
-import { GenericBlockDefinition, blockDefinitionToBlock } from "@/blocks/toolbox/toolbox_definition";
+import { GenericBlockDefinition, blockDefinitionToBlockState } from "@/blocks/toolbox/toolbox_definition";
 import { useEffect, useRef } from "react";
 import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
@@ -35,7 +35,7 @@ export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadPar
 
             workspace.setScale(0.9);
 
-            const blockState = blockDefinitionToBlock(props.block);
+            const blockState = blockDefinitionToBlockState(props.block);
 
             const enumNames = Array.from(new Set([...JSON.stringify(props.block).matchAll(/Enum<.*?>/g)].map(match => match[0].replace("Enum<", "").replace(">", ""))));
             enumNames.forEach(enumName => {

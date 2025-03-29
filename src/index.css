@@ -146,3 +146,11 @@
 .markdown-body table tr:nth-child(2n) {
     background-color: rgba(0, 0, 0, 0.05) !important;
 }
+
+.full-screen-dragger .blocklyBlockDragSurface {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 100%;
+}
