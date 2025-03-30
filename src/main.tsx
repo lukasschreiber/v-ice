@@ -206,8 +206,8 @@ export function useQuery() {
 }
 
 import { buildBlock, buildToolbox, buildDynamicCategory, buildStaticCategory } from "./blocks/toolbox/builder";
-import { Variables } from "./blocks/toolbox/categories/variables_2";
-import { Nodes } from "./blocks/toolbox/categories/nodes_2";
+import { Variables } from "./blocks/toolbox/categories/variables";
+import { Nodes } from "./blocks/toolbox/categories/nodes";
 import { EmptyToolbox } from "./blocks/toolbox/empty_toolbox";
 import * as ToolboxUtils from "./blocks/toolbox/utils";
 

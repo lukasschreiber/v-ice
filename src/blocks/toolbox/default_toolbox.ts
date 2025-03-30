@@ -1,6 +1,6 @@
 import "blockly/blocks";
-import { Variables } from "@/blocks/toolbox/categories/variables_2";
-import { Nodes } from "./categories/nodes_2";
+import { Variables } from "@/blocks/toolbox/categories/variables";
+import { Nodes } from "./categories/nodes";
 import { DateTime } from "luxon";
 import { FibBlock, MathBinaryOperationBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock } from "../definitions/math";
 import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, HasVariableValueBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "../definitions/comparisons";
