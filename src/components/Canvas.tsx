@@ -32,7 +32,6 @@ import { showHelp } from "@/context/manual/manual_emitter";
 import { useHelp } from "@/context/manual/manual_hooks";
 import { Tooltip } from "./common/Tooltip";
 import { EmptyToolbox } from "@/blocks/toolbox/empty_toolbox";
-import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 import { LoadingOverlay } from "./common/LoadingOverlay";
 import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance";
 import { setTheme } from "@/themes/colors";
@@ -50,6 +49,10 @@ import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
 import { Layer } from "@/utils/zindex";
 import { VariablesOverlay } from "./VariablesOverlay";
 import { FullScreenBlockDragger } from "@/renderer/full_screen_block_dragger";
+import { setVariables } from "@/store/blockly/blockly_slice";
+import types from "@/data/types";
+import { BlocklyToolboxAdapter } from "@/blocks/toolbox/adapters/blockly_adapter";
+import { ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -159,6 +162,8 @@ export function Canvas(props: CanvasProps) {
                     workspace.deleteVariableById(variable.getId());
                 }
             }
+
+            dispatch(setVariables(workspace.getAllVariables().map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() }))));
             Blockly.Events.enable();
         }
 
@@ -166,7 +171,7 @@ export function Canvas(props: CanvasProps) {
     }, [source]);
 
     useEffect(() => {
-        workspaceRef.current?.updateToolbox(toolbox ?? EmptyToolbox);
+        workspaceRef.current?.updateToolbox(new BlocklyToolboxAdapter(toolbox ?? EmptyToolbox).toToolboxDefinition());
         workspaceRef.current?.refreshToolboxSelection();
         setFeaturesReady((old) => ({ ...old, toolbox: true }));
     }, [toolbox]);
@@ -204,7 +209,7 @@ export function Canvas(props: CanvasProps) {
                     startScale: settings.zoom,
                 },
                 trashcan: false,
-                toolbox: toolbox ?? DefaultToolbox,
+                toolbox: new BlocklyToolboxAdapter(toolbox ?? DefaultToolbox).toToolboxDefinition(),
                 maxInstances: {
                     [Blocks.Names.NODE.SOURCE]: 1,
                 },
@@ -259,6 +264,14 @@ export function Canvas(props: CanvasProps) {
 
                         resolve();
                     });
+                });
+
+                workspaceRef.current!.addChangeListener((e) => {
+                    if (e.type === Blockly.Events.VAR_CREATE || e.type === Blockly.Events.VAR_DELETE || e.type === Blockly.Events.VAR_RENAME) {
+                        dispatch(
+                            setVariables(workspaceRef.current!.getAllVariables().map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() })))
+                        );
+                    }
                 });
             }
         }

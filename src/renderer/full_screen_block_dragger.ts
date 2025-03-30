@@ -1,7 +1,8 @@
 
 import * as Blockly from "blockly/core";
+import { BlockDragger } from "./block_dragger";
 
-export class FullScreenBlockDragger extends Blockly.dragging.Dragger {
+export class FullScreenBlockDragger extends BlockDragger {
     constructor(draggable: Blockly.IDraggable, workspace: Blockly.WorkspaceSvg) {
         super(draggable, workspace);
         workspace.getInjectionDiv().classList.add("full-screen-dragger");
@@ -15,6 +16,9 @@ export class FullScreenBlockDragger extends Blockly.dragging.Dragger {
     protected override wouldDeleteDraggable(e: PointerEvent, rootDraggable: Blockly.IDraggable & Blockly.IDeletable): boolean {
         const elements = document.elementsFromPoint(e.clientX, e.clientY);
         if (!elements.find(element => element.id === "canvas")) {
+            return true;
+        }
+        if (elements.find(element => element.classList.contains("blocklyFlyout") || element.id === "variables-overlay")) {
             return true;
         }
         return super.wouldDeleteDraggable(e, rootDraggable);

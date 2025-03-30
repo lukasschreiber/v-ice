@@ -1,3 +1,4 @@
+import { IType } from "@/main";
 import { createSlice } from "@reduxjs/toolkit";
 
 export type EdgeEditMarker = {
@@ -11,17 +12,27 @@ export const blocklySlice = createSlice({
     name: "blockly",
     initialState: {
         edgeEditMarker: null as null | EdgeEditMarker,
-        targetBlocks: {} as Record<string, string>
+        targetBlocks: {} as Record<string, string>,
+        variables: [] as Array<{ name: string, type: IType, id: string }>
     },
     reducers: {
-        setEdgeEditMarker: (state, action: {type: string, payload: EdgeEditMarker | null}) => {
+        setEdgeEditMarker: (state, action: { type: string, payload: EdgeEditMarker | null }) => {
             state.edgeEditMarker = action.payload
         },
         setTargetBlocks: (state, action) => {
             state.targetBlocks = action.payload
         },
+        setVariables: (state, action) => {
+            state.variables = action.payload
+        },
+        addVariable: (state, action: { type: string, payload: { name: string, type: IType, id: string } }) => {
+            state.variables = [...state.variables, action.payload]
+        },
+        removeVariable: (state, action: { type: string, payload: string }) => {
+            state.variables = state.variables.filter(variable => variable.id !== action.payload)
+        }
     }
 })
 
-export const { setTargetBlocks, setEdgeEditMarker } = blocklySlice.actions
+export const { setTargetBlocks, setEdgeEditMarker, setVariables, addVariable, removeVariable } = blocklySlice.actions
 export const blocklyReducer = blocklySlice.reducer

@@ -1,8 +1,8 @@
-import { GenericBlockDefinition } from "@/blocks/toolbox/toolbox_definition";
 import { useRef, useState } from "react";
 import { BlockPreview } from "./BlockPreview";
 import { createPortal } from "react-dom";
 import { Layer } from "@/utils/zindex";
+import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
 
 export function BlockInlinePreview(props: { block: GenericBlockDefinition; text: string, externalWindowRef?: React.RefObject<WindowProxy> }) {
     const [isHovered, setIsHovered] = useState(false);

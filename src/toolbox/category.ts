@@ -12,9 +12,9 @@ import * as Blockly from 'blockly/core';
 import type { IToolbox } from 'blockly/core/interfaces/i_toolbox.js';
 import type { CategoryInfo } from 'blockly/core/utils/toolbox.js';
 import { getColor } from "@/themes/colors";
-import { evaluateIsHiddenFunc, hasIsHiddenFunc } from '@/blocks/toolbox/toolbox_definition';
 import { store } from '@/store/store';
 import { EvaluationAction, triggerAction } from '@/evaluation_emitter';
+import { evaluateIsHiddenFunc, hasIsHiddenFunc } from '@/blocks/toolbox/utils';
 
 /** Toolbox category for continuous toolbox. */
 export class ContinuousCategory extends Blockly.ToolboxCategory {

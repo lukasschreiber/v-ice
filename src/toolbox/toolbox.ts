@@ -8,14 +8,14 @@
 
 import * as Blockly from 'blockly/core';
 import * as toolbox from 'blockly/core/utils/toolbox';
-import type {ISelectableToolboxItem} from 'blockly/core/interfaces/i_selectable_toolbox_item.js';
-import {ContinuousFlyout} from "@/toolbox/flyout";
+import type { ISelectableToolboxItem } from 'blockly/core/interfaces/i_selectable_toolbox_item.js';
+import { ContinuousFlyout } from "@/toolbox/flyout";
 import style from "./toolbox.css?inline";
 import { subscribe } from '@/store/subscribe';
 import { Blocks } from '@/blocks';
-import { evaluateIsHiddenFunc, hasIsHiddenFunc, registerCategory } from '@/blocks/toolbox/toolbox_definition';
 import { store } from '@/store/store';
 import { ContinuousCategory } from './category';
+import { evaluateIsHiddenFunc, hasIsHiddenFunc, registerCategory } from '@/blocks/toolbox/utils';
 export * from './category'
 
 export class ContinuousToolbox extends Blockly.Toolbox {
@@ -29,7 +29,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         const flyout = this.getFlyout();
         if (flyout) {
             this.contents_.forEach((item) => {
-                if(item instanceof ContinuousCategory) {
+                if (item instanceof ContinuousCategory) {
                     registerCategory(item.getCategoryDef(), this.workspace_);
                 }
             });
@@ -69,7 +69,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         for (const toolboxItem of this.contents_.filter(item => (item instanceof ContinuousCategory) && !item.isHidden())) {
             if (toolboxItem instanceof Blockly.ToolboxCategory) {
                 // Create a label node to go at the top of the category
-                contents.push({kind: 'LABEL', text: toolboxItem.getName()});
+                contents.push({ kind: 'LABEL', text: toolboxItem.getName() });
                 const itemContents: string | toolbox.FlyoutItemInfoArray | toolbox.FlyoutItemInfo = toolboxItem.getContents();
 
                 // Handle custom categories (e.g. variables and functions)
@@ -80,7 +80,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
                     })
                 } else {
                     contents = contents.concat(itemContents.filter((item) => {
-                        if(hasIsHiddenFunc(item)) {
+                        if (hasIsHiddenFunc(item)) {
                             return !evaluateIsHiddenFunc(item, this.workspace_, store.getState().sourceTable.columns);
                         }
                     }));
@@ -92,7 +92,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
 
     protected override renderContents_(toolboxDef: Blockly.utils.toolbox.ToolboxItemInfo[]) {
         super.renderContents_(toolboxDef.filter((item) => {
-            if(hasIsHiddenFunc(item)) {
+            if (hasIsHiddenFunc(item)) {
                 return !evaluateIsHiddenFunc(item, this.workspace_, store.getState().sourceTable.columns);
             }
 

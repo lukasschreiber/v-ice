@@ -1,9 +1,10 @@
-import { GenericBlockDefinition } from "@/blocks/toolbox/toolbox_definition";
+import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
 import { useSettings, useWorkspace } from "@/main";
 import { ExternalFlyout } from "@/toolbox/external_flyout";
+import * as Blockly from "blockly/core";
 import { useEffect, useRef, useState } from "react";
 
-export function ReactToolboxBlockItem(props: { block: GenericBlockDefinition }) {
+export function ReactToolboxBlockItem(props: { block?: GenericBlockDefinition, variable?: Blockly.VariableModel | null }) {
     const ref = useRef<HTMLDivElement>(null)
     const { workspace } = useWorkspace()
     const flyoutRef = useRef<ExternalFlyout | null>(null)
@@ -16,9 +17,13 @@ export function ReactToolboxBlockItem(props: { block: GenericBlockDefinition }) 
             setInitialized(true)
             flyoutRef.current = ExternalFlyout.inject(div, workspace.options);
             flyoutRef.current.setTargetWorkspace(workspace);
-            flyoutRef.current.addBlock(props.block);
+            if (props.variable) {
+                flyoutRef.current.addVariable(props.variable);
+            } else if (props.block) {
+                flyoutRef.current.addBlock(props.block);
+            }
         }
     }, [ref.current, workspace, props.block, initialized, settingsIninitialized])
 
-    return <div ref={ref} className="h-[50px] w-[200px]" />
+    return <div ref={ref} className="" />
 }

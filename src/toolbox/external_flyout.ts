@@ -1,9 +1,12 @@
-import { blockDefinitionToBlockState, GenericBlockDefinition } from '@/blocks/toolbox/toolbox_definition';
+import { Blocks } from '@/blocks';
+import { BlocklyToolboxAdapter } from '@/blocks/toolbox/adapters/blockly_adapter';
+import { GenericBlockDefinition } from '@/blocks/toolbox/builder/definitions';
 import { subscribe } from '@/store/subscribe';
 import * as Blockly from 'blockly/core';
 
 export class ExternalFlyout extends Blockly.VerticalFlyout {
     protected targetDiv: HTMLElement
+    private dev_adapter: BlocklyToolboxAdapter = new BlocklyToolboxAdapter([]);
 
     constructor(workspaceOptions: Blockly.Options, targetDiv: HTMLElement) {
         super(workspaceOptions);
@@ -12,8 +15,9 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
 
     // This means that a block is created no matter the angle of the drag
     protected override dragAngleRange_: number = 360;
-    override MARGIN: number = 0;
+    override MARGIN: number = 1;
     override CORNER_RADIUS: number = 0;
+    protected override tabWidth_: number = 0;
 
     static inject(div: HTMLElement, workspaceOptions: Blockly.Options) {
         const flyout = new ExternalFlyout(workspaceOptions, div);
@@ -27,12 +31,24 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         return flyout;
     }
 
-    addBlock(blockDefinition: GenericBlockDefinition) {
-        console.log(blockDefinition)
+    addBlock(block: GenericBlockDefinition) {
+        this.show([
+            this.dev_adapter.blockAdapter(block)
+        ])
+    }
+
+    addVariable(variable: Blockly.VariableModel) {
         this.show([
             {
-                kind: "BLOCK",
-                ...blockDefinitionToBlockState(blockDefinition)
+                kind: "block",
+                type: Blocks.Names.VARIABLE.GET,
+                fields: {
+                    VAR: {
+                        id: variable.getId(),
+                        name: variable.name,
+                        type: variable.type
+                    }
+                }
             }
         ])
     }
@@ -45,8 +61,18 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         const metricsManager = this.workspace_.getMetricsManager();
         const metrics = metricsManager.getContentMetrics();
         this.height_ = metrics.height + 2 * this.MARGIN;
-
+        this.width_ = metrics.width + 2 * this.MARGIN;
+        this.targetDiv.style.width = this.width_ + 'px';
+        this.targetDiv.style.height = this.height_ + 'px';
         this.positionAt_(this.width_, this.height_, 0, 0);
+    }
+
+    override getX(): number {
+        return 0;
+    }
+
+    override getY(): number {
+        return 0;
     }
 
     override createBlock(originalBlock: Blockly.BlockSvg): Blockly.BlockSvg {
@@ -61,23 +87,23 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         }
 
         const newVariables = Blockly.Variables.getAddedVariables(
-          this.targetWorkspace,
-          variablesBeforeCreation,
+            this.targetWorkspace,
+            variablesBeforeCreation,
         );
 
         if (Blockly.Events.isEnabled()) {
             Blockly.Events.setGroup(true);
-          // Fire a VarCreate event for each (if any) new variable created.
-          for (let i = 0; i < newVariables.length; i++) {
-            const thisVariable = newVariables[i];
-            Blockly.Events.fire(
-              new (Blockly.Events.get(Blockly.Events.VAR_CREATE))(thisVariable),
-            );
-          }
+            // Fire a VarCreate event for each (if any) new variable created.
+            for (let i = 0; i < newVariables.length; i++) {
+                const thisVariable = newVariables[i];
+                Blockly.Events.fire(
+                    new (Blockly.Events.get(Blockly.Events.VAR_CREATE))(thisVariable),
+                );
+            }
 
-          // Block events come after var events, in case they refer to newly created
-          // variables.
-          Blockly.Events.fire(new (Blockly.Events.get(Blockly.Events.BLOCK_CREATE))(newBlock));
+            // Block events come after var events, in case they refer to newly created
+            // variables.
+            Blockly.Events.fire(new (Blockly.Events.get(Blockly.Events.BLOCK_CREATE))(newBlock));
         }
 
         return newBlock;
