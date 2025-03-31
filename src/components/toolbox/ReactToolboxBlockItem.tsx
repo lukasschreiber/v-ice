@@ -19,7 +19,7 @@ export function ReactToolboxBlockItem(props: {
         if (div && workspace && !initialized && settingsIninitialized) {
             setInitialized(true);
             flyoutRef.current = ExternalFlyout.inject(div, workspace.options);
-            flyoutRef.current.setTargetWorkspace(workspace);
+            flyoutRef.current.init(workspace);
             if (props.variable) {
                 flyoutRef.current.addVariable(props.variable);
             } else if (props.block) {
@@ -27,19 +27,6 @@ export function ReactToolboxBlockItem(props: {
             }
         }
     }, [ref.current, workspace, props.block, initialized, settingsIninitialized]);
-
-    useEffect(() => {
-        if (!ref.current) return;
-
-        const contextMenuHandler = (e: MouseEvent) => {
-            e.preventDefault();
-        };
-
-        ref.current.addEventListener("contextmenu", contextMenuHandler);
-        return () => {
-            ref.current && ref.current.removeEventListener("contextmenu", contextMenuHandler);
-        };
-    }, [ref.current]);
 
     return <div ref={ref} className="" />;
 }

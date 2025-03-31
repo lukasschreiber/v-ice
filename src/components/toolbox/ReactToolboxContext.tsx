@@ -1,13 +1,14 @@
-import { createContext, useState } from "react";
+import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
+import { createContext, useCallback, useState } from "react";
 
 interface IReactToolboxContext {
-    pinnedBlocks: string[];
-    setPinnedBlocks: (blocks: string[]) => void;
+    isBlockPinned: (block?: GenericBlockDefinition) => boolean;
+    toggleBlockPinned: (block?: GenericBlockDefinition) => void;
 }
 
 export const ReactToolboxContext = createContext<IReactToolboxContext>({
-    pinnedBlocks: [],
-    setPinnedBlocks: () => {}
+    isBlockPinned: () => false,
+    toggleBlockPinned: () => { }
 });
 
 export function ReactToolboxProvider(
@@ -15,8 +16,32 @@ export function ReactToolboxProvider(
 ) {
     const [pinnedBlocks, setPinnedBlocks] = useState<string[]>([]);
 
+    function getToolboxBlockId(block: GenericBlockDefinition) {
+        const str = JSON.stringify(block);
+        let hash = 0;
+        for (var i = 0; i < str.length; i++) {
+            let code = str.charCodeAt(i);
+            hash = ((hash << 5) - hash) + code;
+            hash = hash & hash;
+        }
+        return "ToolboxBlock_" + hash;
+    }
+
+    const isBlockPinned = useCallback((block?: GenericBlockDefinition) => block ? pinnedBlocks.includes(getToolboxBlockId(block)) : false, [pinnedBlocks]);
+    const toggleBlockPinned = useCallback((block?: GenericBlockDefinition) => {
+        if (!block) return;
+        setPinnedBlocks((blocks) => {
+            const id = getToolboxBlockId(block);
+            if (blocks.includes(id)) {
+                return blocks.filter((b) => b !== id);
+            } else {
+                return [...blocks, id];
+            }
+        });
+    }, []);
+
     return (
-        <ReactToolboxContext.Provider value={{ pinnedBlocks, setPinnedBlocks }}>
+        <ReactToolboxContext.Provider value={{ toggleBlockPinned, isBlockPinned }}>
             {props.children}
         </ReactToolboxContext.Provider>
     );

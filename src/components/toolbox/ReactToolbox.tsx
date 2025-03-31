@@ -4,20 +4,21 @@ import { ReactToolboxStaticCategory } from "./ReactToolboxStaticCategory";
 import { ReactToolboxDynamicCategory } from "./ReactToolboxDynamicCategory";
 import { Layer } from "@/utils/zindex";
 
-export function ReactToolbox(props: { definition: ToolboxDefinition }) {
+export function ReactToolbox(props: { definition: ToolboxDefinition, offset: number }) {
     return (
         <ReactToolboxProvider>
             <div
-                className="absolute top-0 right-0 w-fit h-fit bg-pink-300/50 p-2 flex gap-2 flex-col max-h-full overflow-y-auto"
+                className="absolute top-0 w-fit h-full p-2 flex gap-2 flex-col max-h-full overflow-y-auto bg-toolbox-bg/90"
                 data-deletezone={true}
-                style={{ zIndex: Layer.SearchOverlay }}
+                style={{ zIndex: Layer.Toolbox, left: props.offset }}
             >
                 <div className="flex flex-col gap-2">
                     {props.definition.map((category, index) => {
                         if (category.kind === "static") {
                             return <ReactToolboxStaticCategory key={index} category={category} />;
                         } else {
-                            return <ReactToolboxDynamicCategory key={index} category={category} />;
+                            return null;
+                            // return <ReactToolboxDynamicCategory key={index} category={category} />;
                         }
                     })}
                 </div>

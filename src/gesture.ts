@@ -81,7 +81,7 @@ export class Gesture extends Blockly.Gesture {
             this.startEdgeConnection_ = targetField
             return
         }
-
+        
         super.handleUp(e)
     }
 

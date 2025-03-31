@@ -33,7 +33,7 @@ export function ReactToolboxDynamicCategory<T extends DynamicToolboxCategory>(pr
 
     return (
         <div>
-            <h3>{Blockly.utils.parsing.replaceMessageReferences(props.category.name)}</h3>
+            <h3 className="text-xs font-bold mb-2">{Blockly.utils.parsing.replaceMessageReferences(props.category.name)}</h3>
             <div className="flex flex-col gap-2">
                 {blocks.map((block, index) => {
                     return <ReactToolboxRow key={index} block={block} />;

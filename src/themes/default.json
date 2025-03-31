@@ -19,7 +19,7 @@
         "menu": {
             "bg": {
                 "default": "#ffffff",
-                "hover": "#ffffff",
+                "hover": "#e9eef2",
                 "selected": "#e9eef2"
             },
             "text": {

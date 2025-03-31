@@ -9,12 +9,14 @@ import { StoreWorkspaceContextProvider } from "./components/StoreWorkspaceContex
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
     <React.StrictMode>
-        <VICEProvider debug={{
-            ast: true,
-            blocklyJson: true,
-            blocklyXml: true,
-            code: true
-        }}>
+        <VICEProvider
+            debug={{
+                ast: true,
+                blocklyJson: true,
+                blocklyXml: true,
+                code: true,
+            }}
+        >
             <TabContextProvider>
                 <DataContextProvider>
                     <StoreWorkspaceContextProvider>

@@ -28,7 +28,35 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
             flyout.workspace_.setScale(zoom);
         }, { immediate: true });
 
+        flyout.autoClose = false;
+
         return flyout;
+    }
+
+    override init(targetWorkspace: Blockly.WorkspaceSvg): void {
+        super.init(targetWorkspace);
+        this.workspace_.scrollbar = null;
+    }
+
+    protected override wheel_(e: WheelEvent): void {
+        const scrollDelta = Blockly.utils.browserEvents.getScrollDeltaPixels(e);
+        const delta = scrollDelta.x || scrollDelta.y;
+
+        if (delta) {
+            const metricsManager = this.workspace_.getMetricsManager();
+            const scrollMetrics = metricsManager.getScrollMetrics();
+            const viewMetrics = metricsManager.getViewMetrics();
+
+            const pos = viewMetrics.left - scrollMetrics.left + delta;
+            this.workspace_.scrollbar?.setX(pos);
+            // When the flyout moves from a wheel event, hide WidgetDiv and
+            // dropDownDiv.
+            Blockly.WidgetDiv.hideIfOwnerIsInWorkspace(this.workspace_);
+            Blockly.DropDownDiv.hideWithoutAnimation();
+        }
+
+        // We want the scroll to be handled by the flyout, not the workspace
+        e.stopPropagation();
     }
 
     addBlock(block: GenericBlockDefinition) {
@@ -152,14 +180,21 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         block.moveTo(finalOffsetInWorkspace);
     }
 
-
-    setTargetWorkspace(workspace: Blockly.WorkspaceSvg) {
-        this.targetWorkspace = workspace;
-    }
-
     override createDom(tagName: string | Blockly.utils.Svg<SVGSVGElement> | Blockly.utils.Svg<SVGGElement>): SVGElement {
         const element = super.createDom(tagName);
         this.targetDiv.appendChild(element);
+
+        Blockly.utils.browserEvents.conditionalBind(
+            element,
+            "contextmenu",
+            null,
+            (e: MouseEvent) => {
+                if (!Blockly.utils.browserEvents.isTargetInput(e)) {
+                    e.preventDefault();
+                }
+            },
+        );
+
         return element;
     }
 }

@@ -86,6 +86,30 @@ export function useSettingsHandlers(
     }, [workspaceRef, settings.disableLinks]);
 
     useEffect(() => {
+        const toolboxVisible = settings.toolboxVisible && settings.toolboxVersion === "standard";
+
+        const scrollbars = document.querySelectorAll<HTMLElement>(".blocklyFlyoutScrollbar");
+        const flyout = workspaceRef.current?.getToolbox()?.getFlyout() as ContinuousFlyout | null;
+        const definition = flyout?.getDefintion();
+
+        if (flyout && definition && toolboxVisible) {
+            flyout.show(definition);
+            scrollbars.forEach((scrollbar) => {
+                scrollbar.style.display = "block";
+            });
+        }
+
+        if (flyout && definition && !toolboxVisible) {
+            flyout.setVisible(false);
+            flyout.show(definition);
+            scrollbars.forEach((scrollbar) => {
+                scrollbar.style.display = "none";
+            });
+            flyout.hide();
+        }
+    }, [workspaceRef, settings.toolboxVisible, settings.toolboxVersion]);
+
+    useEffect(() => {
         workspaceRef.current?.render();
     }, [workspaceRef, settings.edgeKind, settings.edgeLineCap, settings.edgeMaxWidth, settings.edgeMinWidth]);
 }

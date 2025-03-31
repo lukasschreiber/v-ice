@@ -93,7 +93,7 @@ export class FieldEdgeConnection extends Blockly.Field implements TypedField {
         this.createConnectionDotElement_(align)
 
         if (this.fieldGroup_) {
-            Blockly.utils.dom.addClass(this.fieldGroup_, 'cursor-pointer group')
+            Blockly.utils.dom.addClass(this.fieldGroup_, 'cursor-pointer group/fieldEdegConnection')
             this.fieldGroup_.style.pointerEvents = "bounding-box"
         }
     }
@@ -102,7 +102,7 @@ export class FieldEdgeConnection extends Blockly.Field implements TypedField {
         this.textElement_ = Blockly.utils.dom.createSvgElement(
             Blockly.utils.Svg.TEXT,
             {
-                class: 'blocklyText group-hover:!fill-workspace-connectionpoint-hover !cursor-pointer',
+                class: 'blocklyText group-hover/fieldEdegConnection:!fill-workspace-connectionpoint-hover !cursor-pointer',
             },
             this.fieldGroup_,
         )

@@ -1,4 +1,4 @@
-import React, { createRef, useContext, useEffect, useState } from "react";
+import React, { createRef, memo, useContext, useEffect, useState } from "react";
 import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
 import { LightTheme } from "@/themes/themes";
@@ -47,13 +47,13 @@ import { warn } from "@/utils/logger";
 import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
 // import { SearchForm } from "./SearchForm";
 import { Layer } from "@/utils/zindex";
-import { VariablesOverlay } from "./VariablesOverlay";
 import { FullScreenBlockDragger } from "@/renderer/full_screen_block_dragger";
 import { setFeatureReady, setVariables } from "@/store/blockly/blockly_slice";
 import types from "@/data/types";
 import { BlocklyToolboxAdapter } from "@/blocks/toolbox/adapters/blockly_adapter";
 import { ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
 import { ToolboxOverlay } from "./ToolboxOverlay";
+import { ReactToolbox } from "./toolbox/ReactToolbox";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -365,7 +365,7 @@ export function Canvas(props: CanvasProps) {
             ></div>
             {/* <SearchForm /> */}
             {/* <VariablesOverlay /> */}
-            <ToolboxOverlay />
+            {settings.toolboxVersion === "rich" && <ReactToolbox definition={toolbox || DefaultToolbox} offset={toolboxWidth} />}
             <ButtonStack
                 className={`absolute bottom-8 ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
                 style={{ zIndex: Layer.FloatingButtons }}
