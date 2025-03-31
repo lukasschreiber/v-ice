@@ -26,6 +26,7 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
 
         subscribe(state => state.settings.settings.zoom, (zoom) => {
             flyout.workspace_.setScale(zoom);
+            flyout.position();
         }, { immediate: true });
 
         flyout.autoClose = false;
@@ -35,7 +36,10 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
 
     override init(targetWorkspace: Blockly.WorkspaceSvg): void {
         super.init(targetWorkspace);
+        this.workspace_.scrollbar?.dispose();
         this.workspace_.scrollbar = null;
+
+        this.workspace_.getFlyout()?.dispose();
     }
 
     protected override wheel_(e: WheelEvent): void {
@@ -82,7 +86,7 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
     }
 
     override position(): void {
-        if (!this.isVisible() || !this.targetWorkspace!.isVisible()) {
+        if (!this.isVisible() || !this.targetWorkspace?.isVisible() || !this.workspace_) {
             return;
         }
 
@@ -184,6 +188,8 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         const element = super.createDom(tagName);
         this.targetDiv.appendChild(element);
 
+        console.log("Creating DOM");
+
         Blockly.utils.browserEvents.conditionalBind(
             element,
             "contextmenu",
@@ -196,5 +202,13 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         );
 
         return element;
+    }
+
+    dispose(): void {
+        this.hide();
+       
+        if (this.svgGroup_) {
+            Blockly.utils.dom.removeNode(this.svgGroup_);
+        }
     }
 }

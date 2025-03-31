@@ -27,9 +27,13 @@ export function ReactToolboxProvider(
         return "ToolboxBlock_" + hash;
     }
 
-    const isBlockPinned = useCallback((block?: GenericBlockDefinition) => block ? pinnedBlocks.includes(getToolboxBlockId(block)) : false, [pinnedBlocks]);
+    const isBlockPinned = useCallback((block?: GenericBlockDefinition) => {
+        if (!block) return false;
+        return pinnedBlocks.includes(getToolboxBlockId(block));
+    }, [pinnedBlocks]);
     const toggleBlockPinned = useCallback((block?: GenericBlockDefinition) => {
         if (!block) return;
+        console.log("toggleBlockPinned", block.type);
         setPinnedBlocks((blocks) => {
             const id = getToolboxBlockId(block);
             if (blocks.includes(id)) {

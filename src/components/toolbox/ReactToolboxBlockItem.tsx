@@ -2,7 +2,7 @@ import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
 import { useSettings, useWorkspace } from "@/main";
 import { ExternalFlyout } from "@/toolbox/external_flyout";
 import * as Blockly from "blockly/core";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 
 export function ReactToolboxBlockItem(props: {
     block?: GenericBlockDefinition;
@@ -11,22 +11,26 @@ export function ReactToolboxBlockItem(props: {
     const ref = useRef<HTMLDivElement>(null);
     const { workspace } = useWorkspace();
     const flyoutRef = useRef<ExternalFlyout | null>(null);
-    const [initialized, setInitialized] = useState(false);
-    const { isInitialized: settingsIninitialized } = useSettings();
+    const { isInitialized: settingsInitialized } = useSettings();
 
     useEffect(() => {
-        const div = ref.current;
-        if (div && workspace && !initialized && settingsIninitialized) {
-            setInitialized(true);
-            flyoutRef.current = ExternalFlyout.inject(div, workspace.options);
-            flyoutRef.current.init(workspace);
-            if (props.variable) {
-                flyoutRef.current.addVariable(props.variable);
-            } else if (props.block) {
-                flyoutRef.current.addBlock(props.block);
-            }
-        }
-    }, [ref.current, workspace, props.block, initialized, settingsIninitialized]);
+        if (!workspace || !settingsInitialized || !ref.current) return;
+        if (flyoutRef.current) return; // Prevent re-initialization
 
-    return <div ref={ref} className="" />;
+        flyoutRef.current = ExternalFlyout.inject(ref.current, workspace.options);
+        flyoutRef.current.init(workspace);
+
+        if (props.variable) {
+            flyoutRef.current.addVariable(props.variable);
+        } else if (props.block) {
+            flyoutRef.current.addBlock(props.block);
+        }
+
+        return () => {
+            flyoutRef.current?.dispose();
+            flyoutRef.current = null;
+        };
+    }, [workspace, settingsInitialized, props.block, props.variable]);
+
+    return <div ref={ref} />;
 }

@@ -11,12 +11,14 @@ export function ReactToolbox(props: { definition: ToolboxDefinition; offset: num
     return (
         <ReactToolboxProvider>
             <div
-                className="absolute top-0 w-fit h-full p-2 flex gap-2 flex-col max-h-full overflow-y-auto bg-toolbox-bg/90"
+                className="absolute top-0 w-fit p-2 flex gap-2 flex-col max-h-full overflow-y-auto bg-toolbox-bg/90"
                 data-deletezone={true}
                 style={{
                     zIndex: Layer.Toolbox,
                     left: settings.toolboxPosition === "left" ? props.offset : "unset",
                     right: settings.toolboxPosition === "right" ? props.offset : "unset",
+                    height: `calc(100% - 2px)`,
+                    top: "1px",
                 }}
             >
                 <div className="flex flex-col gap-2">
