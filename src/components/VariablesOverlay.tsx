@@ -38,7 +38,7 @@ export function VariablesOverlay() {
     return (
         <div
             className="absolute top-0 right-0 w-fit h-fit bg-pink-300/50 p-2 flex gap-2 flex-col"
-            id="variables-overlay"
+            data-deletezone={true}
             style={{ zIndex: Layer.SearchOverlay }}
         >
             <div className="flex gap-2 flex-col">

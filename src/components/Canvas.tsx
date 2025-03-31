@@ -49,10 +49,11 @@ import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
 import { Layer } from "@/utils/zindex";
 import { VariablesOverlay } from "./VariablesOverlay";
 import { FullScreenBlockDragger } from "@/renderer/full_screen_block_dragger";
-import { setVariables } from "@/store/blockly/blockly_slice";
+import { setFeatureReady, setVariables } from "@/store/blockly/blockly_slice";
 import types from "@/data/types";
 import { BlocklyToolboxAdapter } from "@/blocks/toolbox/adapters/blockly_adapter";
 import { ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
+import { ToolboxOverlay } from "./ToolboxOverlay";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 
@@ -91,6 +92,7 @@ export function Canvas(props: CanvasProps) {
     const blocklyDiv = createRef<HTMLDivElement>();
     const { workspaceRef, setInitialized } = useContext(WorkspaceContext);
     const [toolboxWidth, setToolboxWidth] = useState(0);
+    const isLoading = useSelector((state) => state.blockly.loading);
     const { i18n } = useTranslation();
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
     const {
@@ -103,18 +105,6 @@ export function Canvas(props: CanvasProps) {
         overrideVisibility,
     } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
-    const [isLoading, setIsLoading] = useState(true);
-    const [featuresReady, setFeaturesReady] = useState<{
-        toolbox: boolean;
-        workspace: boolean;
-        variables: boolean;
-        persistedWorkspace: boolean;
-    }>({
-        toolbox: false,
-        workspace: false,
-        variables: false,
-        persistedWorkspace: false,
-    });
     const debuggingOptions = useSelector((state) => state.settings.debugger);
     const code = useSelector((state) => state.generatedCode.code);
     const astJson = useSelector((state) => state.generatedCode.astJson);
@@ -167,24 +157,21 @@ export function Canvas(props: CanvasProps) {
             Blockly.Events.enable();
         }
 
-        setFeaturesReady((old) => ({ ...old, variables: true }));
+        dispatch(setFeatureReady("variables"));
     }, [source]);
 
     useEffect(() => {
         workspaceRef.current?.updateToolbox(new BlocklyToolboxAdapter(toolbox ?? EmptyToolbox).toToolboxDefinition());
         workspaceRef.current?.refreshToolboxSelection();
-        setFeaturesReady((old) => ({ ...old, toolbox: true }));
+        dispatch(setFeatureReady("toolbox"));
     }, [toolbox]);
 
     const { isWorkspaceLoaded } = useWorkspacePersister();
 
     useEffect(() => {
-        setFeaturesReady((old) => ({ ...old, persistedWorkspace: isWorkspaceLoaded }));
+        if (!isWorkspaceLoaded) return;
+        dispatch(setFeatureReady("persistedWorkspace"));
     }, [isWorkspaceLoaded]);
-
-    useEffect(() => {
-        setIsLoading(!Object.keys(featuresReady).every((key) => featuresReady[key as keyof typeof featuresReady]));
-    }, [featuresReady]);
 
     useEffect(() => {
         const div = blocklyDiv.current;
@@ -218,7 +205,7 @@ export function Canvas(props: CanvasProps) {
 
             div.dataset.workspaceId = workspaceRef.current.id;
 
-            setFeaturesReady((old) => ({ ...old, workspace: true }));
+            dispatch(setFeatureReady("workspace"));
             setInitialized(true);
 
             if (debuggingOptions.blocklyXml || debuggingOptions.blocklyJson) {
@@ -377,7 +364,8 @@ export function Canvas(props: CanvasProps) {
                 id={"canvas"}
             ></div>
             {/* <SearchForm /> */}
-            <VariablesOverlay />
+            {/* <VariablesOverlay /> */}
+            <ToolboxOverlay />
             <ButtonStack
                 className={`absolute bottom-8 ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
                 style={{ zIndex: Layer.FloatingButtons }}

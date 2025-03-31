@@ -18,7 +18,7 @@ export class FullScreenBlockDragger extends BlockDragger {
         if (!elements.find(element => element.id === "canvas")) {
             return true;
         }
-        if (elements.find(element => element.classList.contains("blocklyFlyout") || element.id === "variables-overlay")) {
+        if (elements.find(element => element.classList.contains("blocklyFlyout") || (element as HTMLElement).dataset.deletezone === "true")) {
             return true;
         }
         return super.wouldDeleteDraggable(e, rootDraggable);

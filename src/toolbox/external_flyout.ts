@@ -75,6 +75,10 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         return 0;
     }
 
+    override isScrollable(): boolean {
+        return false;
+    }
+
     override createBlock(originalBlock: Blockly.BlockSvg): Blockly.BlockSvg {
         let newBlock = null;
         Blockly.Events.disable();
@@ -105,6 +109,8 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
             // variables.
             Blockly.Events.fire(new (Blockly.Events.get(Blockly.Events.BLOCK_CREATE))(newBlock));
         }
+
+        // this.filterForCapacity();
 
         return newBlock;
     }
