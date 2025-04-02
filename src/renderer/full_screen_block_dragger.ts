@@ -18,9 +18,9 @@ export class FullScreenBlockDragger extends BlockDragger {
         if (!elements.find(element => element.id === "canvas")) {
             return true;
         }
-        if (elements.find(element => element.classList.contains("blocklyFlyout") || (element as HTMLElement).dataset.deletezone === "true")) {
+        if (elements.find(element => element.classList.contains("blocklyFlyout") || (element as HTMLElement).dataset.deletezone === "true") || elements.find(element => element.classList.contains("blocklyToolboxDiv"))) {
             return true;
         }
-        return super.wouldDeleteDraggable(e, rootDraggable);
+        return false // super.wouldDeleteDraggable(e, rootDraggable);
     }
 }

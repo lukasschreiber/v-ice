@@ -5,7 +5,6 @@ import { useSelector } from "@/store/hooks";
 import { ExternalFlyout } from "@/toolbox/external_flyout";
 import * as Blockly from "blockly/core";
 import { useEffect, useMemo, useRef } from "react";
-import { createUsedDummyVariables } from "@/utils/create_used_dummy_variables";
 
 export function ReactToolboxBlockItem(props: {
     block?: GenericBlockDefinition;
@@ -29,9 +28,7 @@ export function ReactToolboxBlockItem(props: {
         if (props.variable) {
             flyoutRef.current.addVariable(props.variable);
         } else if (props.block) {
-            const blockState = createUsedDummyVariables(props.block, flyoutRef.current.getWorkspace());
-
-            flyoutRef.current.addToolboxItem({kind: "block", ...blockState});
+            flyoutRef.current.addBlock(props.block);
         }
 
         return () => {
@@ -44,7 +41,7 @@ export function ReactToolboxBlockItem(props: {
         if (props.width && props.height) return { width: props.width, height: props.height };
         if (!props.block) return { width: 0, height: 0 };
         return getBlockHeightWidth(props.block, scale);
-    }, [scale, props.block, props.width, props.height]);
+    }, [scale, props.block]);
 
     useEffect(() => {
         const globalClickHandler = (e: MouseEvent) => {

@@ -53,6 +53,8 @@ import { BlocklyToolboxAdapter } from "@/blocks/toolbox/adapters/blockly_adapter
 import { ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
 import { ReactToolbox } from "./toolbox/ReactToolbox";
 import { setLanguage } from "@/context/settings/settings_slice";
+import { VariablesOverlay } from "./VariablesOverlay";
+import { SearchForm } from "./SearchForm";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
 

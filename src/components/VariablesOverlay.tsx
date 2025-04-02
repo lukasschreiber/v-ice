@@ -4,6 +4,7 @@ import { useSelector } from "@/store/hooks";
 import { useRef, useState, useMemo } from "react";
 import types from "@/data/types";
 import { ReactToolboxRow } from "./toolbox/ReactToolboxRow";
+import { ReactToolboxBlockItem } from "./toolbox/ReactToolboxBlockItem";
 
 export function VariablesOverlay() {
     const { workspace } = useWorkspace();
@@ -67,12 +68,12 @@ export function VariablesOverlay() {
                 if (!itemRefs.current.has(variable.id)) {
                     itemRefs.current.set(
                         variable.id,
-                        <ReactToolboxRow variable={workspace.getVariableById(variable.id)} />
+                        <ReactToolboxBlockItem variable={workspace.getVariableById(variable.id)} height={40} />
                     );
                 }
 
                 return (
-                    <div key={variable.id}>
+                    <div key={variable.id} style={{ height: 40 }}>
                         {itemRefs.current.get(variable.id)}
                     </div>
                 );
