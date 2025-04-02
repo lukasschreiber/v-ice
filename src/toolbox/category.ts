@@ -56,6 +56,10 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
         return this.colour_;
     }
 
+    getFlyoutTargetId() {
+        return this.toolboxItemDef_.id;
+    }
+
     override addColourBorder_() {
         // No-op
     }

@@ -1,6 +1,7 @@
 import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
 import { hashString } from "@/utils/hash";
-import { createContext, useCallback, useState } from "react";
+import { useLocalStorage } from "@v-ice/commons";
+import { createContext, useCallback } from "react";
 
 interface IReactToolboxContext {
     isBlockPinned: (block?: GenericBlockDefinition) => boolean;
@@ -15,7 +16,7 @@ export const ReactToolboxContext = createContext<IReactToolboxContext>({
 export function ReactToolboxProvider(
     props: React.ComponentPropsWithoutRef<"div">
 ) {
-    const [pinnedBlocks, setPinnedBlocks] = useState<string[]>([]);
+    const [pinnedBlocks, setPinnedBlocks] = useLocalStorage<string[]>("v-ice-pinned", []);
 
     function getToolboxBlockId(block: GenericBlockDefinition) {
         return hashString(block, (hash) => "toolbox-" + hash);

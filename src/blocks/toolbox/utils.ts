@@ -31,6 +31,10 @@ export function blockDefinitionToBlock(block: GenericBlockDefinition, workspace:
     return Blockly.serialization.blocks.append(blockDefinitionToBlockState(block), workspace, { recordUndo: false })
 }
 
+export function blockStateToBlock(block: Blockly.serialization.blocks.State, workspace: Blockly.Workspace): Blockly.Block {
+    return Blockly.serialization.blocks.append(block, workspace, { recordUndo: false })
+}
+
 export function blockDefinitionToBlockState(block: GenericBlockDefinition): Blockly.serialization.blocks.State {
     const inputs: { [key: string]: Blockly.serialization.blocks.ConnectionState } | undefined = block.inputs ? Object.entries(block.inputs).map(([name, input]) => {
         return {

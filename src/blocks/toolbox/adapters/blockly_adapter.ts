@@ -11,6 +11,7 @@ export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.
     dynamicCategoryAdapter<C extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<C>): DynamicToolboxItem {
         const uid = Blockly.utils.idGenerator.genUid();
         return {
+            id: category.id,
             kind: "category",
             name: category.name,
             custom: uid,
@@ -26,6 +27,7 @@ export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.
 
     staticCategoryAdapter(category: IStaticToolboxCategory): ToolboxItem {
         return {
+            id: category.id,
             kind: "category",
             name: category.name,
             categorystyle: category.style,
@@ -61,6 +63,7 @@ export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.
             type: block.type,
             fields,
             inputs,
+            extraState: block.extraState,
             isHidden: block.isHidden || false
         }
     }

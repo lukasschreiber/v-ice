@@ -11,6 +11,7 @@ export type ToolboxDefinition = (IDynamicToolboxCategory<DynamicToolboxCategory>
 export type IsHiddenFunc = ((workspace: Blockly.Workspace, tableStructure: DataTableStructure) => boolean) | (() => boolean) | boolean
 
 export interface IToolboxCategoryDefinition {
+    id: string
     kind: "static" | "dynamic"
     name: string
     style: string

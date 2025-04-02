@@ -4,10 +4,12 @@ export abstract class ToolboxCategoryBuilder<T extends IToolboxCategoryDefinitio
     protected isHidden?: IsHiddenFunc = false;
     protected name: string = "";
     protected style: string = "";
+    protected id: string;
 
-    constructor(name: string, style: string) {
+    constructor(id: string, name: string, style: string) {
         this.name = name;
         this.style = style;
+        this.id = id;
     }
 
     withCondition(condition: IsHiddenFunc) {

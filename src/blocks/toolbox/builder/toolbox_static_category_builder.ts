@@ -4,8 +4,8 @@ import { ToolboxCategoryBuilder } from "./toolbox_category_builder";
 export class StaticToolboxCategoryBuilder extends ToolboxCategoryBuilder<IStaticToolboxCategory> {
     blocks: GenericBlockDefinition[] = [];
 
-    constructor(name: string, style: string) {
-        super(name, style);
+    constructor(id: string, name: string, style: string) {
+        super(id, name, style);
     }
 
     addBlock(block: GenericBlockDefinition) {
@@ -20,6 +20,7 @@ export class StaticToolboxCategoryBuilder extends ToolboxCategoryBuilder<IStatic
 
     build(): IStaticToolboxCategory {
         return {
+            id: this.id,
             kind: "static",
             name: this.name,
             style: this.style,

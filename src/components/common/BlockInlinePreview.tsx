@@ -28,7 +28,7 @@ export function BlockInlinePreview(props: { block: GenericBlockDefinition; text:
                         <div
                             className={`absolute w-fit py-1 top-0 left-0`}
                             style={{
-                                zIndex: Layer.Tooltips,
+                                zIndex: Layer.Tooltips + Layer.Modals,
                                 transform: `translate(
                                     ${inlineElementRef.current!.getBoundingClientRect().left}px, 
                                     ${

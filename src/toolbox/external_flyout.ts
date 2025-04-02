@@ -1,6 +1,7 @@
 import { Blocks } from '@/blocks';
 import { BlocklyToolboxAdapter } from '@/blocks/toolbox/adapters/blockly_adapter';
 import { GenericBlockDefinition } from '@/blocks/toolbox/builder/definitions';
+import { blockStateToBlock } from '@/blocks/toolbox/utils';
 import { subscribe } from '@/store/subscribe';
 import * as Blockly from 'blockly/core';
 
@@ -66,6 +67,12 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
     addBlock(block: GenericBlockDefinition) {
         this.show([
             this.dev_adapter.blockAdapter(block)
+        ])
+    }
+
+    addToolboxItem(item: Blockly.utils.toolbox.ToolboxItemInfo) {
+        this.show([
+            item
         ])
     }
 
@@ -188,8 +195,6 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
     override createDom(tagName: string | Blockly.utils.Svg<SVGSVGElement> | Blockly.utils.Svg<SVGGElement>): SVGElement {
         const element = super.createDom(tagName);
         this.targetDiv.appendChild(element);
-
-        console.log("Creating DOM");
 
         Blockly.utils.browserEvents.conditionalBind(
             element,

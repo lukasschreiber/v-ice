@@ -5,10 +5,13 @@ import { useSelector } from "@/store/hooks";
 import { ExternalFlyout } from "@/toolbox/external_flyout";
 import * as Blockly from "blockly/core";
 import { useEffect, useMemo, useRef } from "react";
+import { createUsedDummyVariables } from "@/utils/create_used_dummy_variables";
 
 export function ReactToolboxBlockItem(props: {
     block?: GenericBlockDefinition;
     variable?: Blockly.VariableModel | null;
+    width?: number;
+    height?: number;
 }) {
     const ref = useRef<HTMLDivElement>(null);
     const { workspace } = useWorkspace();
@@ -26,7 +29,9 @@ export function ReactToolboxBlockItem(props: {
         if (props.variable) {
             flyoutRef.current.addVariable(props.variable);
         } else if (props.block) {
-            flyoutRef.current.addBlock(props.block);
+            const blockState = createUsedDummyVariables(props.block, flyoutRef.current.getWorkspace());
+
+            flyoutRef.current.addToolboxItem({kind: "block", ...blockState});
         }
 
         return () => {
@@ -36,9 +41,10 @@ export function ReactToolboxBlockItem(props: {
     }, [workspace, settingsInitialized, props.block, props.variable]);
 
     const metrics = useMemo(() => {
+        if (props.width && props.height) return { width: props.width, height: props.height };
         if (!props.block) return { width: 0, height: 0 };
         return getBlockHeightWidth(props.block, scale);
-    }, [scale, props.block]);
+    }, [scale, props.block, props.width, props.height]);
 
     useEffect(() => {
         const globalClickHandler = (e: MouseEvent) => {

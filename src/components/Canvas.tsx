@@ -151,7 +151,9 @@ export function Canvas(props: CanvasProps) {
             Blockly.Events.enable();
         }
 
-        dispatch(setFeatureReady("variables"));
+        if (workspace?.getAllVariables().length === source?.getColumns().length) {
+            dispatch(setFeatureReady("variables"));
+        }
     }, [source]);
 
     useEffect(() => {
@@ -370,7 +372,7 @@ export function Canvas(props: CanvasProps) {
             ></div>
             {/* <SearchForm /> */}
             {/* <VariablesOverlay /> */}
-            {settings.toolboxVersion === "rich" && <ReactToolbox definition={toolbox || DefaultToolbox} offset={toolboxWidth} />}
+            {settings.toolboxVersion === "rich" && <ReactToolbox definition={toolbox || DefaultToolbox} offset={toolboxWidth} height={Number(height)} />}
             <ButtonStack
                 className={`absolute bottom-8 ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
                 style={{ zIndex: Layer.FloatingButtons }}

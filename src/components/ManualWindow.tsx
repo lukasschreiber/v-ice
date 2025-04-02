@@ -56,13 +56,6 @@ export function ManualWindow({ onClose, innerRef }: { onClose: () => void, inner
             externalDocument.body.appendChild(containerEl.current);
             externalWindow.current.addEventListener("beforeunload", onClose);
         }
-
-        return () => {
-            if (externalWindow.current) {
-                info("Closing external window").log();
-                externalWindow.current.close();
-            }
-        };
     }, []);
 
     useEffect(() => {

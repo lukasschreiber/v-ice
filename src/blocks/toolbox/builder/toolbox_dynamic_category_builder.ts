@@ -5,8 +5,8 @@ import { ToolboxCategoryBuilder } from "./toolbox_category_builder";
 export class DynamicToolboxCategoryBuilder<T extends DynamicToolboxCategory> extends ToolboxCategoryBuilder<IDynamicToolboxCategory<T>> {
     private instance: T | null = null;
 
-    constructor(name: string, style: string) {
-        super(name, style);
+    constructor(id: string, name: string, style: string) {
+        super(id, name, style);
     }
 
     withInstance(instance: (new () => T)) {
@@ -20,6 +20,7 @@ export class DynamicToolboxCategoryBuilder<T extends DynamicToolboxCategory> ext
         }
 
         return {
+            id: this.id,
             kind: "dynamic",
             instance: this.instance,
             isHidden: this.isHidden,
