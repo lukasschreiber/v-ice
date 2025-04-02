@@ -1,4 +1,5 @@
 import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
+import { hashString } from "@/utils/hash";
 import { createContext, useCallback, useState } from "react";
 
 interface IReactToolboxContext {
@@ -17,14 +18,7 @@ export function ReactToolboxProvider(
     const [pinnedBlocks, setPinnedBlocks] = useState<string[]>([]);
 
     function getToolboxBlockId(block: GenericBlockDefinition) {
-        const str = JSON.stringify(block);
-        let hash = 0;
-        for (var i = 0; i < str.length; i++) {
-            let code = str.charCodeAt(i);
-            hash = ((hash << 5) - hash) + code;
-            hash = hash & hash;
-        }
-        return "ToolboxBlock_" + hash;
+        return hashString(block, (hash) => "toolbox-" + hash);
     }
 
     const isBlockPinned = useCallback((block?: GenericBlockDefinition) => {

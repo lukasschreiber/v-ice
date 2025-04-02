@@ -1,5 +1,5 @@
 import { Themes, getBlockDefinitionById, useSettings } from "v-ice";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";
 import { Toolbox, useWorkspace } from "@/main";
@@ -16,6 +16,10 @@ export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], se
     const [language, setLanguage] = useState(localStorage.getItem("language") ?? "en");
     const [screenshotModeEnabled, setScreenshotModeEnabled] = useState(false);
 
+    const variables = useMemo(() => {
+        if (!workspace) return [];
+        return new Toolbox.Categories.Variables().getBlocks(workspace)
+    }, [workspace]);
 
     return (
         <div className="p-3">
@@ -183,7 +187,7 @@ export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], se
             </Accordion>
             <Accordion title="Variables" defaultOpen={true}>
                 <div className="flex flex-col gap-2">
-                    {workspace && new Toolbox.Categories.Variables().getBlocks(workspace).map((_block) => {
+                    {variables.map((_block) => {
                         const blockInfo = _block;
                         const block = getBlockDefinitionById(blockInfo.type);
 

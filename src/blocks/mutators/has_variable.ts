@@ -1,6 +1,5 @@
 import * as Blockly from 'blockly';
 import { FieldDynamicDropdown } from '@/blocks/fields/field_dynamic_dropdown';
-import { store } from '@/store/store';
 import { subscribe } from '@/store/subscribe';
 import types from '@/data/types';
 import { BlockMutator } from '../block_mutators';
@@ -39,15 +38,15 @@ export class HasVariableMutator extends BlockMutator<Blockly.Block & HasVariable
 
     @BlockMutator.mixin
     getDropDownOptions_(this: Blockly.Block & HasVariableBlock) {
-        const sourceColumns = store.getState().sourceTable.columns
+        const variables = this.workspace.getAllVariables()
         const columnNames: string[] = []
 
-        for (const column of sourceColumns) {
-            const type = types.utils.toString(column.type)
-            if (types.utils.isNullable(column.type)) {
-                columnNames.push(column.name)
+        for (const variable of variables) {
+            const type = types.utils.fromString(variable.type)
+            if (types.utils.isNullable(type)) {
+                columnNames.push(variable.name)
             }
-            this.columnTypeMap.set(column.name, type)
+            this.columnTypeMap.set(variable.name, variable.type)
         }
 
         return columnNames

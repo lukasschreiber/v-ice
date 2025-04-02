@@ -11,7 +11,9 @@ export function ReactToolboxRow(props: { block?: GenericBlockDefinition; variabl
 
     return (
         <div className="flex flex-col">
-            <div className="flex flex-row items-center justify-between group gap-2">
+            <div
+                className={`flex flex-row items-center justify-between group gap-2 p-1 rounded-md ${isBlockPinned(props.block) ? "bg-gray-100" : ""} hover:bg-gray-50`}
+            >
                 <ReactToolboxBlockItem block={props.block} variable={props.variable} />
                 <button onClick={() => toggleBlockPinned(props.block)}>
                     {isBlockPinned(props.block) ? (

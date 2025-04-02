@@ -27,8 +27,8 @@ export function registerCategory<T>(item: T, workspace: Blockly.WorkspaceSvg) {
     }
 }
 
-export function blockDefinitionToBlock(block: GenericBlockDefinition, workspace: Blockly.WorkspaceSvg): Blockly.BlockSvg {
-    return Blockly.serialization.blocks.append(blockDefinitionToBlockState(block), workspace, { recordUndo: false }) as Blockly.BlockSvg
+export function blockDefinitionToBlock(block: GenericBlockDefinition, workspace: Blockly.Workspace): Blockly.Block {
+    return Blockly.serialization.blocks.append(blockDefinitionToBlockState(block), workspace, { recordUndo: false })
 }
 
 export function blockDefinitionToBlockState(block: GenericBlockDefinition): Blockly.serialization.blocks.State {

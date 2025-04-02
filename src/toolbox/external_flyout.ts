@@ -94,8 +94,9 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         const metrics = metricsManager.getContentMetrics();
         this.height_ = metrics.height + 2 * this.MARGIN;
         this.width_ = metrics.width + 2 * this.MARGIN;
-        this.targetDiv.style.width = this.width_ + 'px';
-        this.targetDiv.style.height = this.height_ + 'px';
+        // found a better way...
+        // this.targetDiv.style.width = this.width_ + 'px';
+        // this.targetDiv.style.height = this.height_ + 'px';
         this.positionAt_(this.width_, this.height_, 0, 0);
     }
 

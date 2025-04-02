@@ -1,4 +1,4 @@
-import React, { createRef, memo, useContext, useEffect, useState } from "react";
+import React, { createRef, useContext, useEffect, useState } from "react";
 import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
 import { LightTheme } from "@/themes/themes";
@@ -43,7 +43,6 @@ import { setResultTables } from "@/store/data/result_tables_slice";
 import { NormalizedFitleredDataTable } from "@/data/filtered_table";
 import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
-import { warn } from "@/utils/logger";
 import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
 // import { SearchForm } from "./SearchForm";
 import { Layer } from "@/utils/zindex";
@@ -52,16 +51,10 @@ import { setFeatureReady, setVariables } from "@/store/blockly/blockly_slice";
 import types from "@/data/types";
 import { BlocklyToolboxAdapter } from "@/blocks/toolbox/adapters/blockly_adapter";
 import { ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
-import { ToolboxOverlay } from "./ToolboxOverlay";
 import { ReactToolbox } from "./toolbox/ReactToolbox";
+import { setLanguage } from "@/context/settings/settings_slice";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
-
-try {
-    Blockly.blockRendering.register(Renderer.name, Renderer);
-} catch (e) {
-    warn("Renderer has already been registered").log();
-}
 
 export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     language?: string;
@@ -125,6 +118,7 @@ export function Canvas(props: CanvasProps) {
 
     useEffect(() => {
         i18n.changeLanguage(language);
+        dispatch(setLanguage(language));
     }, [language, i18n]);
 
     useEffect(() => {
@@ -350,6 +344,17 @@ export function Canvas(props: CanvasProps) {
             setTheme(workspaceRef.current, theme ?? LightTheme);
         }
     }, [theme, workspaceRef.current]);
+
+    useEffect(() => {
+        const globalClickHandler = (e: MouseEvent) => {
+            if ((e.target as HTMLElement).closest(".renderer-renderer") !== null) return;
+            // hide all dropdowns, etc. when clicking outside the workspace
+            workspaceRef.current?.hideChaff();
+        };
+
+        document.addEventListener("click", globalClickHandler);
+        return () => document.removeEventListener("click", globalClickHandler);
+    }, [workspaceRef.current]);
 
     useSettingsHandlers(workspaceRef, settings);
 

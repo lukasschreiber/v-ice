@@ -9,6 +9,7 @@ import { Blocks } from "@/blocks";
 import { PathObject } from "./path_object";
 import { Edge } from "@/utils/edges";
 import { NodeBlock } from "@/blocks/extensions/node";
+import { warn } from "@/utils/logger";
 
 export class Renderer extends Blockly.zelos.Renderer {
     constructor() {
@@ -96,5 +97,10 @@ export class Renderer extends Blockly.zelos.Renderer {
             }
         }
     }
+}
 
+try {
+    Blockly.blockRendering.register(Renderer.name, Renderer);
+} catch (e) {
+    warn("Renderer has already been registered").log();
 }
