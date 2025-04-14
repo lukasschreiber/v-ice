@@ -13,7 +13,7 @@ export class FullScreenBlockDragger extends BlockDragger {
         super.onDrag(e, delta.translate(bounds.left, bounds.top));
     }
 
-    protected override wouldDeleteDraggable(e: PointerEvent, rootDraggable: Blockly.IDraggable & Blockly.IDeletable): boolean {
+    protected override wouldDeleteDraggable(e: PointerEvent, _rootDraggable: Blockly.IDraggable & Blockly.IDeletable): boolean {
         const elements = document.elementsFromPoint(e.clientX, e.clientY);
         if (!elements.find(element => element.id === "canvas")) {
             return true;

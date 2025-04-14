@@ -1,8 +1,8 @@
-import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
+import { GenericBlockDefinition } from "@/toolbox/builder/definitions";
 import { useSettings, useWorkspace } from "@/main";
 import { getBlockHeightWidth } from "@/renderer/block_metric_approximator";
 import { useSelector } from "@/store/hooks";
-import { ExternalFlyout } from "@/toolbox/external_flyout";
+import { SingleBlockFlyout } from "@/toolbox/react/single_block_flyout";
 import * as Blockly from "blockly/core";
 import { useEffect, useMemo, useRef } from "react";
 
@@ -14,7 +14,7 @@ export function ReactToolboxBlockItem(props: {
 }) {
     const ref = useRef<HTMLDivElement>(null);
     const { workspace } = useWorkspace();
-    const flyoutRef = useRef<ExternalFlyout | null>(null);
+    const flyoutRef = useRef<SingleBlockFlyout | null>(null);
     const { isInitialized: settingsInitialized } = useSettings();
     const scale = useSelector((state) => state.settings.settings.zoom);
 
@@ -22,7 +22,7 @@ export function ReactToolboxBlockItem(props: {
         if (!workspace || !settingsInitialized || !ref.current) return;
         if (flyoutRef.current) return; // Prevent re-initialization
 
-        flyoutRef.current = ExternalFlyout.inject(ref.current, workspace.options);
+        flyoutRef.current = SingleBlockFlyout.inject(ref.current, workspace.options);
         flyoutRef.current.init(workspace);
 
         if (props.variable) {

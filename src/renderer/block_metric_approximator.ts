@@ -1,5 +1,5 @@
-import { GenericBlockDefinition } from '@/blocks/toolbox/builder/definitions';
-import { blockStateToBlock } from '@/blocks/toolbox/utils';
+import { GenericBlockDefinition } from '@/toolbox/builder/definitions';
+import { blockStateToBlock } from '@/toolbox/utils';
 import * as Blockly from 'blockly/core';
 import { Renderer } from './renderer';
 import { debug } from '@/utils/logger';

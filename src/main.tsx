@@ -76,7 +76,7 @@ import { WorkspaceContext } from "@/context/workspace_context";
 import { ISerializedWorkspace, clearWorkspace, deserializeWorkspace, serializeWorkspace } from "./serializer";
 import emitter, { EvaluationAction } from "./evaluation_emitter";
 import { ManualPage as ManualPageElement } from "./components/ManualPage";
-import { DefaultToolbox } from "./blocks/toolbox/default_toolbox";
+import { DefaultToolbox } from "@/toolbox/default_toolbox";
 import { RegistrableExtension } from "@/blocks/block_extensions";
 import { RegistrableMutator } from "./blocks/block_mutators";
 import { jsQueryClient } from "./query/clients/javascript/js_query_client";
@@ -205,11 +205,11 @@ export function useQuery() {
     };
 }
 
-import { buildBlock, buildToolbox, buildDynamicCategory, buildStaticCategory } from "./blocks/toolbox/builder";
-import { Variables } from "./blocks/toolbox/categories/variables";
-import { Nodes } from "./blocks/toolbox/categories/nodes";
-import { EmptyToolbox } from "./blocks/toolbox/empty_toolbox";
-import * as ToolboxUtils from "./blocks/toolbox/utils";
+import { buildBlock, buildToolbox, buildDynamicCategory, buildStaticCategory } from "./toolbox/builder";
+import { Variables } from "./toolbox/categories/variables";
+import { Nodes } from "./toolbox/categories/nodes";
+import { EmptyToolbox } from "@/toolbox/empty_toolbox";
+import * as ToolboxUtils from "@/toolbox/utils";
 
 const Toolbox = {
     buildToolbox,
@@ -311,4 +311,4 @@ export { FilteredDataTable } from "@/data/filtered_table";
 export { type ISerializedWorkspace } from "./serializer";
 export { BlockPreview } from "@/components/common/BlockPreview";
 export { WorkspacePreview } from "@/components/common/WorkspacePreview";
-export { type ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
+export { type ToolboxDefinition } from "@/toolbox/builder/definitions";

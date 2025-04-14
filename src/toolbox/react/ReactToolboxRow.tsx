@@ -2,7 +2,7 @@ import { ReactToolboxBlockItem } from "./ReactToolboxBlockItem";
 import * as Blockly from "blockly/core";
 import StarIconOutline from "@/assets/StarIconOutline.svg?react";
 import StarIcon from "@/assets/StarIcon.svg?react";
-import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
+import { GenericBlockDefinition } from "@/toolbox/builder/definitions";
 import { useContext } from "react";
 import { ReactToolboxContext } from "./ReactToolboxContext";
 

@@ -165,5 +165,5 @@ Blockly.Workspace.prototype.newBlock = function (type: string, id?: string) {
     return new Block(this, type, id)
 }
 
-import style from "@/toolbox/toolbox.css?inline";
+import style from "@/toolbox/blockly/toolbox.css?inline";
 Blockly.Css.register(style);

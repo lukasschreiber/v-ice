@@ -1,11 +1,10 @@
 import { Blocks } from '@/blocks';
-import { BlocklyToolboxAdapter } from '@/blocks/toolbox/adapters/blockly_adapter';
-import { GenericBlockDefinition } from '@/blocks/toolbox/builder/definitions';
-import { blockStateToBlock } from '@/blocks/toolbox/utils';
+import { BlocklyToolboxAdapter } from '@/toolbox/adapters/blockly_adapter';
+import { GenericBlockDefinition } from '@/toolbox/builder/definitions';
 import { subscribe } from '@/store/subscribe';
 import * as Blockly from 'blockly/core';
 
-export class ExternalFlyout extends Blockly.VerticalFlyout {
+export class SingleBlockFlyout extends Blockly.VerticalFlyout {
     protected targetDiv: HTMLElement
     private dev_adapter: BlocklyToolboxAdapter = new BlocklyToolboxAdapter([]);
 
@@ -16,12 +15,13 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
 
     // This means that a block is created no matter the angle of the drag
     protected override dragAngleRange_: number = 360;
+    // keeps the stroke visible
     override MARGIN: number = 1;
     override CORNER_RADIUS: number = 0;
     protected override tabWidth_: number = 0;
 
     static inject(div: HTMLElement, workspaceOptions: Blockly.Options) {
-        const flyout = new ExternalFlyout(workspaceOptions, div);
+        const flyout = new SingleBlockFlyout(workspaceOptions, div);
         flyout.createDom("svg");
         flyout.setVisible(true);
 
@@ -101,9 +101,6 @@ export class ExternalFlyout extends Blockly.VerticalFlyout {
         const metrics = metricsManager.getContentMetrics();
         this.height_ = metrics.height + 2 * this.MARGIN;
         this.width_ = metrics.width + 2 * this.MARGIN;
-        // found a better way...
-        // this.targetDiv.style.width = this.width_ + 'px';
-        // this.targetDiv.style.height = this.height_ + 'px';
         this.positionAt_(this.width_, this.height_, 0, 0);
     }
 

@@ -14,7 +14,7 @@ import type { CategoryInfo } from 'blockly/core/utils/toolbox.js';
 import { getColor } from "@/themes/colors";
 import { store } from '@/store/store';
 import { EvaluationAction, triggerAction } from '@/evaluation_emitter';
-import { evaluateIsHiddenFunc, hasIsHiddenFunc } from '@/blocks/toolbox/utils';
+import { evaluateIsHiddenFunc, hasIsHiddenFunc } from '@/toolbox/utils';
 
 /** Toolbox category for continuous toolbox. */
 export class ContinuousCategory extends Blockly.ToolboxCategory {

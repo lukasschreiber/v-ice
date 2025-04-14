@@ -1,7 +1,6 @@
 import { useContext, useEffect, useImperativeHandle, useRef } from "react";
 import { createPortal } from "react-dom";
 import { ManualPage } from "./ManualPage";
-import { info } from "@/utils/logger";
 import { HelpContext } from "@/context/manual/manual_context";
 
 export interface ManualWindowRef {

@@ -1,9 +1,9 @@
-import { GenericBlockDefinition, ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
+import { GenericBlockDefinition, ToolboxDefinition } from "@/toolbox/builder/definitions";
 import { ReactToolboxProvider } from "./ReactToolboxContext";
 import { Layer } from "@/utils/zindex";
 import { VariableSizeList as List } from "react-window";
 import { useSettings, useWorkspace } from "@/main";
-import { evaluateIsHiddenFunc, hasIsHiddenFunc } from "@/blocks/toolbox/utils";
+import { evaluateIsHiddenFunc, hasIsHiddenFunc } from "@/toolbox/utils";
 import { useSelector } from "@/store/hooks";
 import { CSSProperties, useCallback, useEffect, useMemo, useRef } from "react";
 import { getBlockHeightWidth } from "@/renderer/block_metric_approximator";
@@ -26,7 +26,6 @@ export function ReactToolbox(props: { definition: ToolboxDefinition; offset: num
     const MAX_WIDTH = 450;
 
     const flattenedToolbox = useMemo(() => {
-        console.log("flattenedToolbox", variablesReady);
         if (!workspace || !variablesReady) {
             return [];
         }

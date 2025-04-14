@@ -11,7 +11,7 @@ import React, { HTMLProps, memo } from "react";
 import { showHelp } from "@/context/manual/manual_emitter";
 import { InfoBox, InfoBoxType } from "./InfoBox";
 import { BlockInfoWidget } from "./BlockInfoWidget";
-import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
+import { GenericBlockDefinition } from "@/toolbox/builder/definitions";
 
 declare global {
     namespace JSX {

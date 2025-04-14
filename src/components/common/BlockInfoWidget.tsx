@@ -1,5 +1,5 @@
 import { useWorkspace } from "@/main"
-import { ContinuousCategory, ContinuousToolbox } from "@/toolbox/toolbox"
+import { ContinuousCategory, ContinuousToolbox } from "@/toolbox/blockly/toolbox"
 import { darken, isTooLight, lighten } from "@/utils/color"
 import { useEffect, useState } from "react"
 

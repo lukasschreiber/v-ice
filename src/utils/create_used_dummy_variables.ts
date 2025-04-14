@@ -1,8 +1,8 @@
-import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
+import { GenericBlockDefinition } from "@/toolbox/builder/definitions";
 import * as Blockly from "blockly/core";
 import types from "@/data/types";
 import { Blocks } from "@/blocks";
-import { blockDefinitionToBlockState } from "@/blocks/toolbox/utils";
+import { blockDefinitionToBlockState } from "@/toolbox/utils";
 
 export function createUsedDummyVariables(block: GenericBlockDefinition, workspace: Blockly.WorkspaceSvg) {
     const enumNames = Array.from(

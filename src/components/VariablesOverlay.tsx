@@ -3,8 +3,7 @@ import { useWorkspace } from "@/main";
 import { useSelector } from "@/store/hooks";
 import { useRef, useState, useMemo } from "react";
 import types from "@/data/types";
-import { ReactToolboxRow } from "./toolbox/ReactToolboxRow";
-import { ReactToolboxBlockItem } from "./toolbox/ReactToolboxBlockItem";
+import { ReactToolboxBlockItem } from "@/toolbox/react/ReactToolboxBlockItem";
 
 export function VariablesOverlay() {
     const { workspace } = useWorkspace();
@@ -38,7 +37,7 @@ export function VariablesOverlay() {
 
     return (
         <div
-            className="absolute top-0 right-0 w-fit h-fit bg-pink-300/50 p-2 flex gap-2 flex-col"
+            className="fixed top-0 right-0 w-fit h-fit bg-pink-300/50 p-2 flex gap-2 flex-col"
             data-deletezone={true}
             style={{ zIndex: Layer.SearchOverlay }}
         >
