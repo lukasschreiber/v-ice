@@ -1,6 +1,6 @@
 import { Settings } from "@/context/settings/settings";
-import { ContinuousFlyout } from "@/toolbox/flyout";
-import { ContinuousToolbox } from "@/toolbox/toolbox";
+import { ContinuousFlyout } from "@/toolbox/blockly/flyout";
+import { ContinuousToolbox } from "@/toolbox/blockly/toolbox";
 import * as Blockly from "blockly/core";
 import { useEffect } from "react";
 

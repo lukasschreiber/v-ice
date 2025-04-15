@@ -23,20 +23,20 @@ export function SettingsModal(props: ModalProps) {
         if (props.open === true) triggerAction(EvaluationAction.OpenSettings);
     }, [props.open]);
 
-    function renderSettingsInput(setting: Setting<unknown>, key: keyof Settings) {
+    function renderSettingsInput(setting: Setting<any>, key: keyof Settings) {
         if (isRangeSetting(setting)) {
             return (
                 <div className="flex flex-col">
                     <label htmlFor={key} className="flex flex-row items-center gap-2">
                         <span>
-                            {setting.label} - {((settings[key] ?? setting.default) as number).toFixed(2)}
+                            {setting.label} - {setting.valueFormatter ? setting.valueFormatter(settings[key] as number) : ((settings[key] ?? setting.default) as number).toFixed(2)}
                         </span>
                         <span className="text-sm cursor-pointer" onClick={() => set(key, defaultSettings[key])}>
-                            [<span className="underline text-secondary">{defaultSettings[key]}</span>]
+                            [<span className="underline text-secondary">{setting.valueFormatter ? setting.valueFormatter(defaultSettings[key] as number) : defaultSettings[key] }</span>]
                         </span>
                     </label>
                     <div className="flex flex-row text-xs items-center w-full text-slate-500 gap-1">
-                        <div>{setting.min}</div>
+                        <div>{setting.valueFormatter ? setting.valueFormatter(setting.min) : setting.min}</div>
                         <input
                             type="range"
                             id={key}
@@ -47,7 +47,7 @@ export function SettingsModal(props: ModalProps) {
                             onChange={(e) => set(key, parseFloat(e.target.value))}
                             className="grow"
                         />
-                        <div>{setting.max}</div>
+                        <div>{setting.valueFormatter ? setting.valueFormatter(setting.max) : setting.max}</div>
                     </div>
                 </div>
             );

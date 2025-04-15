@@ -1,4 +1,6 @@
+import { GenericBlockDefinition } from "@/toolbox/builder/definitions";
 import { IType } from "@/main";
+import { getToolboxBlockId } from "@/utils/ids";
 import { createSlice } from "@reduxjs/toolkit";
 
 export type EdgeEditMarker = {
@@ -14,6 +16,7 @@ export const blocklySlice = createSlice({
         edgeEditMarker: null as null | EdgeEditMarker,
         targetBlocks: {} as Record<string, string>,
         variables: [] as Array<{ name: string, type: IType, id: string }>,
+        pinnedBlocks: [] as Array<{hash: string}>,
         loading: false,
         featuresReady: {
             toolbox: false,
@@ -44,9 +47,21 @@ export const blocklySlice = createSlice({
                 [action.payload]: true
             }
             state.loading = Object.values(state.featuresReady).some(ready => !ready)
+        },
+        toggleBlockPinned: (state, action: { type: string, payload: GenericBlockDefinition }) => {
+            const blockId = getToolboxBlockId(action.payload);
+            const index = state.pinnedBlocks.findIndex(block => block.hash === blockId);
+            if (index !== -1) {
+                state.pinnedBlocks.splice(index, 1);
+            } else {
+                state.pinnedBlocks.push({ hash: blockId });
+            }
+        },
+        setPinnedBlocks: (state, action: { type: string, payload: Array<{ hash: string }> }) => {
+            state.pinnedBlocks = action.payload;
         }
     }
 })
 
-export const { setTargetBlocks, setEdgeEditMarker, setVariables, addVariable, removeVariable, setFeatureReady } = blocklySlice.actions
+export const { setTargetBlocks, setEdgeEditMarker, setVariables, setPinnedBlocks, addVariable, removeVariable, setFeatureReady, toggleBlockPinned } = blocklySlice.actions
 export const blocklyReducer = blocklySlice.reducer

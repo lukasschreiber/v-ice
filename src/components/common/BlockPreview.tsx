@@ -5,8 +5,8 @@ import { Blocks } from "@/blocks";
 import { LightTheme } from "@/themes/themes";
 import types from "@/data/types";
 import { injectAcrossDocuments } from "@/blockly_inject_across_documents";
-import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
-import { blockDefinitionToBlockState } from "@/blocks/toolbox/utils";
+import { GenericBlockDefinition } from "@/toolbox/builder/definitions";
+import { blockDefinitionToBlockState } from "@/toolbox/utils";
 
 export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadParentRef?: React.RefObject<HTMLElement>, externalWindowRef?: React.RefObject<WindowProxy> }) {
     const div = useRef<HTMLDivElement>(null);

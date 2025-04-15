@@ -5,7 +5,7 @@
  */
 
 import * as Blockly from 'blockly/core';
-import {ContinuousFlyout} from "@/toolbox/flyout";
+import {ContinuousFlyout} from "@/toolbox/blockly/flyout";
 
 /** Adds additional padding to the bottom of the flyout if needed. */
 export class ContinuousFlyoutMetrics extends Blockly.FlyoutMetricsManager {

@@ -1,5 +1,5 @@
-import { GenericBlockDefinition } from '@/blocks/toolbox/builder/definitions';
-import { blockDefinitionToBlock } from '@/blocks/toolbox/utils';
+import { GenericBlockDefinition } from '@/toolbox/builder/definitions';
+import { blockStateToBlock } from '@/toolbox/utils';
 import * as Blockly from 'blockly/core';
 import { Renderer } from './renderer';
 import { debug } from '@/utils/logger';
@@ -7,6 +7,7 @@ import { hash } from '@/utils/hash';
 import { subscribe } from '@/store/subscribe';
 import { setBlocklyLocale } from '@/i18n';
 import { ConstantProvider } from './constants';
+import { createUsedDummyVariables } from '@/utils/create_used_dummy_variables';
 
 const hiddenDiv = document.createElement('div');
 hiddenDiv.style.position = 'absolute';
@@ -28,7 +29,7 @@ subscribe(state => state.settings.language, language => {
     setBlocklyLocale(language);
     metricsCache.clear();
     debug('Blockly locale changed, cleared metrics cache').log();
-}, {immediate: true});
+}, { immediate: true });
 
 export function getBlockHeightWidth(block: GenericBlockDefinition, scale: number): { width: number; height: number } {
     const blockHash = hash(block);
@@ -49,7 +50,8 @@ debug('Hidden workspace created').log();
 
 function computeBlockHeightWidth(block: GenericBlockDefinition): { width: number; height: number } {
     hiddenWorkspace.clear();
-    const blockInstance = blockDefinitionToBlock(block, hiddenWorkspace) as Blockly.BlockSvg;
+    hiddenWorkspace.getAllVariables().forEach(variable => hiddenWorkspace.deleteVariableById(variable.getId()));
+    const blockInstance = blockStateToBlock(createUsedDummyVariables(block, hiddenWorkspace), hiddenWorkspace) as Blockly.BlockSvg;
     blockInstance.initSvg();
     blockInstance.render();
 

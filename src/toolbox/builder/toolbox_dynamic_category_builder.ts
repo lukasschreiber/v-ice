@@ -1,12 +1,12 @@
 import { DynamicToolboxCategory } from "../categories/dynamic_category";
-import { IDynamicToolboxCategory } from "./definitions";
+import { IDynamicToolboxCategory, ToolboxCategoryMetadata } from "./definitions";
 import { ToolboxCategoryBuilder } from "./toolbox_category_builder";
 
-export class DynamicToolboxCategoryBuilder<T extends DynamicToolboxCategory> extends ToolboxCategoryBuilder<IDynamicToolboxCategory<T>> {
+export class DynamicToolboxCategoryBuilder<T extends DynamicToolboxCategory, M extends ToolboxCategoryMetadata> extends ToolboxCategoryBuilder<IDynamicToolboxCategory<T, M>, M> {
     private instance: T | null = null;
 
-    constructor(name: string, style: string) {
-        super(name, style);
+    constructor(id: string, name: string, style: string) {
+        super(id, name, style);
     }
 
     withInstance(instance: (new () => T)) {
@@ -14,17 +14,19 @@ export class DynamicToolboxCategoryBuilder<T extends DynamicToolboxCategory> ext
         return this;
     }
 
-    override build(): IDynamicToolboxCategory<T> {
+    override build(): IDynamicToolboxCategory<T, M> {
         if (this.instance === null) {
             throw new Error("DynamicToolboxCategoryBuilder: instance is not set");
         }
 
         return {
+            id: this.id,
             kind: "dynamic",
             instance: this.instance,
             isHidden: this.isHidden,
             name: this.name,
-            style: this.style
+            style: this.style,
+            metadata: this.metadata
         }
     }
 }

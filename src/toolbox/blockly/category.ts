@@ -14,7 +14,10 @@ import type { CategoryInfo } from 'blockly/core/utils/toolbox.js';
 import { getColor } from "@/themes/colors";
 import { store } from '@/store/store';
 import { EvaluationAction, triggerAction } from '@/evaluation_emitter';
-import { evaluateIsHiddenFunc, hasIsHiddenFunc } from '@/blocks/toolbox/utils';
+import StarIcon from "@/assets/StarIcon.svg?raw";
+
+import { evaluateIsHiddenFunc, hasIsHiddenFunc } from '@/toolbox/utils';
+import { darken } from '@/utils/color';
 
 /** Toolbox category for continuous toolbox. */
 export class ContinuousCategory extends Blockly.ToolboxCategory {
@@ -43,8 +46,20 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
 
     override createIconDom_(): HTMLDivElement {
         const icon = document.createElement('div');
-        icon.classList.add('categoryBubble');
-        icon.style.backgroundColor = this.colour_;
+
+        if (this.categoryDef_.categorystyle === "favorites_category") {
+            icon.classList.add('categoryBubbleIcon');
+            icon.style.color = this.colour_;
+            icon.innerHTML = StarIcon;
+            icon.querySelectorAll("path").forEach((path) => {
+                console.log(this.colour_)
+                path.setAttribute("stroke", darken(this.colour_, 0.09));
+                path.setAttribute("stroke-width", "1");
+            })
+        } else {
+            icon.classList.add('categoryBubble');
+            icon.style.backgroundColor = this.colour_;
+        }
         return icon;
     }
 
@@ -54,6 +69,10 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
 
     getColor(): string {
         return this.colour_;
+    }
+
+    getFlyoutTargetId() {
+        return this.toolboxItemDef_.id;
     }
 
     override addColourBorder_() {

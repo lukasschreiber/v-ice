@@ -9,13 +9,13 @@
 import * as Blockly from 'blockly/core';
 import * as toolbox from 'blockly/core/utils/toolbox';
 import type { ISelectableToolboxItem } from 'blockly/core/interfaces/i_selectable_toolbox_item.js';
-import { ContinuousFlyout } from "@/toolbox/flyout";
-import style from "./toolbox.css?inline";
+import { ContinuousFlyout } from "@/toolbox/blockly/flyout";
 import { subscribe } from '@/store/subscribe';
 import { Blocks } from '@/blocks';
 import { store } from '@/store/store';
 import { ContinuousCategory } from './category';
-import { evaluateIsHiddenFunc, hasIsHiddenFunc, registerCategory } from '@/blocks/toolbox/utils';
+import { evaluateIsHiddenFunc, hasIsHiddenFunc, registerCategory } from '@/toolbox/utils';
+import { scrollToCategory } from '@/context/category_scroll_emitter';
 export * from './category'
 
 export class ContinuousToolbox extends Blockly.Toolbox {
@@ -139,6 +139,14 @@ export class ContinuousToolbox extends Blockly.Toolbox {
                 newItem.getName(),
             )?.y || 0;
             this.getFlyout().scrollTo(target);
+
+            if (store.getState().settings.settings.toolboxVersion === "rich") {
+                const category = this.getCategoryByName(newItem.getName()) as ContinuousCategory | null
+                const id = category?.getFlyoutTargetId()
+                if (id) {
+                    scrollToCategory(id)
+                }
+            }
         }
     }
 
@@ -227,5 +235,3 @@ export class ContinuousToolbox extends Blockly.Toolbox {
         return super.getClientRect();
     }
 }
-
-Blockly.Css.register(style);

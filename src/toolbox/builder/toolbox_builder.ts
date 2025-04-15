@@ -1,5 +1,5 @@
 import { DynamicToolboxCategory } from "../categories/dynamic_category";
-import { IDynamicToolboxCategory, IStaticToolboxCategory, ToolboxDefinition } from "./definitions";
+import { IDynamicToolboxCategory, IStaticToolboxCategory, ToolboxCategoryMetadata, ToolboxDefinition } from "./definitions";
 
 export class ToolboxBuilder {
     readonly categories: ToolboxDefinition;
@@ -8,12 +8,12 @@ export class ToolboxBuilder {
         this.categories = [];
     }
     
-    addStaticCategory(category: IStaticToolboxCategory) {
+    addStaticCategory(category: IStaticToolboxCategory<ToolboxCategoryMetadata>) {
         this.categories.push(category);
         return this;
     }
 
-    addDynamicCategory<T extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<T>) {
+    addDynamicCategory<T extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<T, ToolboxCategoryMetadata>) {
         this.categories.push(category);
         return this;
     }

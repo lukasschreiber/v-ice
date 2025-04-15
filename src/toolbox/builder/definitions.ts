@@ -6,23 +6,27 @@ import { DynamicToolboxCategory } from "../categories/dynamic_category";
 
 export type DataTableStructure = NormalizedDataTable["columns"]
 
-export type ToolboxDefinition = (IDynamicToolboxCategory<DynamicToolboxCategory> | IStaticToolboxCategory)[]
+export type ToolboxDefinition = (IDynamicToolboxCategory<DynamicToolboxCategory, ToolboxCategoryMetadata> | IStaticToolboxCategory<ToolboxCategoryMetadata>)[]
 
 export type IsHiddenFunc = ((workspace: Blockly.Workspace, tableStructure: DataTableStructure) => boolean) | (() => boolean) | boolean
 
-export interface IToolboxCategoryDefinition {
+export type ToolboxCategoryMetadata = { [key: string]: unknown } | undefined
+
+export interface IToolboxCategoryDefinition<M extends ToolboxCategoryMetadata> {
+    id: string
     kind: "static" | "dynamic"
     name: string
     style: string
     isHidden?: IsHiddenFunc
+    metadata?: M
 }
 
-export interface IDynamicToolboxCategory<T extends DynamicToolboxCategory> extends IToolboxCategoryDefinition {
+export interface IDynamicToolboxCategory<T extends DynamicToolboxCategory, M extends ToolboxCategoryMetadata> extends IToolboxCategoryDefinition<M> {
     kind: "dynamic"
     instance: T
 }
 
-export interface IStaticToolboxCategory extends IToolboxCategoryDefinition {
+export interface IStaticToolboxCategory<M extends ToolboxCategoryMetadata> extends IToolboxCategoryDefinition<M> {
     kind: "static"
     blocks: GenericBlockDefinition[]
 }

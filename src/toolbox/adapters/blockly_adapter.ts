@@ -8,9 +8,23 @@ type ToolboxItem = Blockly.utils.toolbox.ToolboxItemInfo & { isHidden: IsHiddenF
 
 export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.toolbox.ToolboxDefinition, DynamicToolboxItem, ToolboxItem, ToolboxItem> {
 
+    toToolboxDefinition(): Blockly.utils.toolbox.ToolboxDefinition {
+        return {
+            kind: "categoryToolbox",
+            contents: this.toolbox.map(category => {
+                if (category.kind === "dynamic") {
+                    return this.dynamicCategoryAdapter(category);
+                } else {
+                    return this.staticCategoryAdapter(category);
+                }
+            })
+        } as unknown as Blockly.utils.toolbox.ToolboxDefinition;
+    }
+
     dynamicCategoryAdapter<C extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<C>): DynamicToolboxItem {
         const uid = Blockly.utils.idGenerator.genUid();
         return {
+            id: category.id,
             kind: "category",
             name: category.name,
             custom: uid,
@@ -26,6 +40,7 @@ export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.
 
     staticCategoryAdapter(category: IStaticToolboxCategory): ToolboxItem {
         return {
+            id: category.id,
             kind: "category",
             name: category.name,
             categorystyle: category.style,
@@ -61,6 +76,7 @@ export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.
             type: block.type,
             fields,
             inputs,
+            extraState: block.extraState,
             isHidden: block.isHidden || false
         }
     }

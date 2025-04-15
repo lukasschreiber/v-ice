@@ -2,7 +2,7 @@ import { useRef, useState } from "react";
 import { BlockPreview } from "./BlockPreview";
 import { createPortal } from "react-dom";
 import { Layer } from "@/utils/zindex";
-import { GenericBlockDefinition } from "@/blocks/toolbox/builder/definitions";
+import { GenericBlockDefinition } from "@/toolbox/builder/definitions";
 
 export function BlockInlinePreview(props: { block: GenericBlockDefinition; text: string, externalWindowRef?: React.RefObject<WindowProxy> }) {
     const [isHovered, setIsHovered] = useState(false);
@@ -28,7 +28,7 @@ export function BlockInlinePreview(props: { block: GenericBlockDefinition; text:
                         <div
                             className={`absolute w-fit py-1 top-0 left-0`}
                             style={{
-                                zIndex: Layer.Tooltips,
+                                zIndex: Layer.Tooltips + Layer.Modals,
                                 transform: `translate(
                                     ${inlineElementRef.current!.getBoundingClientRect().left}px, 
                                     ${

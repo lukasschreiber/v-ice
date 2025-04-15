@@ -1,7 +1,7 @@
 import * as Blockly from 'blockly/core';
 import { FlyoutItem } from 'blockly/core/flyout_base'
-import { ContinuousToolbox } from "@/toolbox/toolbox";
-import { ContinuousFlyoutMetrics } from "@/toolbox/metrics_flyout";
+import { ContinuousToolbox } from "@/toolbox/blockly/toolbox";
+import { ContinuousFlyoutMetrics } from "@/toolbox/blockly/metrics_flyout";
 import { FieldLabelTargetNode } from '@/blocks/fields/field_label_target_node';
 import { Blocks } from '@/blocks';
 import { EvaluationAction, triggerAction } from '@/evaluation_emitter';

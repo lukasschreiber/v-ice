@@ -1,17 +1,19 @@
 import "blockly/blocks";
-import { Variables } from "@/blocks/toolbox/categories/variables";
+import { Variables } from "@/toolbox/categories/variables";
 import { Nodes } from "./categories/nodes";
 import { DateTime } from "luxon";
-import { FibBlock, MathBinaryOperationBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock } from "../definitions/math";
-import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, HasVariableValueBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "../definitions/comparisons";
-import { ListAnyAllBlock, ListArithmeticBlock, ListContainsBlock, ListEqualsBlock, ListLengthBlock } from "../definitions/lists";
-import { ProperySelectBlock } from "../definitions/structs";
-import { LogicNotBlock, LogicOrBlock } from "../definitions/logic";
-import { TimelineAfterBlock, TimelineAfterIntervalBlock, TimelineDateBlock, TimelineEventOccursMatchBlock, TimelineOrBlock, TimelineQueryBlock, TimelineRepeatBlock, TimestampBlock } from "../definitions/timeline";
+import { FibBlock, MathBinaryOperationBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock } from "@/blocks/definitions/math";
+import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, HasVariableValueBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "@/blocks/definitions/comparisons";
+import { ListAnyAllBlock, ListArithmeticBlock, ListContainsBlock, ListEqualsBlock, ListLengthBlock } from "@/blocks/definitions/lists";
+import { ProperySelectBlock } from "@/blocks/definitions/structs";
+import { LogicNotBlock, LogicOrBlock } from "@/blocks/definitions/logic";
+import { TimelineAfterBlock, TimelineAfterIntervalBlock, TimelineDateBlock, TimelineEventOccursMatchBlock, TimelineOrBlock, TimelineQueryBlock, TimelineRepeatBlock, TimestampBlock } from "@/blocks/definitions/timeline";
 import { buildBlock, buildDynamicCategory, buildStaticCategory, buildToolbox } from "./builder";
+import { Favorites } from "./categories/favorites";
 
 export const DefaultToolbox = buildToolbox()
-    .addDynamicCategory(buildDynamicCategory("%{BKY_VARIABLES}", "variables_category").withInstance(Variables).build())
+    .addDynamicCategory(buildDynamicCategory("Favorites", "favorites_category").withInstance(Favorites).withMetadata({ noHighlight: true, sortable: false, filterable: true }).build())
+    .addDynamicCategory(buildDynamicCategory("%{BKY_VARIABLES}", "variables_category").withInstance(Variables).withMetadata({ filterable: true, sortable: true }).build())
     .addStaticCategory(buildStaticCategory("%{BKY_COMPARISONS}", "comparisons_category")
         .addBlock(buildBlock(EqualsBlock).withEmptyInputs().build())
         .addBlock(buildBlock(MatchesBlock).withEmptyInputs().build())
