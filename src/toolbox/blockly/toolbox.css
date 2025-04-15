@@ -2,6 +2,10 @@
   @apply mt-0 mx-auto mb-0.5 rounded-full w-5 h-5 border border-solid border-black/10;
 }
 
+.categoryBubbleIcon {
+  @apply mt-0 mx-auto mb-0.5 rounded-full w-5 h-5;
+}
+
 .blocklyTreeRow {
   @apply py-1 px-0 mb-0 cursor-pointer h-[initial];
 }

@@ -18,6 +18,7 @@ export interface Setting<T> {
     helpText?: string;
     label: string;
     hidden?: boolean | ((settings: Settings) => boolean);
+    valueFormatter?: (value: T) => string;
 }
 
 export interface RangeSetting extends Setting<number> {
@@ -53,27 +54,27 @@ export function defineSettings(settings: LayoutGroup[]) {
     return settings;
 }
 
-export function isRangeSetting(setting: Setting<unknown>): setting is RangeSetting {
+export function isRangeSetting(setting: Setting<any>): setting is RangeSetting {
     return setting.type === "range";
 }
 
-export function isTextSetting(setting: Setting<unknown>): setting is TextSetting {
+export function isTextSetting(setting: Setting<any>): setting is TextSetting {
     return setting.type === "text";
 }
 
-export function isCheckboxSetting(setting: Setting<unknown>): setting is CheckboxSetting {
+export function isCheckboxSetting(setting: Setting<any>): setting is CheckboxSetting {
     return setting.type === "checkbox";
 }
 
-export function isColorSetting(setting: Setting<unknown>): setting is ColorSetting {
+export function isColorSetting(setting: Setting<any>): setting is ColorSetting {
     return setting.type === "color";
 }
 
-export function isSelectSetting<T extends string>(setting: Setting<unknown>): setting is SelectSetting<T> {
+export function isSelectSetting<T extends string>(setting: Setting<any>): setting is SelectSetting<T> {
     return setting.type === "select";
 }
 
-export function isRadioSetting(setting: Setting<unknown>): setting is RadioSetting {
+export function isRadioSetting(setting: Setting<any>): setting is RadioSetting {
     return setting.type === "radio";
 }
 

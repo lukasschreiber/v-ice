@@ -1,4 +1,4 @@
-import React, { createRef, useContext, useEffect, useState } from "react";
+import React, { createRef, useContext, useEffect, useMemo, useState } from "react";
 import * as Blockly from "blockly/core";
 import { Renderer } from "@/renderer/renderer";
 import { LightTheme } from "@/themes/themes";
@@ -53,7 +53,6 @@ import { BlocklyToolboxAdapter } from "@/toolbox/adapters/blockly_adapter";
 import { ToolboxDefinition } from "@/toolbox/builder/definitions";
 import { ReactToolbox } from "@/toolbox/react/ReactToolbox";
 import { setLanguage } from "@/context/settings/settings_slice";
-import { VariablesOverlay } from "./VariablesOverlay";
 import { SearchForm } from "./SearchForm";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
@@ -89,6 +88,7 @@ export function Canvas(props: CanvasProps) {
     const [toolboxWidth, setToolboxWidth] = useState(0);
     const isLoading = useSelector((state) => state.blockly.loading);
     const { i18n } = useTranslation();
+    const [searchFormVisible, setSearchFormVisible] = useState(false);
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
     const {
         settings,
@@ -149,7 +149,13 @@ export function Canvas(props: CanvasProps) {
                 }
             }
 
-            dispatch(setVariables(workspace.getAllVariables().map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() }))));
+            dispatch(
+                setVariables(
+                    workspace
+                        .getAllVariables()
+                        .map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() }))
+                )
+            );
             Blockly.Events.enable();
         }
 
@@ -252,9 +258,17 @@ export function Canvas(props: CanvasProps) {
                 });
 
                 workspaceRef.current!.addChangeListener((e) => {
-                    if (e.type === Blockly.Events.VAR_CREATE || e.type === Blockly.Events.VAR_DELETE || e.type === Blockly.Events.VAR_RENAME) {
+                    if (
+                        e.type === Blockly.Events.VAR_CREATE ||
+                        e.type === Blockly.Events.VAR_DELETE ||
+                        e.type === Blockly.Events.VAR_RENAME
+                    ) {
                         dispatch(
-                            setVariables(workspaceRef.current!.getAllVariables().map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() })))
+                            setVariables(
+                                workspaceRef
+                                    .current!.getAllVariables()
+                                    .map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() }))
+                            )
                         );
                     }
                 });
@@ -356,11 +370,28 @@ export function Canvas(props: CanvasProps) {
             workspaceRef.current?.hideChaff();
         };
 
+        const globalKeyHandler = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                setSearchFormVisible(false);
+            }
+
+            if (e.key === "F1") {
+                e.preventDefault();
+                setSearchFormVisible(true);
+            }
+        };
+
         document.addEventListener("click", globalClickHandler);
-        return () => document.removeEventListener("click", globalClickHandler);
+        document.addEventListener("keydown", globalKeyHandler);
+        return () => {
+            document.removeEventListener("keydown", globalKeyHandler);
+            document.removeEventListener("click", globalClickHandler);
+        };
     }, [workspaceRef.current]);
 
     useSettingsHandlers(workspaceRef, settings);
+
+    const memoizedToolbox = useMemo(() => toolbox || DefaultToolbox, [toolbox]);
 
     return (
         <div className="overflow-hidden w-fit relative canvas-container">
@@ -372,9 +403,11 @@ export function Canvas(props: CanvasProps) {
                 ref={blocklyDiv}
                 id={"canvas"}
             ></div>
-            {/* <SearchForm /> */}
+            {searchFormVisible && <SearchForm onClose={() => setSearchFormVisible(false)} />}
             {/* <VariablesOverlay /> */}
-            {settings.toolboxVersion === "rich" && <ReactToolbox definition={toolbox || DefaultToolbox} offset={toolboxWidth} height={Number(height)} />}
+            {settings.toolboxVersion === "rich" && (
+                <ReactToolbox definition={memoizedToolbox} offset={toolboxWidth} height={Number(height)} />
+            )}
             <ButtonStack
                 className={`absolute bottom-8 ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
                 style={{ zIndex: Layer.FloatingButtons }}

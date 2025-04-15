@@ -1,10 +1,11 @@
-import { IsHiddenFunc, IToolboxCategoryDefinition } from "./definitions";
+import { IsHiddenFunc, IToolboxCategoryDefinition, ToolboxCategoryMetadata } from "./definitions";
 
-export abstract class ToolboxCategoryBuilder<T extends IToolboxCategoryDefinition> {
+export abstract class ToolboxCategoryBuilder<T extends IToolboxCategoryDefinition<M>, M extends ToolboxCategoryMetadata> {
     protected isHidden?: IsHiddenFunc = false;
     protected name: string = "";
     protected style: string = "";
     protected id: string;
+    protected metadata?: M;
 
     constructor(id: string, name: string, style: string) {
         this.name = name;
@@ -24,6 +25,11 @@ export abstract class ToolboxCategoryBuilder<T extends IToolboxCategoryDefinitio
 
     withStyle(style: string) {
         this.style = style;
+        return this;
+    }
+
+    withMetadata(metadata: M) {
+        this.metadata = metadata;
         return this;
     }
 

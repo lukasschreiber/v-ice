@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 export function Tooltip(
     props: HTMLProps<HTMLDivElement> & { text: string; distance?: number; position?: "left" | "right" }
 ) {
-    const { text, distance = 10, position = "right", className, ...rest } = props;
+    const { text, distance = 10, position = "right", className, style, ...rest } = props;
     const [isHovered, setIsHovered] = useState(false);
     const targetRef = useRef<HTMLDivElement>(null);
     const tooltipRef = useRef<HTMLDivElement>(null);
@@ -41,6 +41,7 @@ export function Tooltip(
                             userSelect: "none",
                             pointerEvents: "none",
                             zIndex: Layer.Tooltips,
+                            ...style,
                         }}
                     >
                         {text}

@@ -91,7 +91,7 @@ export class FieldTypeLabel extends Blockly.FieldLabelSerializable implements Ty
     }
 
     override loadState(state: FieldTypeLabelState): void {
-        if (state.type) this.type_ = types.utils.fromString(state.type)
+        if (state && state.type) this.type_ = types.utils.fromString(state.type)
         this.updateIcon_()
     }
 

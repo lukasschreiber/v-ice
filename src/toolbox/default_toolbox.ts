@@ -12,8 +12,8 @@ import { buildBlock, buildDynamicCategory, buildStaticCategory, buildToolbox } f
 import { Favorites } from "./categories/favorites";
 
 export const DefaultToolbox = buildToolbox()
-    .addDynamicCategory(buildDynamicCategory("Favorites", "variables_category").withInstance(Favorites).build())
-    .addDynamicCategory(buildDynamicCategory("%{BKY_VARIABLES}", "variables_category").withInstance(Variables).build())
+    .addDynamicCategory(buildDynamicCategory("Favorites", "favorites_category").withInstance(Favorites).withMetadata({ noHighlight: true, sortable: false, filterable: true }).build())
+    .addDynamicCategory(buildDynamicCategory("%{BKY_VARIABLES}", "variables_category").withInstance(Variables).withMetadata({ filterable: true, sortable: true }).build())
     .addStaticCategory(buildStaticCategory("%{BKY_COMPARISONS}", "comparisons_category")
         .addBlock(buildBlock(EqualsBlock).withEmptyInputs().build())
         .addBlock(buildBlock(MatchesBlock).withEmptyInputs().build())

@@ -1,5 +1,5 @@
 import i18next from "i18next";
-import { CheckboxSetting, ColorSetting, RangeSetting, SelectSetting, TextSetting, defineSettings } from "@/context/settings/settings";
+import { CheckboxSetting, ColorSetting, RangeSetting, SelectSetting, Settings, TextSetting, defineSettings } from "@/context/settings/settings";
 
 export interface LayoutSettings {
     // Blockly
@@ -25,6 +25,8 @@ export interface LayoutSettings {
     showSettings: CheckboxSetting
     showManual: CheckboxSetting
     allowManualToPopout: CheckboxSetting
+    reactToolboxWidth: RangeSetting
+    reactToolboxOverscan: RangeSetting
 
     // Persistence
     saveWorkspace: CheckboxSetting
@@ -43,8 +45,12 @@ export function getSettingsDefinition() {
                     label: t("Zoom"),
                     min: 0.5,
                     max: 1.5,
-                    stepSize: 0.001,
+                    stepSize: 0.01,
                     helpText: t("help.zoom"),
+                    valueFormatter: (value: number) => {
+                        const percentage = Math.round(value * 100 + 20);
+                        return `${percentage}%`;
+                    }
                 },
                 grid: {
                     type: "checkbox",
@@ -104,6 +110,30 @@ export function getSettingsDefinition() {
                     ],
                     helpText: "Change the version of the toolbox",
                 },
+                reactToolboxOverscan: {
+                    type: "range",
+                    default: 5,
+                    label: "React Toolbox Overscan",
+                    min: 0,
+                    max: 20,
+                    stepSize: 1,
+                    helpText: "Change the number of overscan items in the react toolbox",
+                    hidden: (settings: Settings) => {
+                        return settings.toolboxVersion !== "rich";
+                    }
+                },
+                reactToolboxWidth: {
+                    type: "range",
+                    default: 300,
+                    label: "React Toolbox Width",
+                    min: 100,
+                    max: 600,
+                    stepSize: 1,
+                    helpText: "Change the width of the react toolbox",
+                    hidden: (settings: Settings) => {
+                        return settings.toolboxVersion !== "rich";
+                    }
+                }
             },
         },
         {

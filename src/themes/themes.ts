@@ -16,6 +16,9 @@ export function createBlocklyTheme<T extends typeof DefaultColors>(name: string,
             "variables_category": {
                 colour: colors.categories.variables.bg
             },
+            "favorites_category": {
+                colour: colors.categories.variables.bg,
+            },
             "nodes_category": {
                 colour: colors.categories.nodes.bg
             },

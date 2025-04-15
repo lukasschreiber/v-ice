@@ -1,7 +1,7 @@
-import { GenericBlockDefinition, IStaticToolboxCategory } from "./definitions";
+import { GenericBlockDefinition, IStaticToolboxCategory, ToolboxCategoryMetadata } from "./definitions";
 import { ToolboxCategoryBuilder } from "./toolbox_category_builder";
 
-export class StaticToolboxCategoryBuilder extends ToolboxCategoryBuilder<IStaticToolboxCategory> {
+export class StaticToolboxCategoryBuilder<M extends ToolboxCategoryMetadata> extends ToolboxCategoryBuilder<IStaticToolboxCategory<M>, M> {
     blocks: GenericBlockDefinition[] = [];
 
     constructor(id: string, name: string, style: string) {
@@ -18,14 +18,15 @@ export class StaticToolboxCategoryBuilder extends ToolboxCategoryBuilder<IStatic
         return this;
     }
 
-    build(): IStaticToolboxCategory {
+    build(): IStaticToolboxCategory<M> {
         return {
             id: this.id,
             kind: "static",
             name: this.name,
             style: this.style,
             blocks: this.blocks,
-            isHidden: this.isHidden
+            isHidden: this.isHidden,
+            metadata: this.metadata
         }
     }
 }

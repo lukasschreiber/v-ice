@@ -140,7 +140,7 @@ export function ManualPage(props: {externalWindowRef?: React.RefObject<WindowPro
                     <div
                         className="absolute bg-white border border-gray-200 shadow-lg rounded-md px-1"
                         style={{
-                            zIndex: Layer.Tooltips,
+                            zIndex: Layer.Tooltips + Layer.Modals,
                             top: `${
                                 hoveredBreadCrumbElement.getBoundingClientRect().top +
                                 hoveredBreadCrumbElement.getBoundingClientRect().height
