@@ -1,4 +1,4 @@
-import { defineToolbox } from "./toolbox_definition";
+import { buildToolbox } from "./builder";
 
 
-export const EmptyToolbox = defineToolbox([])
+export const EmptyToolbox = buildToolbox().build();

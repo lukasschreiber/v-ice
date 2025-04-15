@@ -19,7 +19,7 @@ function App() {
     const [themeName, setThemeName] = useLocalStorage("theme", "light");
     const [size, setSize] = useState(75);
     const [orientation, setOrientation] = useLocalStorage<"horizontal" | "vertical">("panel-direction", "horizontal");
-    const [toolbox, setToolbox] = useState<ToolboxDefinition>(Toolbox.Defaults.Complete);
+    const [toolbox, setToolbox] = useState<ToolboxDefinition>(Toolbox.Defaults.Default);
 
     useEffect(() => {
         window.addEventListener("resize", () => {

@@ -23,7 +23,7 @@ export type BlocklyBlockDefinition = { [Property in keyof Blockly.Block]?: Block
  * @param block the block to register
  */
 export function registerBlock<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): void {
-    const definition = convertBlockDefinitionToBlocklyJson<Es, M, L, T>(block)
+    const definition = convertblockDefinitionToBlockStatelyJson<Es, M, L, T>(block)
     if (definition.output && typeof definition.output !== "string") definition.output = definition.output.name
     for (const key in definition) {
         if (key.startsWith("args")) {
@@ -62,7 +62,7 @@ export enum ConnectionType {
  * @param block The block definition 
  * @returns The plain Blockly JSON format
  */
-function convertBlockDefinitionToBlocklyJson<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): BlocklyJsonBlockDefinition {
+function convertblockDefinitionToBlockStatelyJson<Es extends RegistrableExtension[], M extends RegistrableMutator, L extends BlockLinesDefinition, T extends RegistrableBlock<Es, M, L>>(block: T): BlocklyJsonBlockDefinition {
 
     const extensions: string[] = []
     let mutatorName: string | undefined = undefined

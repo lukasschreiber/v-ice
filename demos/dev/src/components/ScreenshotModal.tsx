@@ -21,7 +21,7 @@ export function ScreenshotModal(props: ModalProps & { selector?: string }) {
         const canvas = document
             .querySelector(selector ?? ".injectionDiv > .blocklySvg")
             ?.cloneNode(true) as SVGSVGElement | null;
-        if (canvas === null || !screenshotSvg.current) return;
+        if (canvas === null || canvas === undefined || !screenshotSvg.current) return;
         screenshotSvg.current.childNodes.forEach((node) => node.remove());
         screenshotSvg.current.append(...Array.from(canvas.childNodes));
         const initialSize = {

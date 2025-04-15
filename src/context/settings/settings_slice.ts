@@ -7,6 +7,7 @@ export const settingsSlice = createSlice({
     name: "settings",
     initialState: {
         settings: getDefaultSettings(getSettingsDefinition()),
+        language: "en" as "en" | "de",
         debugger: {
             code: false,
             ast: false,
@@ -19,6 +20,9 @@ export const settingsSlice = createSlice({
         setSettings: (state, action) => {
             state.settings = action.payload
         },
+        setLanguage(state, action) {
+            state.language = action.payload
+        },
         setDebugger: (state, action) => {
             state.debugger.ast = action.payload.ast
             state.debugger.blocklyJson = action.payload.blocklyJson
@@ -29,5 +33,5 @@ export const settingsSlice = createSlice({
     }
 })
 
-export const { setSettings, setDebugger } = settingsSlice.actions
+export const { setSettings, setDebugger, setLanguage } = settingsSlice.actions
 export const settingsReducer = settingsSlice.reducer

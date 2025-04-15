@@ -2,210 +2,71 @@ import "blockly/blocks";
 import { Variables } from "@/blocks/toolbox/categories/variables";
 import { Nodes } from "./categories/nodes";
 import { DateTime } from "luxon";
-import { defineBlock, defineCategory, defineToolbox } from "./toolbox_definition";
-import { FibBlock, MathBinaryOperationBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock, NumberBlock } from "../definitions/math";
+import { FibBlock, MathBinaryOperationBlock, MathDividedByBlock, MathMinusBlock, MathNumberPropertyBlock, MathPlusBlock, MathTimesBlock, MathUnaryOperationBlock } from "../definitions/math";
 import { CompareIntervalBlock, CompareNumbersBlock, EqualsBlock, EqualsWithinBlock, GreaterBlock, GreaterEqualsBlock, HasVariableValueBlock, IsNullBlock, LessBlock, LessEqualsBlock, MatchesBlock } from "../definitions/comparisons";
 import { ListAnyAllBlock, ListArithmeticBlock, ListContainsBlock, ListEqualsBlock, ListLengthBlock } from "../definitions/lists";
 import { ProperySelectBlock } from "../definitions/structs";
 import { LogicNotBlock, LogicOrBlock } from "../definitions/logic";
 import { TimelineAfterBlock, TimelineAfterIntervalBlock, TimelineDateBlock, TimelineEventOccursMatchBlock, TimelineOrBlock, TimelineQueryBlock, TimelineRepeatBlock, TimestampBlock } from "../definitions/timeline";
+import { buildBlock, buildDynamicCategory, buildStaticCategory, buildToolbox } from "./builder";
 
-const mathNumberNull = defineBlock(NumberBlock).withFields({
-    NUM: {
-        value: ""
-    }
-})
-
-export const DefaultToolbox = defineToolbox([
-    defineCategory("%{BKY_VARIABLES}", "variables_category").asDynamicCategory(Variables),
-    defineCategory("%{BKY_COMPARISONS}", "comparisons_category").withBlocks([
-        defineBlock(EqualsBlock),
-        defineBlock(MatchesBlock),
-        defineBlock(EqualsWithinBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            },
-            DELTA: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(GreaterBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(LessBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(GreaterEqualsBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(LessEqualsBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(CompareIntervalBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            },
-            C: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(CompareNumbersBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            },
-        }),
-        defineBlock(IsNullBlock).withCondition((_workspace, table) => {
+export const DefaultToolbox = buildToolbox()
+    .addDynamicCategory(buildDynamicCategory("%{BKY_VARIABLES}", "variables_category").withInstance(Variables).build())
+    .addStaticCategory(buildStaticCategory("%{BKY_COMPARISONS}", "comparisons_category")
+        .addBlock(buildBlock(EqualsBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(MatchesBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(EqualsWithinBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(GreaterBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(LessBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(GreaterEqualsBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(LessEqualsBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(CompareIntervalBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(CompareNumbersBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(IsNullBlock).withEmptyInputs().withCondition((_workspace, table) => {
             return !table.some(col => col.type.nullable)
-        }),
-        defineBlock(HasVariableValueBlock).withCondition((_workspace, table) => {
+        }).build())
+        .addBlock(buildBlock(HasVariableValueBlock).withEmptyInputs().withCondition((_workspace, table) => {
             return !table.some(col => col.type.nullable)
-        })
-    ]
-    ),
-    defineCategory("%{BKY_ARITHMETIC}", "math_category").withBlocks([
-        defineBlock(MathPlusBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
+        }).build())
+        .build())
+    .addStaticCategory(buildStaticCategory("%{BKY_ARITHMETIC}", "math_category")
+        .addBlock(buildBlock(MathPlusBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(MathMinusBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(MathTimesBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(MathDividedByBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(MathBinaryOperationBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(MathUnaryOperationBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(MathNumberPropertyBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(FibBlock).withEmptyInputs().build())
+        .build())
+    .addStaticCategory(buildStaticCategory("%{BKY_LISTS}", "list_category")
+        .addBlock(buildBlock(ListArithmeticBlock).build())
+        .addBlock(buildBlock(ListLengthBlock).build())
+        .addBlock(buildBlock(ListContainsBlock).build())
+        .addBlock(buildBlock(ListEqualsBlock).build())
+        .addBlock(buildBlock(ListAnyAllBlock).build())
+        .addBlock(buildBlock(ProperySelectBlock).build())
+        .build())
+    .addStaticCategory(buildStaticCategory("%{BKY_LOGIC}", "logic_category")
+        .addBlock(buildBlock(LogicOrBlock).build())
+        .addBlock(buildBlock(LogicNotBlock).build())
+        .build())
+    .addStaticCategory(buildStaticCategory("%{BKY_TIMELINE}", "history_category")
+        .addBlock(buildBlock(TimelineQueryBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(TimelineEventOccursMatchBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(TimestampBlock).withInputs({
+            TIMESTAMP: {
+                shadow: buildBlock(TimelineDateBlock).withFields({
+                    TIMESTAMP: {
+                        value: DateTime.local().toFormat("dd.MM.yyyy"),
+                    }
+                }).build()
             }
-        }),
-        defineBlock(MathMinusBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(MathTimesBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(MathDividedByBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(MathBinaryOperationBlock).withInputs({
-            A: {
-                shadow: mathNumberNull
-            },
-            B: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(MathUnaryOperationBlock).withInputs({
-            NUM: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(MathNumberPropertyBlock).withInputs({
-            NUM: {
-                shadow: mathNumberNull
-            }
-        }),
-        defineBlock(FibBlock).withInputs({
-            NUM: {
-                shadow: mathNumberNull
-            }
-        }),
-    ]),
-    defineCategory("%{BKY_LISTS}", "list_category").withBlocks([
-        defineBlock(ListArithmeticBlock),
-        defineBlock(ListLengthBlock),
-        defineBlock(ListContainsBlock),
-        defineBlock(ListEqualsBlock),
-        defineBlock(ListAnyAllBlock),
-        defineBlock(ProperySelectBlock)
-    ]),
-    defineCategory("%{BKY_LOGIC}", "logic_category").withBlocks([
-        defineBlock(LogicOrBlock),
-        defineBlock(LogicNotBlock),
-    ]),
-    defineCategory("%{BKY_TIMELINE}", "history_category")
-        .withBlocks([
-            defineBlock(TimelineQueryBlock),
-            // defineBlock(Blocks.Names.TIMELINE.EVENT_OCCURS),
-            defineBlock(TimelineEventOccursMatchBlock),
-            defineBlock(TimestampBlock).withInputs({
-                TIMESTAMP: {
-                    shadow: defineBlock(TimelineDateBlock).withFields({
-                        TIMESTAMP: {
-                            value: DateTime.local().toFormat("dd.MM.yyyy"),
-                        }
-                    })
-                }
-            }),
-            // defineBlock(Blocks.Names.TIMELINE.START_OF_INTERVAL).withCondition((_workspace, table) => {
-            //     return !table.some(col => {
-            //         const type = types.utils.fromString(col.type)
-            //         return types.utils.isTimeline(type) && (types.utils.isInterval(type.elementType) || (types.utils.isUnion(type.elementType) && type.elementType.types.some(types.utils.isInterval)))
-            //     })
-            // }),
-            // defineBlock(Blocks.Names.TIMELINE.END_OF_INTERVAL).withCondition((_workspace, table) => {
-            //     return !table.some(col => {
-            //         const type = types.utils.fromString(col.type)
-            //         return types.utils.isTimeline(type) && (types.utils.isInterval(type.elementType) || (types.utils.isUnion(type.elementType) && type.elementType.types.some(types.utils.isInterval)))
-            //     })
-            // }),
-            defineBlock(TimelineAfterBlock).withInputs({
-                NUM: {
-                    shadow: mathNumberNull
-                }
-            }),
-            defineBlock(TimelineAfterIntervalBlock).withInputs({
-                START: {
-                    shadow: mathNumberNull
-                },
-                END: {
-                    shadow: mathNumberNull
-                },
-            }),
-            defineBlock(TimelineOrBlock),
-            // defineBlock(Blocks.Names.TIMELINE.LOOP_UNTIL),
-            defineBlock(TimelineRepeatBlock).withInputs({
-                NUM: {
-                    shadow: mathNumberNull
-                }
-            }),
-        ]),
-    defineCategory("%{BKY_NODES}", "nodes_category").asDynamicCategory(Nodes)
-])
+        }).build())
+        .addBlock(buildBlock(TimelineAfterBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(TimelineAfterIntervalBlock).withEmptyInputs().build())
+        .addBlock(buildBlock(TimelineOrBlock).build())
+        .addBlock(buildBlock(TimelineRepeatBlock).withEmptyInputs().build())
+        .build())
+    .addDynamicCategory(buildDynamicCategory("%{BKY_NODES}", "nodes_category").withInstance(Nodes).build())
+    .build()

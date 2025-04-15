@@ -6,6 +6,7 @@ import { traverseASTReverse } from "../builder/ast_traverser";
 import { SerializedEdge } from "@/utils/edges";
 import { convertToEvaluatedAST, eAST, isEvaluatedOperationNode, isEvaluatedSetNode } from "../builder/evaluated_ast";
 import { NameManager } from "./query_name_manager";
+import { hashString } from "@/utils/hash";
 
 export interface QueryGeneratorParams {
     transformers: QueryTransformerDefinition[];
@@ -252,14 +253,7 @@ export class QueryCodeGenerator {
     }
 
     protected getNodeHash(node: ASTNode<ASTNodeKind>): string {
-        const string = JSON.stringify(node)
-        let hash = 0;
-        for (var i = 0; i < string.length; i++) {
-            let code = string.charCodeAt(i);
-            hash = ((hash << 5) - hash) + code;
-            hash = hash & hash;
-        }
-        return `ASTNode<${hash}>`;
+        return hashString(node, (hash) => `ASTNode<${hash}>`);
     }
 
     public async formatCode(code: string): Promise<string> {

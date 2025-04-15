@@ -37,7 +37,7 @@ async function logImpl(level: LogLevel, messages: Loggable[], variables: LogVari
         }
         const style = levelStyles[level] || "";
 
-        console.groupCollapsed(`%c[V-ICE] [${timestamp}] [${level}]%c`, style, "color: inherit;", ...messages);
+        console.groupCollapsed(`%c[V-ICE] [${timestamp}] [${level}]%c`, style, "color: inherit; font-weight: normal;", ...messages);
         for (const [name, value] of Object.entries(variables)) {
             console.log(`%c${name}:%c`, "font-weight: bold; color: #4c97ff;", "color: #ccc;", value);
         }

@@ -177,6 +177,8 @@ export function customFields<T extends StructFields>(value: ValueOf<IEventType<T
 }
 
 export function fromString(type: string): IType {
+    if (typeof type !== "string" && isType(type)) return type;
+
     const listRegex = /^List<(.+)>$/;
     const structRegex = /^{(.+)}$/;
     const timelineRegex = /^Timeline<(.+)>$/;

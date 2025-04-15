@@ -1,6 +1,5 @@
 import { useCallback } from "react";
 import {
-    BlockInfo,
     Blocks,
     Toolbox,
     ToolboxDefinition,
@@ -54,13 +53,12 @@ export function ToolboxPanel(props: {
             ...Object.entries(Toolbox.Categories).map(([category, definition]) => ({
                 category,
                 isDynamic: true,
-                blocks: definition
-                    .flyoutCategoryBlocks(workspace)
-                    .filter((block) => block.kind === "block")
+                blocks: new definition()
+                    .getBlocks(workspace)
                     .map((_block) => {
-                        const blockInfo = _block as BlockInfo;
-                        const block = getBlockDefinitionById(blockInfo.type);
-                        const name = getBlockDefinitionNameById(blockInfo.type);
+                        const blockInfo = _block;
+                        const block = getBlockDefinitionById(blockInfo.type) as string | undefined;
+                        const name = getBlockDefinitionNameById(blockInfo.type) as string | undefined;
                         if (!block || !name) return null;
                         return {
                             name,
@@ -72,8 +70,8 @@ export function ToolboxPanel(props: {
                                 blockInfo.type === "variable_get"
                                     ? `🔗 ${blockInfo.fields?.["VAR"]?.["name"]}`
                                     : blockInfo.type === "target_node"
-                                    ? `🔗 ${blockInfo.fields?.["LABEL"]?.["name"]}`
-                                    : "",
+                                      ? `🔗 ${blockInfo.fields?.["LABEL"]?.["name"]}`
+                                      : "",
                         };
                     })
                     .filter(Boolean) as {
@@ -102,19 +100,21 @@ export function ToolboxPanel(props: {
                 <p>Select a toolbox: </p>
                 <select
                     className="bg-white rounded-sm border-slate-300 border border-solid"
-                    value={props.toolbox === Toolbox.Defaults.Default ? "Default" : props.toolbox === Toolbox.Defaults.Complete ? "Complete" : "Empty"}
+                    value={
+                        props.toolbox === Toolbox.Defaults.Default
+                            ? "Default"
+                              : "Empty"
+                    }
                     onChange={(e) => {
                         // change the toolbox by hiding all blocks that are not part of the newly selected toolbox, if the toolbox is Complete just remount
-                        if (e.target.value === "Complete") {
-                            props.setToolbox(Toolbox.Defaults.Complete);
+                        if (e.target.value === "Default") {
+                            props.setToolbox(Toolbox.Defaults.Default);
                         } else {
                             // find the difference between the Toolbox.Defaults.Complete and the new toolbox and hide all blocks that are not part of the new toolbox
-                            
                         }
                     }}
                 >
                     <option value="Default">Default</option>
-                    <option value="Complete">Complete</option>
                     <option value="Empty">Empty</option>
                 </select>
             </div>

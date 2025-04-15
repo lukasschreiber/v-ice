@@ -5,10 +5,13 @@ import { ContinuousFlyoutMetrics } from "@/toolbox/metrics_flyout";
 import { FieldLabelTargetNode } from '@/blocks/fields/field_label_target_node';
 import { Blocks } from '@/blocks';
 import { EvaluationAction, triggerAction } from '@/evaluation_emitter';
+import { store } from '@/store/store';
 
 export interface Position { x: number, y: number }
 
 export class ContinuousFlyout extends Blockly.VerticalFlyout {
+
+    private lastDefinition_: Blockly.utils.toolbox.FlyoutDefinition | null = null;
 
     /**
      * List of scroll positions for each category.
@@ -357,6 +360,11 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         return 0;
     }
 
+    override isVisible(): boolean {
+        const settings = store.getState().settings.settings;
+        return settings.toolboxVisible && settings.toolboxVersion === "standard" && super.isVisible();
+    }
+
     override getX(): number {
         if (
             this.isVisible() &&
@@ -373,6 +381,7 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
 
     override show(flyoutDef: Blockly.utils.toolbox.FlyoutDefinition) {
         super.show(flyoutDef);
+        this.lastDefinition_ = flyoutDef;
         this.filterForCapacity_()
         this.recordScrollPositions();
         this.workspace_.resizeContents();
@@ -399,6 +408,10 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
                 block = block.getNextBlock();
             }
         }
+    }
+
+    getDefintion() {
+        return this.lastDefinition_;
     }
 
     /**

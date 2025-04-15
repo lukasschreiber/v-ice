@@ -17,6 +17,8 @@ export interface LayoutSettings {
     edgeMinWidth: RangeSetting
     edgeMaxWidth: RangeSetting
     toolboxPosition: SelectSetting<"left" | "right">
+    toolboxVersion: SelectSetting<"standard" | "rich">
+    toolboxVisible: CheckboxSetting
     showZoomControls: CheckboxSetting
     showCenterControl: CheckboxSetting
     showAutocomplete: CheckboxSetting
@@ -74,6 +76,78 @@ export function getSettingsDefinition() {
             }
         },
         {
+            name: "Toolbox",
+            settings: {
+                toolboxPosition: {
+                    type: "select",
+                    default: "left",
+                    label: "Toolbox Position",
+                    options: [
+                        { label: "Left", value: "left" },
+                        { label: "Right", value: "right" },
+                    ],
+                    helpText: "Change the position of the toolbox",
+                },
+                toolboxVisible: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Toolbox Visible",
+                    helpText: "Show or hide the toolbox",
+                },
+                toolboxVersion: {
+                    type: "select",
+                    default: "standard",
+                    label: "Toolbox Version",
+                    options: [
+                        { label: "Standard", value: "standard" },
+                        { label: "Rich", value: "rich" },
+                    ],
+                    helpText: "Change the version of the toolbox",
+                },
+            },
+        },
+        {
+            name: "Interface",
+            settings: {
+                showZoomControls: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Zoom Controls",
+                    helpText: "Show the zoom controls",
+                },
+                showCenterControl: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show the Center Button",
+                    helpText: "Show the center control",
+                },
+                showAutocomplete: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Autocomplete",
+                    helpText: "Show the autocomplete dropdown",
+                },
+                showSettings: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Settings",
+                    helpText: "Show the settings button",
+                },
+                showManual: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Show Manual",
+                    helpText: "Show the manual button",
+                },
+                allowManualToPopout: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Allow Manual to Popout",
+                    helpText: "Allow the manual to popout into a new window",
+                },
+            }
+        },
+        {
             name: "Appearance",
             settings: {
                 disableVisualEffects: {
@@ -87,16 +161,6 @@ export function getSettingsDefinition() {
                     default: false,
                     label: "Disable Edges",
                     helpText: "Remove all edges between blocks",
-                },
-                toolboxPosition: {
-                    type: "select",
-                    default: "left",
-                    label: "Toolbox Position",
-                    options: [
-                        { label: "Left", value: "left" },
-                        { label: "Right", value: "right" },
-                    ],
-                    helpText: "Change the position of the toolbox",
                 },
                 edgeKind: {
                     type: "select",
@@ -137,42 +201,6 @@ export function getSettingsDefinition() {
                     max: 30,
                     stepSize: 1,
                     helpText: "The difference between the min and max width",
-                },
-                showZoomControls: {
-                    type: "checkbox",
-                    default: true,
-                    label: "Show Zoom Controls",
-                    helpText: "Show the zoom controls",
-                },
-                showCenterControl: {
-                    type: "checkbox",
-                    default: true,
-                    label: "Show the Center Button",
-                    helpText: "Show the center control",
-                },
-                showAutocomplete: {
-                    type: "checkbox",
-                    default: true,
-                    label: "Show Autocomplete",
-                    helpText: "Show the autocomplete dropdown",
-                },
-                showSettings: {
-                    type: "checkbox",
-                    default: true,
-                    label: "Show Settings",
-                    helpText: "Show the settings button",
-                },
-                showManual: {
-                    type: "checkbox",
-                    default: true,
-                    label: "Show Manual",
-                    helpText: "Show the manual button",
-                },
-                allowManualToPopout: {
-                    type: "checkbox",
-                    default: true,
-                    label: "Allow Manual to Popout",
-                    helpText: "Allow the manual to popout into a new window",
                 },
             }
         },

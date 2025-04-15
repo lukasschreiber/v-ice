@@ -1,49 +1,30 @@
+import { ColumnSelectBlock, VariableBlock } from "@/blocks/definitions/variables";
+import { buildBlock } from "../builder";
+import { GenericBlockDefinition } from "../builder/definitions";
+import { DynamicToolboxCategory } from "./dynamic_category";
 import * as Blockly from "blockly/core"
-import { Blocks } from "@/blocks";
 
-export class Variables {
-    static CATEGORY_NAME = 'COMPUTED_VARIABLES';
-
-    static flyoutCategory(workspace: Blockly.WorkspaceSvg): Blockly.utils.toolbox.FlyoutItemInfo[] {
-        // option to add buttons etc to the array
-        return Variables.flyoutCategoryBlocks(workspace);
-    }
-
-    static flyoutCategoryBlocks(workspace: Blockly.Workspace): Blockly.utils.toolbox.FlyoutItemInfo[] {
+export class Variables extends DynamicToolboxCategory {
+    getBlocks(workspace: Blockly.Workspace): GenericBlockDefinition[] {
         const variableModelList = workspace.getAllVariables();
-        const flyoutInfoList: Blockly.utils.toolbox.FlyoutItemInfo[] = []
+
+        const variableBlocks: GenericBlockDefinition[] = [];
+
         if (variableModelList.length > 0) {
             variableModelList.sort(Blockly.VariableModel.compareByName);
             for (let i = 0, variable; (variable = variableModelList[i]); i++) {
-                flyoutInfoList.push(Variables.getTypedBlockFlyoutInfo(variable))
+                variableBlocks.push(buildBlock(VariableBlock).withFields({
+                    VAR: {
+                        id: variable.getId(),
+                        name: variable.name,
+                        type: variable.type
+                    }
+                }).build())
             }
         }
 
-        flyoutInfoList.push({
-            kind: "block",
-            type: Blocks.Names.VARIABLE.GET_COLUMN,
-            gap: "24",
-            fields: {}
-        })
+        variableBlocks.push(buildBlock(ColumnSelectBlock).build())
 
-        return flyoutInfoList;
+        return variableBlocks;
     }
-
-    static getTypedBlockFlyoutInfo(variable: Blockly.VariableModel): Blockly.utils.toolbox.FlyoutItemInfo {
-        const flyoutItemInfo: Blockly.utils.toolbox.FlyoutItemInfo = {
-            kind: "block",
-            type: Blocks.Names.VARIABLE.GET,
-            gap: "24",
-            fields: {
-                VAR: {
-                    id: variable.getId(),
-                    name: variable.name,
-                    type: variable.type
-                }
-            }
-        }
-
-        return flyoutItemInfo
-    }
-
 }

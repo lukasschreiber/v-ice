@@ -1,8 +1,8 @@
 import { Themes, getBlockDefinitionById, useSettings } from "v-ice";
-import { useContext, useState } from "react";
+import { useContext, useMemo, useState } from "react";
 import { Button } from "../Button";
 import { ScreenshotModal } from "../ScreenshotModal";
-import { BlockInfo, Toolbox, useWorkspace } from "@/main";
+import { Toolbox, useWorkspace } from "@/main";
 import { showNotification } from "@/context/notifications/notification_emitter";
 import types from "@/data/types";
 import { TypeIconPreview } from "@/components/common/TypeIconPreview";
@@ -16,6 +16,10 @@ export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], se
     const [language, setLanguage] = useState(localStorage.getItem("language") ?? "en");
     const [screenshotModeEnabled, setScreenshotModeEnabled] = useState(false);
 
+    const variables = useMemo(() => {
+        if (!workspace) return [];
+        return new Toolbox.Categories.Variables().getBlocks(workspace)
+    }, [workspace]);
 
     return (
         <div className="p-3">
@@ -183,14 +187,14 @@ export function MiscPanel(props: { theme: typeof Themes[keyof typeof Themes], se
             </Accordion>
             <Accordion title="Variables" defaultOpen={true}>
                 <div className="flex flex-col gap-2">
-                    {workspace && Toolbox.Categories.Variables.flyoutCategoryBlocks(workspace).filter((block) => block.kind === "block").map((_block) => {
-                        const blockInfo = _block as BlockInfo;
+                    {variables.map((_block) => {
+                        const blockInfo = _block;
                         const block = getBlockDefinitionById(blockInfo.type);
 
                         if (blockInfo.type !== "variable_get" || !block) return null;
 
-                        const typeString = blockInfo.fields?.["VAR"]?.["type"];
-                        const name = blockInfo.fields?.["VAR"]?.["name"];
+                        const typeString: string | undefined = blockInfo.fields?.["VAR"]?.["type"] as string;
+                        const name: string | undefined = blockInfo.fields?.["VAR"]?.["name"] as string;
 
                         return (
                             <div key={name} className="flex flex-col gap-1 py-2">

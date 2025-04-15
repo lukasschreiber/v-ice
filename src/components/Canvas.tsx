@@ -7,7 +7,6 @@ import { ContinuousFlyout } from "@/toolbox/flyout";
 import { ContinuousToolbox } from "@/toolbox/toolbox";
 import { DefaultToolbox } from "@/blocks/toolbox/default_toolbox";
 import { useTranslation } from "react-i18next";
-import { BlockDragger } from "@/renderer/block_dragger";
 import { SettingsContext } from "@/context/settings/settings_context";
 import { SettingsModal } from "@/components/SettingsModal";
 import { setBlocklyLocale } from "@/i18n";
@@ -33,7 +32,6 @@ import { showHelp } from "@/context/manual/manual_emitter";
 import { useHelp } from "@/context/manual/manual_hooks";
 import { Tooltip } from "./common/Tooltip";
 import { EmptyToolbox } from "@/blocks/toolbox/empty_toolbox";
-import { ToolboxDefinition } from "blockly/core/utils/toolbox";
 import { LoadingOverlay } from "./common/LoadingOverlay";
 import { getASTBuilderInstance } from "@/query/builder/ast_builder_instance";
 import { setTheme } from "@/themes/colors";
@@ -45,18 +43,18 @@ import { setResultTables } from "@/store/data/result_tables_slice";
 import { NormalizedFitleredDataTable } from "@/data/filtered_table";
 import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
-import { warn } from "@/utils/logger";
 import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
 // import { SearchForm } from "./SearchForm";
 import { Layer } from "@/utils/zindex";
+import { FullScreenBlockDragger } from "@/renderer/full_screen_block_dragger";
+import { setFeatureReady, setVariables } from "@/store/blockly/blockly_slice";
+import types from "@/data/types";
+import { BlocklyToolboxAdapter } from "@/blocks/toolbox/adapters/blockly_adapter";
+import { ToolboxDefinition } from "@/blocks/toolbox/builder/definitions";
+import { ReactToolbox } from "./toolbox/ReactToolbox";
+import { setLanguage } from "@/context/settings/settings_slice";
 
 Blockly.Scrollbar.scrollbarThickness = 10;
-
-try {
-    Blockly.blockRendering.register(Renderer.name, Renderer);
-} catch (e) {
-    warn("Renderer has already been registered").log();
-}
 
 export type CanvasProps = React.HTMLProps<HTMLDivElement> & {
     language?: string;
@@ -87,6 +85,7 @@ export function Canvas(props: CanvasProps) {
     const blocklyDiv = createRef<HTMLDivElement>();
     const { workspaceRef, setInitialized } = useContext(WorkspaceContext);
     const [toolboxWidth, setToolboxWidth] = useState(0);
+    const isLoading = useSelector((state) => state.blockly.loading);
     const { i18n } = useTranslation();
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
     const {
@@ -99,18 +98,6 @@ export function Canvas(props: CanvasProps) {
         overrideVisibility,
     } = useContext(SettingsContext);
     const { setHelpUrl } = useHelp();
-    const [isLoading, setIsLoading] = useState(true);
-    const [featuresReady, setFeaturesReady] = useState<{
-        toolbox: boolean;
-        workspace: boolean;
-        variables: boolean;
-        persistedWorkspace: boolean;
-    }>({
-        toolbox: false,
-        workspace: false,
-        variables: false,
-        persistedWorkspace: false,
-    });
     const debuggingOptions = useSelector((state) => state.settings.debugger);
     const code = useSelector((state) => state.generatedCode.code);
     const astJson = useSelector((state) => state.generatedCode.astJson);
@@ -131,6 +118,7 @@ export function Canvas(props: CanvasProps) {
 
     useEffect(() => {
         i18n.changeLanguage(language);
+        dispatch(setLanguage(language));
     }, [language, i18n]);
 
     useEffect(() => {
@@ -158,27 +146,26 @@ export function Canvas(props: CanvasProps) {
                     workspace.deleteVariableById(variable.getId());
                 }
             }
+
+            dispatch(setVariables(workspace.getAllVariables().map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() }))));
             Blockly.Events.enable();
         }
 
-        setFeaturesReady((old) => ({ ...old, variables: true }));
+        dispatch(setFeatureReady("variables"));
     }, [source]);
 
     useEffect(() => {
-        workspaceRef.current?.updateToolbox(toolbox ?? EmptyToolbox);
+        workspaceRef.current?.updateToolbox(new BlocklyToolboxAdapter(toolbox ?? EmptyToolbox).toToolboxDefinition());
         workspaceRef.current?.refreshToolboxSelection();
-        setFeaturesReady((old) => ({ ...old, toolbox: true }));
+        dispatch(setFeatureReady("toolbox"));
     }, [toolbox]);
 
     const { isWorkspaceLoaded } = useWorkspacePersister();
 
     useEffect(() => {
-        setFeaturesReady((old) => ({ ...old, persistedWorkspace: isWorkspaceLoaded }));
+        if (!isWorkspaceLoaded) return;
+        dispatch(setFeatureReady("persistedWorkspace"));
     }, [isWorkspaceLoaded]);
-
-    useEffect(() => {
-        setIsLoading(!Object.keys(featuresReady).every((key) => featuresReady[key as keyof typeof featuresReady]));
-    }, [featuresReady]);
 
     useEffect(() => {
         const div = blocklyDiv.current;
@@ -191,7 +178,7 @@ export function Canvas(props: CanvasProps) {
                     toolbox: ContinuousToolbox,
                     flyoutsVerticalToolbox: ContinuousFlyout,
                     metricsManager: ContinuousMetrics,
-                    blockDragger: BlockDragger,
+                    blockDragger: FullScreenBlockDragger,
                 },
                 media: media || "https://blockly-demo.appspot.com/static/media/",
                 theme: theme ?? LightTheme,
@@ -203,14 +190,16 @@ export function Canvas(props: CanvasProps) {
                     startScale: settings.zoom,
                 },
                 trashcan: false,
-                toolbox: toolbox ?? DefaultToolbox,
+                toolbox: new BlocklyToolboxAdapter(toolbox ?? DefaultToolbox).toToolboxDefinition(),
                 maxInstances: {
                     [Blocks.Names.NODE.SOURCE]: 1,
                 },
                 toolboxPosition: settings.toolboxPosition === "left" ? "start" : "end",
             });
 
-            setFeaturesReady((old) => ({ ...old, workspace: true }));
+            div.dataset.workspaceId = workspaceRef.current.id;
+
+            dispatch(setFeatureReady("workspace"));
             setInitialized(true);
 
             if (debuggingOptions.blocklyXml || debuggingOptions.blocklyJson) {
@@ -256,6 +245,14 @@ export function Canvas(props: CanvasProps) {
 
                         resolve();
                     });
+                });
+
+                workspaceRef.current!.addChangeListener((e) => {
+                    if (e.type === Blockly.Events.VAR_CREATE || e.type === Blockly.Events.VAR_DELETE || e.type === Blockly.Events.VAR_RENAME) {
+                        dispatch(
+                            setVariables(workspaceRef.current!.getAllVariables().map((v) => ({ name: v.name, type: types.utils.fromString(v.type), id: v.getId() })))
+                        );
+                    }
                 });
             }
         }
@@ -348,6 +345,17 @@ export function Canvas(props: CanvasProps) {
         }
     }, [theme, workspaceRef.current]);
 
+    useEffect(() => {
+        const globalClickHandler = (e: MouseEvent) => {
+            if ((e.target as HTMLElement).closest(".renderer-renderer") !== null) return;
+            // hide all dropdowns, etc. when clicking outside the workspace
+            workspaceRef.current?.hideChaff();
+        };
+
+        document.addEventListener("click", globalClickHandler);
+        return () => document.removeEventListener("click", globalClickHandler);
+    }, [workspaceRef.current]);
+
     useSettingsHandlers(workspaceRef, settings);
 
     return (
@@ -361,6 +369,8 @@ export function Canvas(props: CanvasProps) {
                 id={"canvas"}
             ></div>
             {/* <SearchForm /> */}
+            {/* <VariablesOverlay /> */}
+            {settings.toolboxVersion === "rich" && <ReactToolbox definition={toolbox || DefaultToolbox} offset={toolboxWidth} />}
             <ButtonStack
                 className={`absolute bottom-8 ${settings.toolboxPosition === "left" ? "right-8" : "left-8"}`}
                 style={{ zIndex: Layer.FloatingButtons }}

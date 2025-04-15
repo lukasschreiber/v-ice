@@ -1,52 +1,29 @@
-import * as Blockly from "blockly/core"
+import { buildBlock } from "../builder";
+import { GenericBlockDefinition } from "../builder/definitions";
+import { DynamicToolboxCategory } from "./dynamic_category";
+import { SetArithmeticNodeBlock, SourceNodeBlock, SubsetNodeBlock, TargetNodeBlock } from "@/blocks/definitions/nodes";
 import { store } from "@/store/store";
-import { Blocks } from "@/blocks";
 
-export class Nodes {
-    static CATEGORY_NAME = 'NODES';
+export class Nodes extends DynamicToolboxCategory {
+    getBlocks(): GenericBlockDefinition[] {
+        const nodeBlocks: GenericBlockDefinition[] = [];
 
-    static flyoutCategory(): Blockly.utils.toolbox.FlyoutItemInfo[] {
-        // option to add buttons etc to the array
-        return Nodes.flyoutCategoryBlocks();
-    }
-
-    static flyoutCategoryBlocks(): Blockly.utils.toolbox.FlyoutItemInfo[] {
-        const flyoutInfoList: Blockly.utils.toolbox.FlyoutItemInfo[] = []
-
-        flyoutInfoList.push({
-            kind: "block",
-            type: Blocks.Names.NODE.SOURCE,
-            gap: "24"
-        })
-
-        flyoutInfoList.push({
-            kind: "block",
-            type: Blocks.Names.NODE.SUBSET,
-            gap: "24"
-        })
-
-        flyoutInfoList.push({
-            kind: "block",
-            type: Blocks.Names.NODE.SET_ARITHMETIC,
-            gap: "24"
-        })
+        nodeBlocks.push(buildBlock(SourceNodeBlock).build())
+        nodeBlocks.push(buildBlock(SubsetNodeBlock).build())
+        nodeBlocks.push(buildBlock(SetArithmeticNodeBlock).build())
 
         const targetBlocks = store.getState().blockly.targetBlocks
-        for(const [uid, name] of Object.entries(targetBlocks)) {
-            flyoutInfoList.push({
-                kind: "block",
-                type: Blocks.Names.NODE.TARGET,
-                gap: "24",
-                fields: {
+        for (const [uid, name] of Object.entries(targetBlocks)) {
+            nodeBlocks.push(
+                buildBlock(TargetNodeBlock).withFields({
                     LABEL: {
                         name,
                         id: uid
-                    },
-                }
-            })
+                    }
+                }).build()
+            )
         }
 
-
-        return flyoutInfoList;
+        return nodeBlocks;
     }
 }
