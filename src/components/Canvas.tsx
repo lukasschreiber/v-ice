@@ -47,7 +47,7 @@ import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
 import { warn } from "@/utils/logger";
 import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
-import { SearchForm } from "./SearchForm";
+// import { SearchForm } from "./SearchForm";
 import { Layer } from "@/utils/zindex";
 
 Blockly.Scrollbar.scrollbarThickness = 10;

@@ -24,6 +24,8 @@
         "test": "vitest",
         "demo:prod": "npm run build && cd demos/%npm_config_demo% && npm run build && npm run preview",
         "demo": "cd demos/%npm_config_demo% && npm run dev -- --host",
+        "demo:dev": "cd demos/dev && pnpm run dev",
+        "demo:basic": "cd demos/basic && pnpm run dev",
         "analyze": "vite-bundle-visualizer -c vite.config.ts"
     },
     "imports": {
