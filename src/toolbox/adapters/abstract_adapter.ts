@@ -1,4 +1,4 @@
-import { GenericBlockDefinition, IDynamicToolboxCategory, IStaticToolboxCategory, ToolboxDefinition } from "../builder/definitions";
+import { GenericBlockDefinition, IDynamicToolboxCategory, IStaticToolboxCategory, ToolboxCategoryMetadata, ToolboxDefinition } from "../builder/definitions";
 import { DynamicToolboxCategory } from "../categories/dynamic_category";
 
 export abstract class AbstractToolboxAdapter<T, D, S, B> {
@@ -6,9 +6,9 @@ export abstract class AbstractToolboxAdapter<T, D, S, B> {
 
     abstract toToolboxDefinition(): T
     
-    abstract dynamicCategoryAdapter<C extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<C>): D;
+    abstract dynamicCategoryAdapter<C extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<C, ToolboxCategoryMetadata>): D;
 
-    abstract staticCategoryAdapter(category: IStaticToolboxCategory): S;
+    abstract staticCategoryAdapter(category: IStaticToolboxCategory<ToolboxCategoryMetadata>): S;
 
     abstract blockAdapter(block: GenericBlockDefinition): B;
 }

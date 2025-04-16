@@ -92,6 +92,7 @@ export function ReactToolboxProvider({
 
     const columns = useSelector((state) => state.sourceTable.columns);
     const variablesReady = useSelector((state) => state.blockly.featuresReady.variables);
+    const variables = useSelector((state) => state.blockly.variables);
     const toolboxWidth = useSelector((state) => state.settings.settings.reactToolboxWidth);
     const scale = useSelector((state) => state.settings.settings.zoom);
     const { pinnedBlocks: reduxPinnedBlocks } = useSelector((state) => state.blockly);
@@ -125,7 +126,7 @@ export function ReactToolboxProvider({
 
             return [...categoryEntry, ...blockEntries] as FlattenedToolboxEntry[];
         });
-    }, [definition, workspace, columns, variablesReady, pinnedBlocks]);
+    }, [definition, workspace, columns, variablesReady, pinnedBlocks, variables]);
 
     const getSearchTermForCategory = useCallback(
         (categoryId: string) => {

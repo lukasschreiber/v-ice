@@ -178,7 +178,6 @@ export function customFields<T extends StructFields>(value: ValueOf<IEventType<T
 
 export function fromString(type: string): IType {
     if (typeof type !== "string" && isType(type)) return type;
-
     const listRegex = /^List<(.+)>$/;
     const structRegex = /^{(.+)}$/;
     const timelineRegex = /^Timeline<(.+)>$/;
@@ -312,6 +311,20 @@ export function examples(type: IType, n: number = 3, table: DataTable | null = n
 
 export function examplesForColumn(column: string, table: DataTable, n: number = 3): string[] {
     return [... new Set(faker.faker.helpers.arrayElements(table.getColumnByName(column)!.values.map(v => TypeConverter.toType(v, t.string)), n))];
+}
+
+export function registerEnumsFromType(type: any, columnName: string) {
+    if (isEnum(type) && !typeRegistry.getEnum(type.enumName)) {
+        typeRegistry.registerEnum(type.enumName, { columns: [columnName] });
+    } else if (isUnion(type)) {
+        type.types.forEach((t: any) => registerEnumsFromType(t, columnName));
+    } else if (isList(type)) {
+        registerEnumsFromType(type.elementType, columnName);
+    } else if (isStruct(type)) {
+        Object.entries(type.fields).forEach(([key, value]) => {
+            registerEnumsFromType(value, columnName + "." + key);
+        });
+    }
 }
 
 export function example(type: IType, table: DataTable | null = null): string {
