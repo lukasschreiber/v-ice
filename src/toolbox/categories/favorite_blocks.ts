@@ -7,7 +7,6 @@ import { store } from "@/store/store";
 import { getToolboxBlockId } from "@/utils/ids";
 
 export class FavoriteBlocks extends DynamicToolboxCategory {
-    private blockHashMap: Map<string, string> = new Map();
 
     getBlocks(workspace: Blockly.Workspace): GenericBlockDefinition[] {
         const pinnedBlocks = store.getState().blockly.pinnedBlocks;

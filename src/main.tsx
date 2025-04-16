@@ -308,6 +308,8 @@ export {
     type ValueOf,
 } from "@/data/types";
 export { FilteredDataTable } from "@/data/filtered_table";
+export { TypePredictor } from "@/data/type_predictor";
+export { TypeConverter } from "@/data/type_converter";
 export { type ISerializedWorkspace } from "./serializer";
 export { BlockPreview } from "@/components/common/BlockPreview";
 export { WorkspacePreview } from "@/components/common/WorkspacePreview";

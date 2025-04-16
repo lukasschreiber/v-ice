@@ -16,7 +16,7 @@ export const ReactToolBoxRowRenderer = React.memo(
                     key={item.id}
                     item={item}
                     style={style}
-                    onSearchTermChange={(id, value) => {}}
+                    onSearchTermChange={() => {}}
                 />
             );
         }

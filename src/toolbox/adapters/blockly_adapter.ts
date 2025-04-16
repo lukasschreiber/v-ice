@@ -1,4 +1,4 @@
-import { GenericBlockDefinition, IDynamicToolboxCategory, IsHiddenFunc, IStaticToolboxCategory } from "../builder/definitions";
+import { GenericBlockDefinition, IDynamicToolboxCategory, IsHiddenFunc, IStaticToolboxCategory, ToolboxCategoryMetadata } from "../builder/definitions";
 import { DynamicToolboxCategory } from "../categories/dynamic_category";
 import { AbstractToolboxAdapter } from "./abstract_adapter";
 import * as Blockly from "blockly/core";
@@ -21,7 +21,7 @@ export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.
         } as unknown as Blockly.utils.toolbox.ToolboxDefinition;
     }
 
-    dynamicCategoryAdapter<C extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<C>): DynamicToolboxItem {
+    dynamicCategoryAdapter<C extends DynamicToolboxCategory>(category: IDynamicToolboxCategory<C, ToolboxCategoryMetadata>): DynamicToolboxItem {
         const uid = Blockly.utils.idGenerator.genUid();
         return {
             id: category.id,
@@ -38,7 +38,7 @@ export class BlocklyToolboxAdapter extends AbstractToolboxAdapter<Blockly.utils.
         }
     }
 
-    staticCategoryAdapter(category: IStaticToolboxCategory): ToolboxItem {
+    staticCategoryAdapter(category: IStaticToolboxCategory<ToolboxCategoryMetadata>): ToolboxItem {
         return {
             id: category.id,
             kind: "category",

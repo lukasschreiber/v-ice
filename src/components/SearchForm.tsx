@@ -5,7 +5,7 @@ import { Variables } from "@/toolbox/categories/variables";
 import { ReactToolboxBlockRow } from "@/toolbox/react/ReactToolboxBlockRow";
 import { getBlockTextFromBlockDefinition } from "@/utils/blocks";
 import { Layer } from "@/utils/zindex";
-import { CSSProperties, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { CSSProperties, useCallback, useMemo, useRef, useState } from "react";
 import { VariableSizeList } from "react-window";
 
 export function SearchForm(props: { onClose: () => void }) {

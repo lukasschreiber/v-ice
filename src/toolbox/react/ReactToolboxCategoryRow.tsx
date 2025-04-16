@@ -1,6 +1,6 @@
 import { CSSProperties, memo } from "react";
-import { FlattendToolboxEntry } from "./ReactToolbox";
 import * as Blockly from "blockly/core";
+import { FlattenedToolboxEntry } from "./ReactToolboxContext";
 
 export const ReactToolboxCategoryRow = memo(function ReactToolboxCategoryRow({
     item,
@@ -8,7 +8,7 @@ export const ReactToolboxCategoryRow = memo(function ReactToolboxCategoryRow({
     searchTerm,
     onSearchTermChange,
 }: {
-    item: Extract<FlattendToolboxEntry, { kind: "category" }>;
+    item: Extract<FlattenedToolboxEntry, { kind: "category" }>;
     style: CSSProperties;
     searchTerm?: string;
     onSearchTermChange: (id: string, value: string) => void;
