@@ -53,6 +53,8 @@ function App() {
     return (
         <>
             <PanelGroup autoSaveId={"main-panel"} direction={orientation} className="!w-screen !h-screen">
+                <Panel defaultSize={20} />
+                <PanelResizeHandle />
                 <Panel
                     defaultSize={75}
                     onResize={(size) => handleResize(size)}
@@ -67,7 +69,7 @@ function App() {
                         theme={themeName === "light" ? Themes.LightTheme : Themes.DarkTheme}
                         queryClient={Clients[queryClient as keyof typeof Clients]}
                         initialSettings={{
-                            toolboxPosition: "right"
+                            toolboxPosition: "right",
                         }}
                     />
                 </Panel>
@@ -104,11 +106,7 @@ function App() {
                                         </option>
                                     ))}
                                 </select>
-                                <Button
-                                    onClick={() => showNotification("No Action has been performed")}
-                                >
-                                    Run
-                                </Button>
+                                <Button onClick={() => showNotification("No Action has been performed")}>Run</Button>
                             </div>
 
                             <Code
@@ -117,7 +115,10 @@ function App() {
                                 decorations={[
                                     { regex: /(?<=function\s+)(query_\w*)/g, className: "bg-orange-200" },
                                     { regex: /(?<=function\s+)(set_\w*)/g, className: "bg-purple-200" },
-                                    { regex: /"[a-zA-Z0-9,=()@|/{}\$~\*!:;\+\-`#^%?\[\]\._]{20}"/g, className: "bg-green-50 text-green-300" },
+                                    {
+                                        regex: /"[a-zA-Z0-9,=()@|/{}\$~\*!:;\+\-`#^%?\[\]\._]{20}"/g,
+                                        className: "bg-green-50 text-green-300",
+                                    },
                                 ]}
                             />
                         </Tab>

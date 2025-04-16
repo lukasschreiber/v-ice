@@ -100,6 +100,19 @@ export class BlockDragStrategy implements Blockly.IDragStrategy {
         this.workspace.getLayerManager()?.moveToDragLayer(this.block);
     }
 
+    private adjustBlockPosition(coord: Blockly.utils.Coordinate): Blockly.utils.Coordinate {
+        if (!this.workspace.getInjectionDiv().classList.contains('full-screen-dragger')) {
+            return coord;
+        }
+
+        const injectionDivBounds = this.workspace.getInjectionDiv().getBoundingClientRect();
+        const offset = new Blockly.utils.Coordinate(
+            coord.x - injectionDivBounds.left / this.workspace.scale,
+            coord.y - injectionDivBounds.top / this.workspace.scale,
+        );
+        return offset;
+    }
+
     /** Starts a drag on a shadow, recording the drag offset. */
     private startDraggingShadow(e?: PointerEvent) {
         const parent = this.block.getParent();
@@ -113,6 +126,7 @@ export class BlockDragStrategy implements Blockly.IDragStrategy {
             parent.getRelativeToSurfaceXY(),
             this.block.getRelativeToSurfaceXY(),
         );
+
         parent.startDrag(e);
     }
 
@@ -185,6 +199,7 @@ export class BlockDragStrategy implements Blockly.IDragStrategy {
     /** Moves the block and updates any connection previews. */
     drag(newLoc: Blockly.utils.Coordinate): void {
         if (this.block.isShadow()) {
+
             this.block.getParent()?.drag(Blockly.utils.Coordinate.sum(newLoc, this.dragOffset));
             return;
         }
@@ -203,7 +218,7 @@ export class BlockDragStrategy implements Blockly.IDragStrategy {
      */
     private updateConnectionPreview(draggingBlock: Blockly.BlockSvg, delta: Blockly.utils.Coordinate) {
         const currCandidate = this.connectionCandidate;
-        const newCandidate = this.getConnectionCandidate(draggingBlock, delta);
+        const newCandidate = this.getConnectionCandidate(draggingBlock, this.adjustBlockPosition(delta));
         if (!newCandidate) {
             this.connectionPreviewer!.hidePreview();
             this.connectionCandidate = null;
@@ -213,7 +228,7 @@ export class BlockDragStrategy implements Blockly.IDragStrategy {
         }
         const candidate =
             currCandidate &&
-                this.currCandidateIsBetter(currCandidate, delta, newCandidate)
+                this.currCandidateIsBetter(currCandidate, this.adjustBlockPosition(delta), newCandidate)
                 ? currCandidate
                 : newCandidate;
         this.connectionCandidate = candidate;
@@ -355,6 +370,7 @@ export class BlockDragStrategy implements Blockly.IDragStrategy {
                 .getLayerManager()
                 ?.moveOffDragLayer(this.block, 50); // layers.BLOCK is 50
             this.block.setDragging(false);
+            this.block.moveTo(this.adjustBlockPosition(this.block.getRelativeToSurfaceXY()));
         }
 
         if (this.connectionCandidate) {

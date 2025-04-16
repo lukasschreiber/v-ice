@@ -183,7 +183,8 @@ export class SingleBlockFlyout extends Blockly.VerticalFlyout {
 
         const relativeCoords = new Blockly.utils.Coordinate(finalOffset.x, finalOffset.y);
         const absoluteCoords = targetWorkspace.getOriginOffsetInPixels();
-        const finalOffsetInWorkspace = relativeCoords.translate(-absoluteCoords.x, -absoluteCoords.y);
+        const injectionDivBounds = targetWorkspace.getInjectionDiv().getBoundingClientRect();
+        const finalOffsetInWorkspace = relativeCoords.translate(-absoluteCoords.x, -absoluteCoords.y).translate(-injectionDivBounds.left, -injectionDivBounds.top)
         finalOffsetInWorkspace.scale(1 / targetWorkspace.scale);
 
         block.moveTo(finalOffsetInWorkspace);
