@@ -16,8 +16,22 @@ export const ReactToolBoxRowRenderer = React.memo(
                     key={item.id}
                     item={item}
                     style={style}
-                    onSearchTermChange={(id, value) => {}}
                 />
+            );
+        }
+
+        if (item.kind === "empty") {
+            return (
+                <div
+                    key={item.id}
+                    className="flex items-center justify-center text-gray-500 text-xs"
+                    style={{
+                        ...style,
+                        backgroundColor: "transparent",
+                    }}
+                >
+                    No blocks found
+                </div>
             );
         }
 

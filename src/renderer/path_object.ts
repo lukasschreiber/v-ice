@@ -11,4 +11,16 @@ export class PathObject extends Blockly.zelos.PathObject {
         if(connection.isConnected()) return
         super.addConnectionHighlight(connection, connectionPath, offset, rtl)
     }
+
+    override setOutlinePath(name: string, pathString: string): void {
+        super.setOutlinePath(name, pathString)
+        this.getOutlinePathWithForce(name)?.setAttribute("data-input-name", name)
+    }
+
+    private getOutlinePathWithForce(name: string): SVGElement | null {
+        // use reflection to get the private property
+        const outlines = (this as any).outlines
+        const outline = outlines.get(name)
+        return outline
+    }
 }

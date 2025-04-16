@@ -9,6 +9,7 @@ import { useEffect, useMemo, useRef } from "react";
 export function ReactToolboxBlockItem(props: {
     block?: GenericBlockDefinition;
     variable?: Blockly.VariableModel | null;
+    noInteraction?: boolean;
     width?: number;
     height?: number;
 }) {
@@ -22,7 +23,7 @@ export function ReactToolboxBlockItem(props: {
         if (!workspace || !settingsInitialized || !ref.current) return;
         if (flyoutRef.current) return; // Prevent re-initialization
 
-        flyoutRef.current = SingleBlockFlyout.inject(ref.current, workspace.options);
+        flyoutRef.current = SingleBlockFlyout.inject(ref.current, {...workspace.options});
         flyoutRef.current.init(workspace);
 
         if (props.variable) {
@@ -35,7 +36,7 @@ export function ReactToolboxBlockItem(props: {
             flyoutRef.current?.dispose();
             flyoutRef.current = null;
         };
-    }, [workspace, settingsInitialized, props.block, props.variable]);
+    }, [workspace, settingsInitialized, props.block, props.variable, props.noInteraction]);
 
     const metrics = useMemo(() => {
         if (props.width && props.height) return { width: props.width, height: props.height };
@@ -71,6 +72,8 @@ export function ReactToolboxBlockItem(props: {
             ref={ref}
             className="renderer-renderer light-theme"
             style={{
+                userSelect: "none",
+                pointerEvents: props.noInteraction ? "none" : "auto",
                 width: `${metrics.width}px`,
                 height: `${metrics.height}px`,
             }}

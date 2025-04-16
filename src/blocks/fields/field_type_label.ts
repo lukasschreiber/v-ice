@@ -47,6 +47,12 @@ export class FieldTypeLabel extends Blockly.FieldLabelSerializable implements Ty
             this.iconGroup_?.childNodes.forEach(it => it.remove())
             const icon = IconFactory.createIconForType(this.type_, (this.sourceBlock_ as Blockly.BlockSvg).style.colourTertiary, (this.sourceBlock_ as Blockly.BlockSvg).style.colourPrimary)
             if (icon) this.iconGroup_?.appendChild(icon)
+
+            const block = this.getSourceBlock() as Blockly.BlockSvg | null
+            if (block) {
+                block.getSvgRoot()?.setAttribute("data-type", this.type_?.name || "")
+                block.getSvgRoot()?.setAttribute("data-clickable", "true")
+            }
         }
         this.updateSize_()
     }

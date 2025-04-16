@@ -10,6 +10,7 @@ export function ReactToolboxBlockRow(props: {
     block?: GenericBlockDefinition;
     variable?: Blockly.VariableModel | null;
     noHighlight?: boolean;
+    noInteraction?: boolean;
     noFavorite?: boolean;
     width?: number;
     height?: number;
@@ -27,6 +28,7 @@ export function ReactToolboxBlockRow(props: {
                 variable={props.variable}
                 width={props.width}
                 height={props.height}
+                noInteraction={props.noInteraction}
             />
             {!props.noFavorite && (
                 <button onClick={() => toggleBlockPinned(props.block)}>

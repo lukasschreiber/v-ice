@@ -173,3 +173,7 @@
 .canvas-container ::-webkit-scrollbar-thumb:hover {
     background-color: #bbb;
 }
+
+[data-clickable="true"] {
+    cursor: pointer;
+}

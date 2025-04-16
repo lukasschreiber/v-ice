@@ -66,7 +66,7 @@ function ReactToolboxList(props: { definition: ToolboxDefinition; offset: number
                 top: "1px",
             }}
         >
-            <div>
+            {settings.toolboxGlobalSearch && <div>
                 <input
                     type="text"
                     placeholder="Search..."
@@ -77,7 +77,7 @@ function ReactToolboxList(props: { definition: ToolboxDefinition; offset: number
                     }}
                     className="w-full p-2 border rounded"
                 />
-            </div>
+            </div>}
             <List
                 ref={listRef}
                 height={props.height}

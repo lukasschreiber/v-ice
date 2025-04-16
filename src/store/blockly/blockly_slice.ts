@@ -16,7 +16,15 @@ export const blocklySlice = createSlice({
         edgeEditMarker: null as null | EdgeEditMarker,
         targetBlocks: {} as Record<string, string>,
         variables: [] as Array<{ name: string, type: IType, id: string }>,
-        pinnedBlocks: [] as Array<{hash: string}>,
+        pinnedBlocks: [] as Array<{ hash: string }>,
+        searchForm: {
+            open: false,
+            allowDragging: true,
+            blockId: null as null | string,
+            inputName: null as null | string,
+            type: {} as IType,
+            broaderType: null as null | IType,
+        },
         loading: false,
         featuresReady: {
             toolbox: false,
@@ -59,9 +67,35 @@ export const blocklySlice = createSlice({
         },
         setPinnedBlocks: (state, action: { type: string, payload: Array<{ hash: string }> }) => {
             state.pinnedBlocks = action.payload;
+        },
+        toggleSearchFormOpen: (state) => {
+            state.searchForm.open = !state.searchForm.open;
+            state.searchForm.type = {name: "*?", wildcard: true, primitive: false, nullable: true} as IType;
+            state.searchForm.broaderType = null;
+            state.searchForm.allowDragging = true;
+            state.searchForm.blockId = null;
+            state.searchForm.inputName = null;
+        },
+        closeSearchForm: (state) => {
+            state.searchForm.open = false;
+            state.searchForm.allowDragging = true;
+            state.searchForm.blockId = null;
+            state.searchForm.inputName = null;
+        },
+        openSearchForm: (state, action: {
+            type: string, payload: {
+                open: boolean,
+                allowDragging: boolean,
+                type: IType,
+                broaderType: IType | null,
+                blockId: null | string,
+                inputName: null | string
+            }
+        }) => {
+            state.searchForm = { ...action.payload }
         }
     }
 })
 
-export const { setTargetBlocks, setEdgeEditMarker, setVariables, setPinnedBlocks, addVariable, removeVariable, setFeatureReady, toggleBlockPinned } = blocklySlice.actions
+export const { setTargetBlocks, setEdgeEditMarker, setVariables, setPinnedBlocks, addVariable, removeVariable, setFeatureReady, toggleBlockPinned, toggleSearchFormOpen, openSearchForm, closeSearchForm } = blocklySlice.actions
 export const blocklyReducer = blocklySlice.reducer

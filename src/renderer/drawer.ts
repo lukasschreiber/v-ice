@@ -56,13 +56,6 @@ export class Drawer extends Blockly.zelos.Drawer {
 
         const typeString = input.input.connection?.getCheck()?.[0]
         if (typeString) {
-
-            // hover effect on the inline input if it's not connected
-            // pathObject.svgRoot.classList.add("cursor-pointer")
-            // pathObject.svgRoot.addEventListener("click", () => {
-            //     showNotification("Yay! " + typeString)
-            // })
-
             const icon = IconFactory.createIconForType(types.utils.fromString(typeString), this.block_.style.colourPrimary, this.block_.style.colourTertiary)
             if (icon) {
                 if (!this.block_.isInFlyout) {
@@ -70,6 +63,10 @@ export class Drawer extends Blockly.zelos.Drawer {
                 }
                 icon.setAttribute("data-input", inputName + "-" + this.block_.id)
                 this.block_.getSvgRoot().appendChild(icon)
+                
+                icon.dataset.clickable = "true"
+                icon.dataset.type = typeString
+
                 const iconBBox = icon.getBBox()
                 icon.setAttribute("transform", `translate(${input.xPos + input.width / 2 - iconBBox.width / 2}, ${yPos + input.height / 2 - iconBBox.height / 2})`)
             }

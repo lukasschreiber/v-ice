@@ -44,10 +44,15 @@ import { NormalizedFitleredDataTable } from "@/data/filtered_table";
 import { LayoutSettings, Settings } from "@/context/settings/settings";
 import { createPortal } from "react-dom";
 import { useWorkspacePersister } from "./hooks/useWorkspacePersister";
-// import { SearchForm } from "./SearchForm";
 import { Layer } from "@/utils/zindex";
 import { FullScreenBlockDragger } from "@/renderer/full_screen_block_dragger";
-import { setFeatureReady, setVariables } from "@/store/blockly/blockly_slice";
+import {
+    setFeatureReady,
+    openSearchForm,
+    setVariables,
+    toggleSearchFormOpen,
+    closeSearchForm,
+} from "@/store/blockly/blockly_slice";
 import types from "@/data/types";
 import { BlocklyToolboxAdapter } from "@/toolbox/adapters/blockly_adapter";
 import { ToolboxDefinition } from "@/toolbox/builder/definitions";
@@ -88,7 +93,7 @@ export function Canvas(props: CanvasProps) {
     const [toolboxWidth, setToolboxWidth] = useState(0);
     const isLoading = useSelector((state) => state.blockly.loading);
     const { i18n } = useTranslation();
-    const [searchFormVisible, setSearchFormVisible] = useState(false);
+    const searchFormOpen = useSelector((state) => state.blockly.searchForm.open);
     const [settingsModalOpen, setSettingsModalOpen] = useState(false);
     const {
         settings,
@@ -365,27 +370,114 @@ export function Canvas(props: CanvasProps) {
 
     useEffect(() => {
         const globalClickHandler = (e: MouseEvent) => {
+            if (e.detail === 2) {
+                const element = (e.target as HTMLElement).closest("[data-clickable='true']");
+                const block = (e.target as HTMLElement).closest("[data-id]");
+                const blockId = block?.getAttribute("data-id");
+                const workspaceBlock = blockId ? workspaceRef.current?.getBlockById(blockId) : null;
+                const type = element?.getAttribute("data-type");
+
+                if (element && type) {
+                    if (workspaceBlock?.outputConnection) {
+                        if (!workspaceBlock.outputConnection.isConnected()) return;
+                        const connectedBlock = workspaceBlock.outputConnection.targetBlock();
+                        const connectedInput = workspaceBlock.outputConnection.targetConnection?.getParentInput();
+                        let broaderType = connectedInput?.connection?.getCheck()?.[0] ? types.utils.fromString(connectedInput.connection.getCheck()![0]) : null 
+
+                        if (Blocks.Types.isDynamicInputBlock(connectedBlock) && connectedInput) {
+                            broaderType = connectedBlock.originalTypes[connectedInput.name]
+                        }
+
+                        if (connectedBlock && connectedInput) {
+                            dispatch(
+                                openSearchForm({
+                                    open: true,
+                                    allowDragging: false,
+                                    type: types.utils.fromString(type),
+                                    blockId: connectedBlock.id,
+                                    inputName: connectedInput?.name,
+                                    broaderType,
+                                })
+                            );
+                            Blockly.WidgetDiv.hide();
+                        }
+                    } else {
+                        dispatch(
+                            openSearchForm({
+                                open: true,
+                                allowDragging: false,
+                                type: types.utils.fromString(type),
+                                blockId: null,
+                                inputName: null,
+                                broaderType: types.utils.fromString(type),
+                            })
+                        );
+                        Blockly.WidgetDiv.hide();
+                    }
+                }
+            }
+
             if ((e.target as HTMLElement).closest(".renderer-renderer") !== null) return;
             // hide all dropdowns, etc. when clicking outside the workspace
             workspaceRef.current?.hideChaff();
         };
 
+        const widgetDivClickHandler = (e: MouseEvent) => {
+            if (e.detail === 2) {
+                Blockly.WidgetDiv.hide();
+                // find element behind the widget div
+                // by using the elementFromPoint method
+                const elements: HTMLElement[] = document.elementsFromPoint(e.clientX, e.clientY) as HTMLElement[];
+                e.preventDefault();
+                const element = elements.find((el) => el.classList.contains("blocklyPath") && el.parentElement?.dataset.id)?.parentElement;
+                if (element) {
+                    const blockId = element.dataset.id;
+                    const block = workspaceRef.current?.getBlockById(blockId!);
+                    const type = block?.outputConnection.getCheck()?.[0];
+                    const connectedBlock = block?.getParent();
+                    const connectedInput = block?.outputConnection.targetConnection?.getParentInput();
+
+                    let broaderType = connectedInput?.connection?.getCheck()?.[0] ? types.utils.fromString(connectedInput.connection.getCheck()![0]) : null 
+
+                    if (Blocks.Types.isDynamicInputBlock(connectedBlock) && connectedInput) {
+                        broaderType = connectedBlock.originalTypes[connectedInput.name]
+                    }
+
+                    if (block && type && connectedBlock) {
+                        dispatch(
+                            openSearchForm({
+                                open: true,
+                                allowDragging: false,
+                                type: types.utils.fromString(type),
+                                blockId: connectedBlock.id,
+                                inputName: connectedInput?.name || null,
+                                broaderType,
+                            })
+                        );
+                        Blockly.WidgetDiv.hide();
+                    }
+                }
+            }
+        }
+
         const globalKeyHandler = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
-                setSearchFormVisible(false);
+                dispatch(closeSearchForm());
             }
 
             if (e.key === "F1") {
                 e.preventDefault();
-                setSearchFormVisible(true);
+                dispatch(toggleSearchFormOpen());
             }
         };
 
         document.addEventListener("click", globalClickHandler);
         document.addEventListener("keydown", globalKeyHandler);
+        Blockly.WidgetDiv.getDiv()?.addEventListener("click", widgetDivClickHandler);
         return () => {
             document.removeEventListener("keydown", globalKeyHandler);
             document.removeEventListener("click", globalClickHandler);
+            Blockly.WidgetDiv.getDiv()?.removeEventListener("click", widgetDivClickHandler);
         };
     }, [workspaceRef.current]);
 
@@ -403,7 +495,7 @@ export function Canvas(props: CanvasProps) {
                 ref={blocklyDiv}
                 id={"canvas"}
             ></div>
-            {searchFormVisible && <SearchForm onClose={() => setSearchFormVisible(false)} />}
+            {searchFormOpen && <SearchForm onClose={() => dispatch(closeSearchForm())} />}
             {/* <VariablesOverlay /> */}
             {settings.toolboxVersion === "rich" && (
                 <ReactToolbox definition={memoizedToolbox} offset={toolboxWidth} height={Number(height)} />

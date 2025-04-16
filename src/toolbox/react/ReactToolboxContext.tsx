@@ -20,7 +20,8 @@ type FlattenedToolboxCategoryEntry = {
     filterable: boolean;
 };
 type FlattenedToolboxBlockEntry = { kind: "block"; block: GenericBlockDefinition; noHighlight: boolean };
-export type FlattenedToolboxEntry = FlattenedToolboxCategoryEntry | FlattenedToolboxBlockEntry;
+type FlattenedToolboxEmptyEntry = { kind: "empty" };
+export type FlattenedToolboxEntry = FlattenedToolboxCategoryEntry | FlattenedToolboxBlockEntry | FlattenedToolboxEmptyEntry;
 
 export const ToolboxPinnedContext = createContext<{
     isBlockPinned: (block?: GenericBlockDefinition) => boolean;
@@ -56,10 +57,18 @@ export const ToolboxMetaContext = createContext<{
 
 export const ToolboxUIContext = createContext<{
     searchTerm: string;
+    getSearchTermForCategory: (categoryId: string) => string;
+    setSearchTermForCategory: (categoryId: string, term: string) => void;
     setSearchTerm: (term: string) => void;
+    getSortingDirectionForCategory: (categoryId: string) => "asc" | "desc";
+    setSortingDirectionForCategory: (categoryId: string, direction: "asc" | "desc") => void;
 }>({
     searchTerm: "",
+    getSearchTermForCategory: () => "",
+    setSearchTermForCategory: () => {},
     setSearchTerm: () => {},
+    getSortingDirectionForCategory: () => "asc",
+    setSortingDirectionForCategory: () => {},
 });
 
 const PADDING = 6;
@@ -75,6 +84,8 @@ export function ReactToolboxProvider({
     const { workspace } = useWorkspace();
     const [pinnedBlocks, setPinnedBlocks] = useLocalStorage<string[]>("v-ice-pinned", []);
     const [searchTerm, setSearchTerm] = useState("");
+    const [perCategorySearchTerm, setPerCategorySearchTerm] = useState<Record<string, string>>({});
+    const [perCategorySortingDirection, setPerCategorySortingDirection] = useState<Record<string, "asc" | "desc">>({});
     const [initialized, setInitialized] = useState(false);
 
     const dispatch = useDispatch();
@@ -116,37 +127,77 @@ export function ReactToolboxProvider({
         });
     }, [definition, workspace, columns, variablesReady, pinnedBlocks]);
 
+    const getSearchTermForCategory = useCallback(
+        (categoryId: string) => {
+            return perCategorySearchTerm[categoryId] || "";
+        },
+        [perCategorySearchTerm]
+    );
+
+    const setSearchTermForCategory = useCallback((categoryId: string, term: string) => {
+        setPerCategorySearchTerm((prev) => ({ ...prev, [categoryId]: term }));
+    }, []);
+
+    const getSortingDirectionForCategory = useCallback(
+        (categoryId: string) => {
+            return perCategorySortingDirection[categoryId] || "asc";
+        },
+        [perCategorySortingDirection]
+    );
+
+    const setSortingDirectionForCategory = useCallback((categoryId: string, direction: "asc" | "desc") => {
+        setPerCategorySortingDirection((prev) => ({ ...prev, [categoryId]: direction }));
+    }, []);
+
+    const collator = useMemo(() => new Intl.Collator(undefined, { numeric: true, sensitivity: "base" }), []);
+
     const filteredToolbox = useMemo(() => {
-        if (!searchTerm.trim()) return flattenedToolbox;
-    
-        const lowerSearch = searchTerm.toLowerCase();
-    
+        const lowerSearch = searchTerm.toLowerCase().trim();
+
         const result: FlattenedToolboxEntry[] = [];
-    
+
         let currentCategory: FlattenedToolboxCategoryEntry | null = null;
-        let collectedBlocks: FlattenedToolboxEntry[] = [];
-    
+        let collectedBlocks: FlattenedToolboxBlockEntry[] = [];
+
         const pushCategoryWithBlocks = () => {
             if (currentCategory) {
+                // Sort blocks if the category is sortable
+                if (currentCategory.sortable) {
+                    const sortDirection = getSortingDirectionForCategory(currentCategory.id);
+                    collectedBlocks.sort((a, b) => {
+                        const aText = getBlockTextFromBlockDefinition(a.block);
+                        const bText = getBlockTextFromBlockDefinition(b.block);
+                        return sortDirection === "asc"
+                            ? collator.compare(aText, bText)
+                            : collator.compare(bText, aText);
+                    });
+                }
                 result.push(currentCategory, ...collectedBlocks);
             } else {
                 result.push(...collectedBlocks);
             }
+
+            if (currentCategory && collectedBlocks.length === 0) {
+                result.push({ kind: "empty" });
+            }
         };
-    
+
         for (const entry of flattenedToolbox) {
             if (entry.kind === "category") {
                 // Push previous category + blocks
                 pushCategoryWithBlocks();
-    
+
                 // Start new category
                 currentCategory = entry;
                 collectedBlocks = [];
             } else if (entry.kind === "block") {
-                const matches = getBlockTextFromBlockDefinition(entry.block)
+                const matches = getBlockTextFromBlockDefinition(entry.block).toLowerCase().includes(lowerSearch);
+                const categorySearchTerm = getSearchTermForCategory(currentCategory?.id || "")
+                    .trim()
+                    .toLowerCase();
+                const categoryMatches = getBlockTextFromBlockDefinition(entry.block)
                     .toLowerCase()
-                    .includes(lowerSearch);
-    
+                    .includes(categorySearchTerm);
                 if (!currentCategory) {
                     // No active category → standalone block
                     if (matches) result.push(entry);
@@ -155,22 +206,28 @@ export function ReactToolboxProvider({
                     collectedBlocks.push(entry);
                 } else {
                     // Category is filterable → only include matching blocks
-                    if (matches) collectedBlocks.push(entry);
+                    if ((!lowerSearch || matches) && (!categorySearchTerm || categoryMatches))
+                        collectedBlocks.push(entry);
                 }
             }
         }
-    
+
         // Push the last batch
         pushCategoryWithBlocks();
-    
+
         return result;
-    }, [searchTerm, flattenedToolbox]);
+    }, [searchTerm, flattenedToolbox, getSearchTermForCategory, getSortingDirectionForCategory, collator]);
 
     const itemMetrics = useMemo(() => {
         return filteredToolbox.map((entry) => {
             if (entry.kind === "category") {
                 return { width: 0, height: entry.filterable ? 60 : 25 };
             }
+
+            if (entry.kind === "empty") {
+                return { width: 0, height: 50 };
+            }
+
             const metrics = getBlockHeightWidth(entry.block, scale);
             return {
                 width: metrics.width,
@@ -223,7 +280,16 @@ export function ReactToolboxProvider({
 
     return (
         <ToolboxPinnedContext.Provider value={{ isBlockPinned, toggleBlockPinned }}>
-            <ToolboxUIContext.Provider value={{ searchTerm, setSearchTerm }}>
+            <ToolboxUIContext.Provider
+                value={{
+                    searchTerm,
+                    setSearchTerm,
+                    getSearchTermForCategory,
+                    setSearchTermForCategory,
+                    getSortingDirectionForCategory,
+                    setSortingDirectionForCategory,
+                }}
+            >
                 <ToolboxLayoutContext.Provider
                     value={{
                         getItem,

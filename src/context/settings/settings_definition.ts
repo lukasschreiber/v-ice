@@ -27,6 +27,7 @@ export interface LayoutSettings {
     allowManualToPopout: CheckboxSetting
     reactToolboxWidth: RangeSetting
     reactToolboxOverscan: RangeSetting
+    toolboxGlobalSearch: CheckboxSetting
 
     // Persistence
     saveWorkspace: CheckboxSetting
@@ -130,6 +131,15 @@ export function getSettingsDefinition() {
                     max: 600,
                     stepSize: 1,
                     helpText: "Change the width of the react toolbox",
+                    hidden: (settings: Settings) => {
+                        return settings.toolboxVersion !== "rich";
+                    }
+                },
+                toolboxGlobalSearch: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Toolbox Global Search",
+                    helpText: "Enable or disable the global search in the toolbox",
                     hidden: (settings: Settings) => {
                         return settings.toolboxVersion !== "rich";
                     }
