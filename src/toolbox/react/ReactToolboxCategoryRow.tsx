@@ -30,7 +30,6 @@ export const ReactToolboxCategoryRow = memo(function ReactToolboxCategoryRow({
                     value={getSearchTermForCategory(item.id) ?? ""}
                     onChange={(event) => {
                         const value = event.target.value;
-                        console.log("search term", value, item.id);
                         setSearchTermForCategory(item.id, value);
                     }}
                 />

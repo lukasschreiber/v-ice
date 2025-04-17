@@ -1,25 +1,51 @@
 import { useSettings } from "@/main";
 import { useSelector } from "@/store/hooks";
 import { Layer } from "@/utils/zindex";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 export function LoadingOverlay(props: { isLoading: boolean }) {
     const [shouldRender, setShouldRender] = useState(props.isLoading);
     const featuresReady = useSelector((state) => state.blockly.featuresReady);
-    const { isInitialized: settingsIninitialized } = useSettings();
+    const { isInitialized: settingsInitialized } = useSettings();
+    const startTimeInMilliseconds = useRef<number>(performance.now());
 
+    const [readyTimestamps, setReadyTimestamps] = useState<Record<string, number>>({});
+    const [settingsReadyTimestamp, setSettingsReadyTimestamp] = useState<number | null>(null);
+
+    // When props.isLoading changes, handle mount/unmount logic
     useEffect(() => {
         if (props.isLoading) {
-            setShouldRender(true); // Show immediately when loading starts
+            setShouldRender(true);
         } else {
-            const timeout = setTimeout(() => setShouldRender(false), 250); // Match transition duration
-            return () => clearTimeout(timeout); // Cleanup on component unmount or re-trigger
+            const timeout = setTimeout(() => setShouldRender(false), 250);
+            return () => clearTimeout(timeout);
         }
     }, [props.isLoading]);
 
-    if (!shouldRender) {
-        return null; // Completely remove from the DOM
-    }
+    // Watch for feature readiness updates
+    useEffect(() => {
+        const now = performance.now();
+        setReadyTimestamps((prev) => {
+            const updated = { ...prev };
+            Object.entries(featuresReady).forEach(([feature, isReady]) => {
+                if (isReady && !prev[feature]) {
+                    updated[feature] = now;
+                }
+            });
+            return updated;
+        });
+    }, [featuresReady]);
+
+    // Watch for settings initialization timestamp
+    useEffect(() => {
+        if (settingsInitialized && settingsReadyTimestamp === null) {
+            setSettingsReadyTimestamp(performance.now());
+        }
+    }, [settingsInitialized, settingsReadyTimestamp]);
+
+    if (!shouldRender) return null;
+
+    const formatDuration = (ms: number) => `${(ms / 1000).toFixed(1)}s`;
 
     return (
         <div
@@ -46,13 +72,27 @@ export function LoadingOverlay(props: { isLoading: boolean }) {
                     />
                 </svg>
                 <span className="sr-only">Loading...</span>
-                <div className="text-gray-500 text-xs">
+                <div className="text-gray-500 text-xs text-left">
                     {Object.entries(featuresReady).map(([feature, ready]) => (
                         <div key={feature}>
-                            {feature}: {ready ? "Ready" : "Loading..."}
+                            {feature}:{" "}
+                            {ready
+                                ? `Ready (${formatDuration(
+                                      (readyTimestamps[feature] ?? performance.now()) -
+                                          startTimeInMilliseconds.current
+                                  )})`
+                                : "Loading..."}
                         </div>
                     ))}
-                    <div>Settings: {settingsIninitialized ? "Ready" : "Loading..."}</div>
+                    <div>
+                        Settings:{" "}
+                        {settingsInitialized
+                            ? `Ready (${formatDuration(
+                                  (settingsReadyTimestamp ?? performance.now()) -
+                                      startTimeInMilliseconds.current
+                              )})`
+                            : "Loading..."}
+                    </div>
                 </div>
             </div>
         </div>

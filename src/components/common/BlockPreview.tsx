@@ -82,6 +82,7 @@ export function BlockPreview(props: { block: GenericBlockDefinition, lazyLoadPar
             };
 
             createUsedVariables(blockState);
+
             const block = Blockly.serialization.blocks.append(blockState, workspace, { recordUndo: false }) as Blockly.BlockSvg;
 
             block.moveBy(margin, margin);

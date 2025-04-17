@@ -157,6 +157,19 @@ Blockly.Field.prototype.updateEditable = function (this: Blockly.Field) {
     }
 }
 
+// If variables are created we do not want to update the toolbox selection, instead we do it once manually
+const createWorkspaceVariable = Blockly.Workspace.prototype.createVariable
+Blockly.WorkspaceSvg.prototype.createVariable = function (this: Blockly.WorkspaceSvg, name: string, opt_type?: string | null, opt_id?: string | null): Blockly.VariableModel {
+    const newVar = createWorkspaceVariable.call(this, name, opt_type, opt_id)
+    return newVar
+}
+
+// If variables are deleted we do not want to update the toolbox selection, instead we do it once manually
+const deleteWorkspaceVariable = Blockly.Workspace.prototype.deleteVariableById
+Blockly.WorkspaceSvg.prototype.deleteVariableById = function (this: Blockly.WorkspaceSvg, id: string): void {
+    deleteWorkspaceVariable.call(this, id)
+}
+
 Blockly.WorkspaceSvg.prototype.newBlock = function (type: string, id?: string) {
     return new BlockSvg(this, type, id)
 }
