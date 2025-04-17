@@ -85,7 +85,7 @@ function App() {
                                 setTheme={(theme) => setThemeName(theme.name)}
                             />
                         </Tab>
-                        <Tab label="Toolbox" description="Toolbox configuration">
+                        <Tab label="Toolbox" description="Toolbox configuration" disabled>
                             <ToolboxPanel toolbox={toolbox} setToolbox={setToolbox} />
                         </Tab>
                         <Tab label="Workspaces" description="Manage different workspace saves">

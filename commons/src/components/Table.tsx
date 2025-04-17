@@ -32,6 +32,7 @@ export function Table(
     const rows = React.useMemo(() => {
         const start = page * rowsPerPage;
         const end = start + rowsPerPage;
+        console.log(dataTable.getRows())
         return dataTable.getRows().slice(start, end);
     }, [dataTable, page, rowsPerPage]);
 
@@ -103,7 +104,7 @@ export function Table(
                         >
                             {headers.map((col, colIndex) => (
                                 <td key={`${row[DataTable.indexColumnName_]}_${colIndex}`} className="px-2 py-1 whitespace-nowrap align-top">
-                                    {formatTableCell(dataTable.getValue(row[DataTable.indexColumnName_], colIndex), col.type)}
+                                    {formatTableCell(colIndex === 0 ? dataTable.getIndexColumn().values[row[DataTable.indexColumnName_]] : dataTable.getValue(row[DataTable.indexColumnName_], colIndex - 1), col.type)}
                                 </td>
                             ))}
                         </tr>

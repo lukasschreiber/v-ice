@@ -3,7 +3,12 @@ import { TabContext } from "./TabContext";
 import DockBottom from "../../assets/dock-bottom.svg?react";
 import DockRight from "../../assets/dock-right.svg?react";
 
-export function Tabs(props: React.HTMLProps<HTMLDivElement> & { orientation: "horizontal" | "vertical", setOrientation: (orientation: "horizontal" | "vertical") => void }) {
+export function Tabs(
+    props: React.HTMLProps<HTMLDivElement> & {
+        orientation: "horizontal" | "vertical";
+        setOrientation: (orientation: "horizontal" | "vertical") => void;
+    }
+) {
     const { setActiveTab, activeTab } = useContext(TabContext);
     const { orientation, setOrientation, ...rest } = props;
 
@@ -16,13 +21,15 @@ export function Tabs(props: React.HTMLProps<HTMLDivElement> & { orientation: "ho
                             .filter((x) => (x as { type: unknown }).type === Tab)
                             .map((child, index) => {
                                 const label = (child as React.ReactElement<{ label: string }>).props.label;
+                                const disabled =
+                                    (child as React.ReactElement<{ disabled?: boolean }>).props.disabled || false;
                                 return (
                                     <div
                                         key={index}
-                                        onClick={() => setActiveTab(index)}
+                                        onClick={() => (!disabled ? setActiveTab(index) : undefined)}
                                         className={`px-3 pt-1 pb-1 font-semibold text-xs text-gray-700 hover:bg-gray-50 cursor-pointer border-t-2 border-r border-b border-solid border-x-gray-200 border-y-gray-200 bg-gray-100 ${
                                             index === activeTab ? "border-t-primary border-b-0 bg-white" : ""
-                                        }`}
+                                        } ${disabled ? "cursor-not-allowed opacity-40" : ""}`}
                                     >
                                         {label}
                                     </div>
@@ -30,10 +37,16 @@ export function Tabs(props: React.HTMLProps<HTMLDivElement> & { orientation: "ho
                             })}
                     </div>
                     <div className="flex flex-row items-center border border-gray-200 overflow-hidden cursor-pointer text-gray-800 w-fit shrink-0">
-                        <div className={`flex items-center justify-center h-full p-0.5 px-1 ${orientation === "vertical" ? "bg-gray-300" : "bg-white"}`} onClick={() => setOrientation("vertical")}>
+                        <div
+                            className={`flex items-center justify-center h-full p-0.5 px-1 ${orientation === "vertical" ? "bg-gray-300" : "bg-white"}`}
+                            onClick={() => setOrientation("vertical")}
+                        >
                             <DockBottom className="w-4 h-4" />
                         </div>
-                        <div className={`flex items-center justify-center h-full p-0.5 px-1 ${orientation === "horizontal" ? "bg-gray-300" : "bg-white"}`} onClick={() => setOrientation("horizontal")}>
+                        <div
+                            className={`flex items-center justify-center h-full p-0.5 px-1 ${orientation === "horizontal" ? "bg-gray-300" : "bg-white"}`}
+                            onClick={() => setOrientation("horizontal")}
+                        >
                             <DockRight className="w-4 h-4" />
                         </div>
                     </div>
@@ -46,7 +59,9 @@ export function Tabs(props: React.HTMLProps<HTMLDivElement> & { orientation: "ho
     );
 }
 
-export function Tab(props: React.HTMLProps<HTMLDivElement> & { label: string; description: string }) {
+export function Tab(
+    props: React.HTMLProps<HTMLDivElement> & { label: string; description: string; disabled?: boolean }
+) {
     return (
         <div {...props} className="h-full flex flex-col relative">
             <div className="text-xs p-1 border-b border-solid border-gray-200">{props.description}</div>
