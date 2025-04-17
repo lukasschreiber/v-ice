@@ -253,7 +253,6 @@ export const jsQueryClient = createQueryClient({
                 args: { STATEMENTS: t.boolean },
                 transformer: (astNode) => `!(${astNode.args.STATEMENTS})`
             }),
-
             createOperationTransformer({
                 complexity: 2,
                 operation: "fib",
