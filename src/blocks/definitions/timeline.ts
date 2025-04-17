@@ -7,6 +7,7 @@ import { DynamicEventMatchesExtension } from "../extensions/dynamic_event_matche
 import { ParentColorExtension } from "../extensions/parent_color";
 import { EitherOrMutator } from "../mutators/either_or";
 import { EventDoesNotOccurForMutator } from "../mutators/event_does_not_occur_for";
+import { parseDate } from "@/utils/datetime";
 
 export const TimelineQueryBlock = createBlock({
     id: Blocks.Names.TIMELINE.QUERY,
@@ -267,7 +268,9 @@ export const TimelineDateBlock = createBlock({
     output: types.timestamp,
     style: "timeline_blocks",
     extensions: [ParentColorExtension],
-    
+    code: (scope => {
+        return scope.buildASTForField("TIMESTAMP", v => parseDate(v)) 
+    }),
 })
 
 export const TimelineOrBlock = createBlock({
