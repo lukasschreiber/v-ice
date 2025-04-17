@@ -1,6 +1,6 @@
 import { TypeChecker } from "@/data/type_checker";
 import types from "@/data/types";
-import { DataTable, useWorkspace } from "@/main";
+import { useWorkspace } from "@/main";
 import { getBlockHeightWidth } from "@/renderer/block_metric_approximator";
 import { useSelector } from "@/store/hooks";
 import { Variables } from "@/toolbox/categories/variables";
@@ -22,7 +22,7 @@ export function SearchForm(props: { onClose: () => void }) {
     const { workspace } = useWorkspace();
     const scale = useSelector((state) => state.settings.settings.zoom);
     const [searchTerm, setSearchTerm] = useState<string>("");
-    const sourceTable = useSelector((state) => state.sourceTable);
+    // const sourceTable = useSelector((state) => state.sourceTable);
     const [onlyUseExactType, setOnlyUseExactType] = useLocalStorage("onlyUseExactType", true);
     const overscanCount = useSelector((state) => state.settings.settings.reactToolboxOverscan);
     const type = useSelector((state) => state.blockly.searchForm.type);
@@ -158,7 +158,7 @@ export function SearchForm(props: { onClose: () => void }) {
                                                 {types.utils.describe(type)}
                                             </div>
                                         </div>
-                                        <div className="flex">
+                                        {/* <div className="flex">
                                             <div className="w-24 font-semibold text-gray-700">Examples:</div>
                                             <div className="text-gray-600 max-w-[200px]">
                                                 {types.utils
@@ -169,7 +169,7 @@ export function SearchForm(props: { onClose: () => void }) {
                                                     )
                                                     .join(", ")}
                                             </div>
-                                        </div>
+                                        </div> */}
                                     </div>
                                 );
                             })()}
