@@ -73,6 +73,10 @@ export function getSettingsDefinition() {
                     max: 41,
                     stepSize: 0.5,
                     helpText: "Adjust the size of the grid",
+                    valueFormatter: (value: number) => {
+                        const percentage = Math.round((value - 4) / (41 - 4) * 100);
+                        return `${percentage}%`;
+                    }
                 },
                 gridColor: {
                     type: "color",
