@@ -148,13 +148,13 @@ export const jsQueryClient = createQueryClient({
             createOperationTransformer({
                 complexity: 1,
                 operation: "get_struct_property",
-                args: { struct: t.nullable(t.struct(t.wildcard)), property: t.nullable(t.string) },
+                args: { struct: t.nullable(t.struct(t.wildcard)), property: t.nullable(t.wildcard) },
                 transformer: (astNode) => `${astNode.args.struct}?.["${astNode.args.property}"]`
             }),
             createOperationTransformer({
                 complexity: 1,
                 operation: "get_struct_property",
-                args: { struct: t.nullable(t.list(t.struct(t.wildcard))), property: t.nullable(t.string) },
+                args: { struct: t.nullable(t.list(t.struct(t.wildcard))), property: t.nullable(t.wildcard) },
                 transformer: (astNode) => `(${astNode.args.struct}?.map(it => it["${astNode.args.property}"]).filter(it => it !== undefined) || [])`
             }),
 

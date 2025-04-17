@@ -40,14 +40,14 @@ export class ContinuousToolbox extends Blockly.Toolbox {
 
         this.workspace_.addChangeListener((e) => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if (e.type === Blockly.Events.CREATE && (e.toJson() as any).json.type !== Blocks.Names.VARIABLE.LOCAL_GET) {
-                this.refreshSelection();
-            }
+            // if (e.type === Blockly.Events.CREATE && (e.toJson() as any).json.type !== Blocks.Names.VARIABLE.LOCAL_GET) {
+            //     this.refreshSelection();
+            // }
 
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
-            if (e.type === Blockly.Events.DELETE && (e.toJson() as any).oldJson.type !== Blocks.Names.VARIABLE.LOCAL_GET) {
-                this.refreshSelection();
-            }
+            // if (e.type === Blockly.Events.DELETE && (e.toJson() as any).oldJson.type !== Blocks.Names.VARIABLE.LOCAL_GET) {
+            //     this.refreshSelection();
+            // }
         });
 
         subscribe(state => state.blockly.targetBlocks, () => {

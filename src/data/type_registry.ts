@@ -95,7 +95,7 @@ export class TypeRegistry {
                                 } else if (instruction === "$all") {
                                     // we extract all values from a list
                                     currentValues = currentValues.flat();
-                                } else if (currentValues.some(v => Object.prototype.hasOwnProperty.call(v, instruction))) {
+                                } else if (currentValues.some(v => v && Object.prototype.hasOwnProperty.call(v, instruction))) {
                                     // we extract a field from a struct
                                     currentValues = currentValues.filter(v => Object.prototype.hasOwnProperty.call(v, instruction)).map(v => v[instruction]);
                                 } else if (instruction === "$events") {

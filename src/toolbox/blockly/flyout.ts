@@ -52,9 +52,9 @@ export class ContinuousFlyout extends Blockly.VerticalFlyout {
         );
 
         this.workspace_.addChangeListener((e) => {
-            if (e.type === Blockly.Events.VIEWPORT_CHANGE) {
-                this.selectCategoryByScrollPosition_(-this.workspace_.scrollY);
-            }
+            // if (e.type === Blockly.Events.VIEWPORT_CHANGE) {
+            //     this.selectCategoryByScrollPosition_(-this.workspace_.scrollY);
+            // }
         });
 
         this.autoClose = false;
