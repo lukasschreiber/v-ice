@@ -82,7 +82,7 @@ export function ReactToolboxProvider({
     definition: ToolboxDefinition;
 }) {
     const { workspace } = useWorkspace();
-    const [pinnedBlocks, setPinnedBlocks] = useLocalStorage<string[]>("v-ice-pinned", []);
+    const [pinnedBlocks, setPinnedBlocks] = useLocalStorage<{hash: string, block: GenericBlockDefinition}[]>("v-ice-pinned", []);
     const [searchTerm, setSearchTerm] = useState("");
     const [perCategorySearchTerm, setPerCategorySearchTerm] = useState<Record<string, string>>({});
     const [perCategorySortingDirection, setPerCategorySortingDirection] = useState<Record<string, "asc" | "desc">>({});
@@ -269,12 +269,12 @@ export function ReactToolboxProvider({
     );
 
     useEffect(() => {
-        setPinnedBlocks(reduxPinnedBlocks.map((b) => b.hash));
+        setPinnedBlocks(reduxPinnedBlocks);
     }, [reduxPinnedBlocks]);
 
     useEffect(() => {
         if (!initialized && pinnedBlocks.length > 0) {
-            dispatch(reduxSetPinnedBlocks(pinnedBlocks.map((hash) => ({ hash }))));
+            dispatch(reduxSetPinnedBlocks(pinnedBlocks));
             setInitialized(true);
         }
     }, [initialized, pinnedBlocks]);

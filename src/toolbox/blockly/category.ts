@@ -47,7 +47,7 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
     override createIconDom_(): HTMLDivElement {
         const icon = document.createElement('div');
 
-        if (this.categoryDef_.categorystyle === "favorites_category") {
+        if (this.categoryDef_.categorystyle === "favorites_category" || this.categoryDef_.categorystyle === "favorite_blocks_category") {
             icon.classList.add('categoryBubbleIcon');
             icon.style.color = this.colour_;
             icon.innerHTML = StarIcon;

@@ -16,7 +16,7 @@ export const blocklySlice = createSlice({
         edgeEditMarker: null as null | EdgeEditMarker,
         targetBlocks: {} as Record<string, string>,
         variables: [] as Array<{ name: string, type: IType, id: string }>,
-        pinnedBlocks: [] as Array<{ hash: string }>,
+        pinnedBlocks: [] as Array<{ hash: string, block: GenericBlockDefinition }>,
         searchForm: {
             open: false,
             allowDragging: true,
@@ -62,10 +62,10 @@ export const blocklySlice = createSlice({
             if (index !== -1) {
                 state.pinnedBlocks.splice(index, 1);
             } else {
-                state.pinnedBlocks.push({ hash: blockId });
+                state.pinnedBlocks.push({ hash: blockId, block: action.payload });
             }
         },
-        setPinnedBlocks: (state, action: { type: string, payload: Array<{ hash: string }> }) => {
+        setPinnedBlocks: (state, action: { type: string, payload: Array<{ hash: string, block: GenericBlockDefinition }> }) => {
             state.pinnedBlocks = action.payload;
         },
         toggleSearchFormOpen: (state) => {
