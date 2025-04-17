@@ -112,4 +112,14 @@ export function useSettingsHandlers(
     useEffect(() => {
         workspaceRef.current?.render();
     }, [workspaceRef, settings.edgeKind, settings.edgeLineCap, settings.edgeMaxWidth, settings.edgeMinWidth]);
+
+    useEffect(() => {
+        const workspace = workspaceRef.current;
+        if (!workspace) return;
+
+        const toolbox = workspace.getToolbox() as ContinuousToolbox | null;
+        if (!toolbox) return;
+
+        toolbox.handleToolboxItemResize();
+    }, [settings.reactToolboxWidth, settings.toolboxVersion, workspaceRef]);
 }

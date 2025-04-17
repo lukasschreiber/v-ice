@@ -8,6 +8,7 @@
  * @fileoverview Overrides metrics to exclude the flyout from the viewport.
  */
 
+import { store } from '@/store/store';
 import * as Blockly from 'blockly/core';
 
 /** Computes metrics for a toolbox with an always open flyout. */
@@ -26,6 +27,7 @@ export class ContinuousMetrics extends Blockly.MetricsManager {
         const toolboxMetrics = this.getToolboxMetrics();
         const flyoutMetrics = this.getFlyoutMetrics(false);
         const toolboxPosition = toolboxMetrics.position;
+        const isRichToolbxox = store.getState().settings.settings.toolboxVersion === "rich";
 
         if (this.workspace_.getToolbox()) {
             // Note: Not actually supported at this time due to ContinunousToolbox
@@ -39,7 +41,11 @@ export class ContinuousMetrics extends Blockly.MetricsManager {
                 toolboxPosition == Blockly.TOOLBOX_AT_LEFT ||
                 toolboxPosition == Blockly.TOOLBOX_AT_RIGHT
             ) {
-                svgMetrics.width -= toolboxMetrics.width + flyoutMetrics.width;
+                if (isRichToolbxox) {
+                    svgMetrics.width -= store.getState().settings.settings.reactToolboxWidth + toolboxMetrics.width;
+                } else {
+                    svgMetrics.width -= toolboxMetrics.width + flyoutMetrics.width;
+                }
             }
         }
         return {
