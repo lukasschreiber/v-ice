@@ -60,3 +60,7 @@ export function isEvaluatedOperationNode(node: ASTNodeBase<ASTNodeKind>): node i
 export function isEvaluatedSetNode(node: ASTNodeBase<ASTNodeKind>): node is eASTSetNode {
     return node.kind === ASTNodeKind.Set && node.hasOwnProperty("evaluatedOperations")
 }
+
+export function isEvaluatedSetArithmeticNode(node: ASTNodeBase<ASTNodeKind>): node is eASTSetNode {
+    return node.kind === ASTNodeKind.Set && "attributes" in node && typeof node.attributes === "object" && node.attributes !== null &&  node.attributes.hasOwnProperty("selection")
+}

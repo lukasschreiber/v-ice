@@ -98,6 +98,12 @@ export function createSubsetTransformer(
     return { ...definition, kind: ASTNodeKind.Set, blockName: "subset_node" } as SetNodeQueryTransformerDefinition
 }
 
+export function createSetArithmeticTransformer(
+    definition: Omit<SetNodeQueryTransformerDefinition, "kind" | "blockName">
+): SetNodeQueryTransformerDefinition {
+    return { ...definition, kind: ASTNodeKind.Set, blockName: "set_arithmetic_node" } as SetNodeQueryTransformerDefinition
+}
+
 export function createQueryFunctionTransformer(
     definition: Omit<QueryFunctionTransformerDefinition, "kind">
 ): QueryFunctionTransformerDefinition {

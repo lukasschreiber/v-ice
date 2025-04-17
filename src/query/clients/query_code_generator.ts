@@ -4,7 +4,7 @@ import { NodeTransformerFn, OperationNodeQueryTransformerDefinition, PrimitiveNo
 import types, { IType } from "@/data/types";
 import { traverseASTReverse } from "../builder/ast_traverser";
 import { SerializedEdge } from "@/utils/edges";
-import { convertToEvaluatedAST, eAST, isEvaluatedOperationNode, isEvaluatedSetNode } from "../builder/evaluated_ast";
+import { convertToEvaluatedAST, eAST, isEvaluatedOperationNode, isEvaluatedSetArithmeticNode, isEvaluatedSetNode } from "../builder/evaluated_ast";
 import { NameManager } from "./query_name_manager";
 import { hashString } from "@/utils/hash";
 
@@ -41,11 +41,11 @@ export class QueryCodeGenerator {
             const setMap: Map<string, ASTSetNode> = new Map()
             traverseASTReverse(clonedAST, {
                 visit: (node) => {
-                    if (isEvaluatedSetNode(node)) {
+                    if (isEvaluatedSetNode(node) || isEvaluatedSetArithmeticNode(node)) {
                         setMap.set(node.attributes.id, node)
                     }
 
-                    if (isEvaluatedSetNode(node) && node.inputs) {
+                    if ((isEvaluatedSetNode(node) || isEvaluatedSetArithmeticNode(node)) && node.inputs) {
                         for (const [name, edges] of Object.entries(node.inputs)) {
                             for (const edge of edges) {
                                 edgeSetMap.set(`${edge.connectedSetId}-${edge.connectionPoint ?? "output"}_${node.attributes.id}-${name}`, {
@@ -58,7 +58,7 @@ export class QueryCodeGenerator {
                         }
                     }
 
-                    if (isEvaluatedSetNode(node) && !node.operations) return;
+                    if (isEvaluatedSetNode(node) && !node.operations && !isEvaluatedSetArithmeticNode(node)) return;
 
                     const transformer = this.getTransformerForNode(node)
                     if (isEvaluatedOperationNode(node)) {
@@ -83,7 +83,7 @@ export class QueryCodeGenerator {
                     } else if (nodeClone.hasOwnProperty("evaluatedArgs")) {
                         nodeClone.args = nodeClone.evaluatedArgs
                     }
-
+                    
                     this.generatedCodeMap.set(this.getNodeHash(node), transformer(nodeClone, this.getQueryTransformerUtils(node.kind, node)))
                 }
             })
@@ -185,7 +185,15 @@ export class QueryCodeGenerator {
         }
 
         if (isSetNode(node)) {
-            let blockName = "operations" in node ? "subset_node" : "inputs" in node ? "target_node" : "source_node"
+            let blockName = "source_node" 
+            if ("attributes" in node && typeof node.attributes === "object" && node.attributes !== null &&  node.attributes.hasOwnProperty("selection")) {
+                blockName = "set_arithmetic_node"
+            } else if ("operations" in node) {
+                blockName = "subset_node"
+            }  else if ("inputs" in node) {
+                blockName = "target_node"
+            }
+
             transformer = (this.transformers[ASTNodeKind.Set][blockName]?.transformer || null) as NodeTransformerFn<K, N> | null
         }
 

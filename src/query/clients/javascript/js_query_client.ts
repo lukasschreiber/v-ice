@@ -1,5 +1,5 @@
 import { createQueryClient } from "@/query/clients/query_client_build";
-import { createOperationTransformer, createPrimitiveTransformer, createQueryFunctionTransformer, createSubsetTransformer } from "@/query/clients/query_transformer";
+import { createOperationTransformer, createPrimitiveTransformer, createQueryFunctionTransformer, createSetArithmeticTransformer, createSubsetTransformer } from "@/query/clients/query_transformer";
 import t, { IBooleanType } from "@/data/types"
 import prettier from "prettier";
 import babelParser from "prettier/plugins/babel"
@@ -327,7 +327,7 @@ export const jsQueryClient = createQueryClient({
                 args: { number: t.number, operator: t.string },
                 transformer: (astNode) => {
                     const op = astNode.args.operator.replaceAll("\"", "")
-                    switch(op) {
+                    switch (op) {
                         case "SIN": return `Math.sin(${astNode.args.number})`
                         case "COS": return `Math.cos(${astNode.args.number})`
                         case "TAN": return `Math.tan(${astNode.args.number})`
@@ -430,6 +430,15 @@ export const jsQueryClient = createQueryClient({
                 }
             }),
 
+            createSetArithmeticTransformer({
+                transformer: (astNode, utils) => {
+                    const selection = astNode.attributes.selection as string[]
+                    return `function ${utils.createName(astNode.attributes.id, `set_arithmetic`)}(left, right, source) {
+                    return setArithmetic(left, right, source, [${selection.map(it => `"${it}"`).join(", ")}]);
+                }`
+                }
+            }),
+
             createQueryFunctionTransformer({
                 transformer: (source, sets, targets, edgeSetMap, utils) => {
                     function processInputs(inputs: ASTSetNodeInput[] | undefined): string {
@@ -452,7 +461,17 @@ export const jsQueryClient = createQueryClient({
                     }
 
                     return `function query_${source.attributes.name}(source) {
-                        ${sets.map(set => `const evaluated_${utils.getName(set.attributes.id)} = ${utils.getName(set.attributes.id)}(${processInputs(set.inputs?.["input"])})`).join("\n")}
+                        ${sets.map(set => {
+                            const isArithmeticNode = set.attributes.selection !== undefined
+                            let inputs: string | undefined = undefined
+                            if (isArithmeticNode) {
+                                inputs = processInputs(set.inputs?.["left"]) + ", " + processInputs(set.inputs?.["right"]) + ", source"
+                            } else {
+                                inputs = processInputs(set.inputs?.["input"])
+                            }
+
+                            return `const evaluated_${utils.getName(set.attributes.id)} = ${utils.getName(set.attributes.id)}(${inputs})` 
+                        }).join("\n")}
                         return {
                             targets: {${targets.map(target => `"${target.attributes.targetId}": ${processInputs(target.inputs?.["input"])}`).join(", ")}},
                             edgeCounts: {${Array.from(edgeSetMap.entries()).map(([key, value]) => `"${key}": count(${processInputs([{
