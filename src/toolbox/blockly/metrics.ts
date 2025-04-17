@@ -52,7 +52,7 @@ export class ContinuousMetrics extends Blockly.MetricsManager {
             height: svgMetrics.height / scale,
             width: svgMetrics.width / scale,
             top: -this.workspace_.scrollY / scale,
-            left: -this.workspace_.scrollX / scale,
+            left: (-this.workspace_.scrollX) / scale,
         };
     }
 
@@ -64,13 +64,18 @@ export class ContinuousMetrics extends Blockly.MetricsManager {
         const toolboxMetrics = this.getToolboxMetrics();
         const flyoutMetrics = this.getFlyoutMetrics(false);
         const toolboxPosition = toolboxMetrics.position;
+        const isRichToolbxox = store.getState().settings.settings.toolboxVersion === "rich";
         let absoluteLeft = 0;
 
         if (
             this.workspace_.getToolbox() &&
             toolboxPosition == Blockly.TOOLBOX_AT_LEFT
         ) {
-            absoluteLeft = toolboxMetrics.width + flyoutMetrics.width;
+            if (isRichToolbxox) {
+                absoluteLeft = store.getState().settings.settings.reactToolboxWidth + toolboxMetrics.width;
+            } else {
+                absoluteLeft = toolboxMetrics.width + flyoutMetrics.width;
+            }
         }
         let absoluteTop = 0;
         if (
