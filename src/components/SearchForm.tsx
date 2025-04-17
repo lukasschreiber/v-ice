@@ -1,6 +1,6 @@
 import { TypeChecker } from "@/data/type_checker";
 import types from "@/data/types";
-import { useWorkspace } from "@/main";
+import { DataTable, useWorkspace } from "@/main";
 import { getBlockHeightWidth } from "@/renderer/block_metric_approximator";
 import { useSelector } from "@/store/hooks";
 import { Variables } from "@/toolbox/categories/variables";
@@ -12,14 +12,17 @@ import { VariableSizeList } from "react-window";
 import { TypeIconPreview } from "./common/TypeIconPreview";
 import * as Blockly from "blockly/core";
 import { blockDefinitionToBlockState } from "@/toolbox/utils";
+import InfoIcon from "@/assets/InfoIcon.svg?react";
 import { Blocks } from "@/blocks";
 import { useLocalStorage } from "@v-ice/commons";
+import { Tooltip } from "./common/Tooltip";
 
 export function SearchForm(props: { onClose: () => void }) {
     const listRef = useRef<VariableSizeList>(null);
     const { workspace } = useWorkspace();
     const scale = useSelector((state) => state.settings.settings.zoom);
     const [searchTerm, setSearchTerm] = useState<string>("");
+    const sourceTable = useSelector((state) => state.sourceTable);
     const [onlyUseExactType, setOnlyUseExactType] = useLocalStorage("onlyUseExactType", true);
     const overscanCount = useSelector((state) => state.settings.settings.reactToolboxOverscan);
     const type = useSelector((state) => state.blockly.searchForm.type);
@@ -71,6 +74,51 @@ export function SearchForm(props: { onClose: () => void }) {
         );
     }, [variableBlocks, getItemSize]);
 
+    const handleItemClick = useCallback(
+        (index: number) => {
+            const block = variableBlocks[index];
+            if (allowDragging) return;
+
+            if (blockId && inputName) {
+                const parentBlock = workspace.getBlockById(blockId);
+                if (!parentBlock) return;
+
+                const connection = parentBlock.getInput(inputName)?.connection;
+
+                if (connection) {
+                    const oldBlock = connection.targetBlock();
+                    if (oldBlock) {
+                        connection.disconnect();
+                        oldBlock.dispose();
+                    }
+                }
+
+                const newBlock = Blockly.serialization.blocks.append(blockDefinitionToBlockState(block), workspace);
+
+                if (Blocks.Types.isDynamicInputBlock(parentBlock)) {
+                    parentBlock.setType(
+                        inputName,
+                        types.utils.fromString(newBlock.outputConnection?.getCheck()?.[0] ?? ""),
+                        false
+                    );
+                }
+
+                connection?.connect(newBlock.outputConnection!);
+            }
+
+            props.onClose();
+        },
+        [allowDragging, variableBlocks, blockId, inputName, props.onClose, workspace]
+    );
+
+    const handleInfoClick = useCallback(
+        (event: React.MouseEvent, _index: number) => {
+            event.stopPropagation();
+            event.preventDefault();
+        },
+        [variableBlocks]
+    );
+
     const rowRenderer = useCallback(
         ({ index, style }: { index: number; style: CSSProperties }) => {
             const block = variableBlocks[index];
@@ -79,42 +127,8 @@ export function SearchForm(props: { onClose: () => void }) {
             return (
                 <div
                     style={style}
-                    onMouseDown={() => {
-                        if (allowDragging) return;
-
-                        if (blockId && inputName) {
-                            const parentBlock = workspace.getBlockById(blockId);
-                            if (!parentBlock) return;
-
-                            const connection = parentBlock.getInput(inputName)?.connection;
-
-                            if (connection) {
-                                const oldBlock = connection.targetBlock();
-                                if (oldBlock) {
-                                    connection.disconnect();
-                                    oldBlock.dispose();
-                                }
-                            }
-
-                            const newBlock = Blockly.serialization.blocks.append(
-                                blockDefinitionToBlockState(block),
-                                workspace
-                            );
-
-                            if (Blocks.Types.isDynamicInputBlock(parentBlock)) {
-                                parentBlock.setType(
-                                    inputName,
-                                    types.utils.fromString(newBlock.outputConnection?.getCheck()?.[0] ?? ""),
-                                    false
-                                );
-                            }
-
-                            connection?.connect(newBlock.outputConnection!);
-                        }
-
-                        props.onClose();
-                    }}
-                    className={`w-full hover:bg-gray-100 rounded-md flex items-center ${allowDragging ? "" : "cursor-pointer"}`}
+                    onClick={() => handleItemClick(index)}
+                    className={`w-full hover:bg-gray-100 rounded-md flex items-center justify-between pr-2 ${allowDragging ? "" : "cursor-pointer"}`}
                 >
                     <ReactToolboxBlockRow
                         block={block}
@@ -125,6 +139,51 @@ export function SearchForm(props: { onClose: () => void }) {
                         noFavorite
                         noInteraction={!allowDragging}
                     />
+                    <div className="flex items-center gap-2">
+                        <Tooltip
+                            text={(() => {
+                                const variableField = block.fields?.["VAR"];
+                                if (!variableField) return null;
+                                const type = types.utils.fromString(variableField.type as string);
+                                const name = variableField.name as string;
+                                return (
+                                    <div className="flex flex-col gap-1 text-xs p-1">
+                                        <div className="flex">
+                                            <div className="w-24 font-semibold text-gray-700">Variable Name:</div>
+                                            <div className="text-gray-600">{name}</div>
+                                        </div>
+                                        <div className="flex">
+                                            <div className="w-24 font-semibold text-gray-700">Variable Type:</div>
+                                            <div className="text-gray-600 max-w-[200px]">
+                                                {types.utils.describe(type)}
+                                            </div>
+                                        </div>
+                                        <div className="flex">
+                                            <div className="w-24 font-semibold text-gray-700">Examples:</div>
+                                            <div className="text-gray-600 max-w-[200px]">
+                                                {types.utils
+                                                    .examplesForColumn(
+                                                        name,
+                                                        DataTable.fromNormalizedTable(sourceTable),
+                                                        3
+                                                    )
+                                                    .join(", ")}
+                                            </div>
+                                        </div>
+                                    </div>
+                                );
+                            })()}
+                            position="right"
+                            className="text-text"
+                        >
+                            <div
+                                className="rounded-md hover:bg-gray-200 p-1 flex items-center justify-center cursor-pointer"
+                                onClick={(e) => handleInfoClick(e, index)}
+                            >
+                                <InfoIcon className="w-5 h-5 text-gray-500" />
+                            </div>
+                        </Tooltip>
+                    </div>
                 </div>
             );
         },

@@ -1,9 +1,9 @@
 import { Layer } from "@/utils/zindex";
-import { HTMLProps, useRef, useState } from "react";
+import { HTMLProps, ReactNode, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 
 export function Tooltip(
-    props: HTMLProps<HTMLDivElement> & { text: string; distance?: number; position?: "left" | "right" }
+    props: HTMLProps<HTMLDivElement> & { text: string | ReactNode; distance?: number; position?: "left" | "right" }
 ) {
     const { text, distance = 10, position = "right", className, style, ...rest } = props;
     const [isHovered, setIsHovered] = useState(false);
