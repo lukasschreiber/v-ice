@@ -26,9 +26,27 @@ export class FieldEdgeConnection extends Blockly.Field implements TypedField {
         return new FieldEdgeConnection(options)
     }
 
-    getEdgeXY(): Blockly.utils.Coordinate {
+    getEdgeXY(includeOffset: boolean = false): Blockly.utils.Coordinate {
         const offset = this.getConnectionDotOffset()
-        return this.getRelativeToSurfaceXY().translate(offset.x, offset.y)
+
+        if (!includeOffset) {
+            return this.getRelativeToSurfaceXY().translate(offset.x, offset.y)
+        }
+
+        const sourceBlock = this.getSourceBlock() as Blockly.BlockSvg | null
+        const workspace = sourceBlock?.workspace as Blockly.WorkspaceSvg | null
+
+        if (!workspace) {
+            throw new Error('Cannot calculate position because the workspace has not been appended');
+        }
+
+        const injectionDivBounds = workspace.getInjectionDiv().getBoundingClientRect();
+        const scale = workspace.scale
+
+        const offsetX = injectionDivBounds.left / scale
+        const offsetY = injectionDivBounds.top / scale
+
+        return this.getRelativeToSurfaceXY().translate(offset.x, offset.y).translate(-offsetX, -offsetY)
     }
 
     getConnectionDotOffset(): Blockly.utils.Coordinate {

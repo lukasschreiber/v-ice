@@ -4,6 +4,7 @@ import { getFieldFromEvent } from "@/events/utils";
 import { closeSearchForm } from "@/store/blockly/blockly_slice";
 import { store } from "@/store/store";
 import * as Blockly from "blockly/core";
+import { Renderer } from "./renderer";
 
 export class BlockDragger extends Blockly.dragging.Dragger {
 
@@ -21,7 +22,8 @@ export class BlockDragger extends Blockly.dragging.Dragger {
             if (targetField && targetField instanceof FieldLocalVariable && Blocks.Types.isScopedBlock(target) && targetField.getSourceBlock()?.id === target.scope) {
                 this.wouldDeleteDraggable = () => true;
             }
-            target.render()
+            const renderer = target.workspace.getRenderer() as Renderer;
+            renderer.render(target, true);
         }
     }
 }

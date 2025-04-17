@@ -135,7 +135,7 @@ Blockly.Events.BlockMove.prototype.run = function (forward: boolean) {
         const renderer = workspace.getRenderer() as Renderer
         const block = workspace.getBlockById(this.blockId)
         if (block && Blocks.Types.isNodeBlock(block)) {
-            renderer.renderEdges(block)
+            renderer.renderEdges(block, true)
         }
     }
 }

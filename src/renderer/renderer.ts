@@ -70,16 +70,16 @@ export class Renderer extends Blockly.zelos.Renderer {
         new EdgeDrawer({} as Edge, this.linkSvgRoot_!).disposeMarker()
     }
 
-    override render(block: Blockly.BlockSvg) {
+    override render(block: Blockly.BlockSvg, opt_include_edge_offset: boolean = false): void {
         const info = this.makeRenderInfo_(block);
         info.measure();
         this.makeDrawer_(block, info).draw();
         if (Blocks.Types.isNodeBlock(block) && block.shouldDrawEdges()) {
-            this.renderEdges(block)
+            this.renderEdges(block, opt_include_edge_offset)
         }
     }
 
-    renderEdges(block: Blockly.BlockSvg & NodeBlock) {
+    renderEdges(block: Blockly.BlockSvg & NodeBlock, includeOffset: boolean = false): void {
         this.linkSvgRoot_!.querySelectorAll(`[data-id="${block.id}"]`).forEach((element) => element.remove())
         // FIXME: currently connections are drawn two times and only updated on either side
         const connections = block.edgeConnections
@@ -92,7 +92,7 @@ export class Renderer extends Blockly.zelos.Renderer {
                         sourceField: block.getField(fieldName) as FieldEdgeConnection,
                         targetBlock: targetBlock,
                         targetField: targetBlock.getField([...targetBlock.edgeConnections.entries()].find(([, value]) => value.connections.includes(connection.targetConnection!))![0]) as FieldEdgeConnection,
-                    }).draw()
+                    }).draw(includeOffset)
                 }
             }
         }

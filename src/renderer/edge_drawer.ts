@@ -112,14 +112,14 @@ export class EdgeDrawer {
         }
     }
 
-    draw() {
+    draw(includeOffset: boolean = false) {
         if (!this.edge_.sourceField || !this.edge_.sourceBlock) return
 
         if (this.edge_.sourceBlock.shouldDrawEdges() && this.edge_.targetBlock && this.edge_.targetField && this.edge_.sourceField.name) {
             const connectionId = getEdgeId(this.edge_)
             this.linkRoot_.querySelectorAll(`[data-connection="${connectionId}"]`).forEach((element) => element.remove())
 
-            this.drawEdge_(this.edge_.sourceField.getEdgeXY(), this.edge_.targetField.getEdgeXY(), this.edge_.sourceBlock.id, connectionId, this.colorClass_)
+            this.drawEdge_(this.edge_.sourceField.getEdgeXY(includeOffset), this.edge_.targetField.getEdgeXY(), this.edge_.sourceBlock.id, connectionId, this.colorClass_)
 
             // TODO: move to gesture
             this.edgePath_!.addEventListener("click", () => {
