@@ -2,11 +2,13 @@ import React, { CSSProperties, useContext } from "react";
 import { ReactToolboxCategoryRow } from "./ReactToolboxCategoryRow";
 import { ReactToolboxBlockRow } from "./ReactToolboxBlockRow";
 import { ToolboxLayoutContext, ToolboxMetaContext } from "./ReactToolboxContext";
+import { useSelector } from "@/store/hooks";
 
 export const ReactToolBoxRowRenderer = React.memo(
     function ReactToolBoxRowRenderer({ index, style }: { index: number; style: CSSProperties }) {
         const { padding, margin } = useContext(ToolboxMetaContext);
         const { getItem, getItemSize } = useContext(ToolboxLayoutContext);
+        const showFavorites = useSelector((state) => state.settings.settings.toolboxFavorites);
 
         const item = getItem(index);
 
@@ -44,6 +46,7 @@ export const ReactToolBoxRowRenderer = React.memo(
                     height={metrics.height - 2 * padding - 2 * margin}
                     padding={padding}
                     noHighlight={item.noHighlight}
+                    noFavorite={!showFavorites}
                 />
             </div>
         );

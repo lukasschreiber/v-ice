@@ -1,7 +1,7 @@
 import { NodeBlock } from "@/blocks/extensions/node";
 import * as Blockly from "blockly/core";
 import { Order as JsOrder } from 'blockly/javascript';
-import * as ambient from "@/query/ambient_functions"
+import * as ambient from "@/query/clients/javascript/ambient/ambient_functions"
 import * as timeline_matcher from "@/query/timeline_matcher"
 import { Blocks } from "@/blocks";
 import { NodeConnectionType } from "@/blocks/fields/field_edge_connection";

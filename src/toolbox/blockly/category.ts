@@ -97,7 +97,8 @@ export class ContinuousCategory extends Blockly.ToolboxCategory {
 
     isHidden() {
         if (hasIsHiddenFunc(this.categoryDef_)) {
-            return evaluateIsHiddenFunc(this.categoryDef_, this.workspace_, store.getState().sourceTable.columns);
+            const state = store.getState();
+            return evaluateIsHiddenFunc(this.categoryDef_, this.workspace_, state.sourceTable.columns, state.settings.settings);
         }
 
         return false;

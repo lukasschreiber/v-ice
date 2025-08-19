@@ -3,6 +3,13 @@ import { useSelector } from "@/store/hooks";
 import { Layer } from "@/utils/zindex";
 import { useEffect, useRef, useState } from "react";
 
+const featureLabels: Record<string, string> = {
+    toolbox: "Loading Toolbox",
+    workspace: "Rendering Workspace",
+    variables: "Creating Variables",
+    persistedWorkspace: "Restoring Saved State"
+}
+
 export function LoadingOverlay(props: { isLoading: boolean }) {
     const [shouldRender, setShouldRender] = useState(props.isLoading);
     const featuresReady = useSelector((state) => state.blockly.featuresReady);
@@ -75,7 +82,7 @@ export function LoadingOverlay(props: { isLoading: boolean }) {
                 <div className="text-gray-500 text-xs text-left">
                     {Object.entries(featuresReady).map(([feature, ready]) => (
                         <div key={feature}>
-                            {feature}:{" "}
+                            {featureLabels[feature]}:{" "}
                             {ready
                                 ? `Ready (${formatDuration(
                                       (readyTimestamps[feature] ?? performance.now()) -
@@ -85,7 +92,7 @@ export function LoadingOverlay(props: { isLoading: boolean }) {
                         </div>
                     ))}
                     <div>
-                        Settings:{" "}
+                        Applying Settings:{" "}
                         {settingsInitialized
                             ? `Ready (${formatDuration(
                                   (settingsReadyTimestamp ?? performance.now()) -

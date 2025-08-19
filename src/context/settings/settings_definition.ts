@@ -19,6 +19,7 @@ export interface LayoutSettings {
     toolboxPosition: SelectSetting<"left" | "right">
     toolboxVersion: SelectSetting<"standard" | "rich">
     toolboxVisible: CheckboxSetting
+    toolboxFavorites: CheckboxSetting
     showZoomControls: CheckboxSetting
     showCenterControl: CheckboxSetting
     showAutocomplete: CheckboxSetting
@@ -144,6 +145,15 @@ export function getSettingsDefinition() {
                     default: true,
                     label: "Toolbox Global Search",
                     helpText: "Enable or disable the global search in the toolbox",
+                    hidden: (settings: Settings) => {
+                        return settings.toolboxVersion !== "rich";
+                    }
+                },
+                toolboxFavorites: {
+                    type: "checkbox",
+                    default: true,
+                    label: "Toolbox Favorites",
+                    helpText: "Enable or disable the favorites in the toolbox",
                     hidden: (settings: Settings) => {
                         return settings.toolboxVersion !== "rich";
                     }

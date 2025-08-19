@@ -26,6 +26,9 @@ importers:
       '@v-ice/commons':
         specifier: workspace:^
         version: link:commons
+      '@viz-js/viz':
+        specifier: ^3.16.0
+        version: 3.16.0
       acorn:
         specifier: ^8.11.3
         version: 8.14.1
@@ -1536,6 +1539,9 @@ packages:
 
   '@vitest/utils@3.0.8':
     resolution: {integrity: sha512-nkBC3aEhfX2PdtQI/QwAWp8qZWwzASsU4Npbcd5RdMPBSSLCpkZp52P3xku3s3uA0HIEhGvEcF8rNkBsz9dQ4Q==}
+
+  '@viz-js/viz@3.16.0':
+    resolution: {integrity: sha512-tu9I4aYyai39G6TTQKtLKyfxFjDYPxad/LKu8Nk6Tvd4O4Hy/UHqr4DM6+N6ItW6hO6LeEhB51NzwpWch420qQ==}
 
   '@volar/language-core@2.4.12':
     resolution: {integrity: sha512-RLrFdXEaQBWfSnYGVxvR2WrO6Bub0unkdHYIdC31HzIEqATIuuhRRzYu76iGPZ6OtA4Au1SnW0ZwIqPP217YhA==}
@@ -5124,6 +5130,8 @@ snapshots:
       '@vitest/pretty-format': 3.0.8
       loupe: 3.1.3
       tinyrainbow: 2.0.0
+
+  '@viz-js/viz@3.16.0': {}
 
   '@volar/language-core@2.4.12':
     dependencies:

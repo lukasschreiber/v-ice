@@ -6,7 +6,8 @@ import babelParser from "prettier/plugins/babel"
 import estree from "prettier/plugins/estree"
 import { QueryCodeGenerator } from "@/query/clients/query_code_generator";
 import { minify } from "terser";
-import * as ambient from "@/query/ambient_functions"
+import * as ambient from "@/query/clients/javascript/ambient/ambient_functions"
+import * as datetime_ambient from "@/query/clients/javascript/ambient/datetime";
 import { ASTSetNodeInput } from "@/query/builder/ast";
 // import { JSSimpleRuntime } from "./js_simple_runtime";
 // import { JSWorkerRuntime } from "./js_worker_runtime";
@@ -516,9 +517,10 @@ export const jsQueryClient = createQueryClient({
             }
             return result.code;
         },
-        ambientFunctions: Object.values(ambient).map((fn) => fn.toString()),
+        ambientFunctions: [...Object.values(ambient).map((fn) => fn.toString()), ...Object.values(datetime_ambient).map((fn) => fn.toString())],
         nameManager: new NameManager([
             ...Object.keys(ambient),
+            ...Object.keys(datetime_ambient),
             "source",
             "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do",
             "else", "export", "extends", "finally", "for", "function", "if", "import", "in", "instanceof",

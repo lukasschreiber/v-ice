@@ -1,3 +1,4 @@
+import { Settings } from "@/context/settings/settings"
 import { BlockConnectionDefinition, DataTableStructure, GenericBlockDefinition, IsHiddenFunc } from "./builder/definitions"
 import * as Blockly from "blockly/core"
 
@@ -9,10 +10,10 @@ export function getMetadataValue<K extends string, V, T>(item: T, key: K): V | u
     return item && typeof item === "object" && "metadata" in item && item.metadata && typeof item.metadata === "object" && key in item.metadata ? (item.metadata as { [key in K]: V })[key] : undefined
 }
 
-export function evaluateIsHiddenFunc<T>(item: T, workspace: Blockly.Workspace, tableStructure: DataTableStructure): boolean {
+export function evaluateIsHiddenFunc<T>(item: T, workspace: Blockly.Workspace, tableStructure: DataTableStructure, settings: Settings): boolean {
     if (hasIsHiddenFunc(item)) {
         if (typeof item.isHidden === "function") {
-            return item.isHidden(workspace, tableStructure)
+            return item.isHidden(workspace, tableStructure, settings)
         } else {
             return item.isHidden
         }

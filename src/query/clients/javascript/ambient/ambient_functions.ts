@@ -1,5 +1,4 @@
 import { type DataRow, type IndexedDataRow } from "@/data/table";
-import { DateTimeGranularityType } from "@/utils/datetime";
 
 export function conditionalSplit(dataset: DataRow[], filterFn: (row: DataRow) => boolean): { positive: DataRow[], negative: DataRow[] } {
     const positive: DataRow[] = []
@@ -186,62 +185,4 @@ export function hierarchyEquals(left: string, right: string, hierarchyName: stri
     if (leftPath === null && rightPath === null) return true
     if (leftPath === null || rightPath === null) return false
     return rightPath.every((part, i) => part === leftPath[i])
-}
-
-export function maskDate(date: string, maskedComponents: DateTimeGranularityType[]): string {
-    // the date string is in ISO format, so it is: yyyy-MM-ddThh:mm:ss.sssZ
-    let dateTime = window.luxon.DateTime.fromISO(date)
-    for (const component of maskedComponents) {
-        dateTime = dateTime.set({ [component]: component === "month" || component === "day" ? 1 : 0 })
-    }
-    return dateTime.toFormat("yyyy-MM-dd'T'HH:mm:ss")
-}
-
-export function compareDates(op: "equals" | "after" | "before" | "after_or_equals" | "before_or_equals", a: { timestamp: string, masked?: DateTimeGranularityType[] } | string, b: { timestamp: string, masked?: DateTimeGranularityType[] } | string): boolean {
-    if (typeof a === "string") a = { timestamp: a }
-    if (typeof b === "string") b = { timestamp: b }
-
-    let mask: DateTimeGranularityType[] = []
-    if (a.masked && b.masked) {
-        mask = Array.from(new Set(a.masked.concat(b.masked)))
-    } else if (a.masked) {
-        mask = a.masked
-    } else if (b.masked) {
-        mask = b.masked
-    }
-
-    if (op === "equals") {
-        return maskDate(a.timestamp, mask) === maskDate(b.timestamp, mask)
-    } else if (op === "after") {
-        return maskDate(a.timestamp, mask) > maskDate(b.timestamp, mask)
-    } else if (op === "before") {
-        return maskDate(a.timestamp, mask) < maskDate(b.timestamp, mask)
-    } else if (op === "after_or_equals") {
-        return maskDate(a.timestamp, mask) >= maskDate(b.timestamp, mask)
-    } else if (op === "before_or_equals") {
-        return maskDate(a.timestamp, mask) <= maskDate(b.timestamp, mask)
-    }
-
-    return false
-}
-
-export function dateDiff(a: { timestamp: string, masked?: DateTimeGranularityType[] } | string, b: { timestamp: string, masked?: DateTimeGranularityType[] } | string): number {
-    if (typeof a === "string") a = { timestamp: a }
-    if (typeof b === "string") b = { timestamp: b }
-
-    // get the unit as the smallest granularity not masked
-    let unit: DateTimeGranularityType = "second"
-    const mask = a.masked && b.masked ? Array.from(new Set(a.masked.concat(b.masked))) : a.masked || b.masked || []
-    const units: DateTimeGranularityType[] = ["second", "minute", "hour", "day", "month", "year"]
-    for (const component of units) {
-        if (!mask.includes(component)) {
-            unit = component as DateTimeGranularityType
-            break
-        }
-    }
-
-    const aDate = window.luxon.DateTime.fromISO(a.timestamp)
-    const bDate = window.luxon.DateTime.fromISO(b.timestamp)
-
-    return Math.abs(aDate.diff(bDate, unit).as(unit))
 }

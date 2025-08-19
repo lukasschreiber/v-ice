@@ -87,6 +87,7 @@ export function ReactToolboxProvider({
     const [perCategorySearchTerm, setPerCategorySearchTerm] = useState<Record<string, string>>({});
     const [perCategorySortingDirection, setPerCategorySortingDirection] = useState<Record<string, "asc" | "desc">>({});
     const [initialized, setInitialized] = useState(false);
+    const settings = useSelector((state) => state.settings.settings);
 
     const dispatch = useDispatch();
 
@@ -101,7 +102,7 @@ export function ReactToolboxProvider({
         if (!workspace || !variablesReady) return [];
 
         return definition.flatMap((category) => {
-            if (hasIsHiddenFunc(category) && evaluateIsHiddenFunc(category, workspace, columns)) return [];
+            if (hasIsHiddenFunc(category) && evaluateIsHiddenFunc(category, workspace, columns, settings)) return [];
 
             const blocks = category.kind === "static" ? category.blocks : category.instance.getBlocks(workspace);
             const noHighlight = getMetadataValue(category, "noHighlight") ?? false;
@@ -117,7 +118,7 @@ export function ReactToolboxProvider({
             ];
 
             const blockEntries = blocks
-                .filter((block) => !(hasIsHiddenFunc(block) && evaluateIsHiddenFunc(block, workspace, columns)))
+                .filter((block) => !(hasIsHiddenFunc(block) && evaluateIsHiddenFunc(block, workspace, columns, settings)))
                 .map((block) => ({
                     kind: "block",
                     block,
@@ -126,7 +127,7 @@ export function ReactToolboxProvider({
 
             return [...categoryEntry, ...blockEntries] as FlattenedToolboxEntry[];
         });
-    }, [definition, workspace, columns, variablesReady, pinnedBlocks, variables]);
+    }, [definition, workspace, columns, variablesReady, pinnedBlocks, variables, settings]);
 
     const getSearchTermForCategory = useCallback(
         (categoryId: string) => {

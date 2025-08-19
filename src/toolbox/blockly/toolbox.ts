@@ -38,7 +38,7 @@ export class ContinuousToolbox extends Blockly.Toolbox {
             flyout.recordScrollPositions();
         }
 
-        this.workspace_.addChangeListener((e) => {
+        this.workspace_.addChangeListener(() => {
             // eslint-disable-next-line @typescript-eslint/no-explicit-any
             // if (e.type === Blockly.Events.CREATE && (e.toJson() as any).json.type !== Blocks.Names.VARIABLE.LOCAL_GET) {
             //     this.refreshSelection();
@@ -81,7 +81,8 @@ export class ContinuousToolbox extends Blockly.Toolbox {
                 } else {
                     contents = contents.concat(itemContents.filter((item) => {
                         if (hasIsHiddenFunc(item)) {
-                            return !evaluateIsHiddenFunc(item, this.workspace_, store.getState().sourceTable.columns);
+                            const state = store.getState();
+                            return !evaluateIsHiddenFunc(item, this.workspace_, state.sourceTable.columns, state.settings.settings);
                         }
                     }));
                 }
@@ -93,7 +94,8 @@ export class ContinuousToolbox extends Blockly.Toolbox {
     protected override renderContents_(toolboxDef: Blockly.utils.toolbox.ToolboxItemInfo[]) {
         super.renderContents_(toolboxDef.filter((item) => {
             if (hasIsHiddenFunc(item)) {
-                return !evaluateIsHiddenFunc(item, this.workspace_, store.getState().sourceTable.columns);
+                const state = store.getState();
+                return !evaluateIsHiddenFunc(item, this.workspace_, state.sourceTable.columns, state.settings.settings);
             }
 
             return true;

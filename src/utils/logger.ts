@@ -17,6 +17,9 @@ type LogVariables = Record<string, Loggable>;
 
 async function shouldLog(level: LogLevel): Promise<boolean> {
     const store = (await import("@/store/store")).store;
+    if (!store) {
+        return false; // Store not available, cannot determine log level
+    }
     const allowedLogLevel = store.getState().settings.debugger.logLevel;
     return Object.values(LogLevel).indexOf(level) >= Object.values(LogLevel).indexOf(allowedLogLevel);
 }

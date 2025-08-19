@@ -3,12 +3,13 @@ import { NormalizedDataTable } from "@/data/table";
 import { IType, ValueOf } from "@/main";
 import * as Blockly from "blockly/core";
 import { DynamicToolboxCategory } from "../categories/dynamic_category";
+import { Settings } from "@/context/settings/settings";
 
 export type DataTableStructure = NormalizedDataTable["columns"]
 
 export type ToolboxDefinition = (IDynamicToolboxCategory<DynamicToolboxCategory, ToolboxCategoryMetadata> | IStaticToolboxCategory<ToolboxCategoryMetadata>)[]
 
-export type IsHiddenFunc = ((workspace: Blockly.Workspace, tableStructure: DataTableStructure) => boolean) | (() => boolean) | boolean
+export type IsHiddenFunc = ((workspace: Blockly.Workspace, tableStructure: DataTableStructure, settings: Settings) => boolean) | (() => boolean) | boolean
 
 export type ToolboxCategoryMetadata = { [key: string]: unknown } | undefined
 
