@@ -3,8 +3,9 @@ import GithubLight from "../assets/github-light.json";
 import { useEffect, useRef } from "react";
 
 export function Code(
-    props: React.HTMLProps<HTMLPreElement> & {
+    props: {
         code: string;
+        onChange?: (value: string) => void;
         language: string;
         decorations?: { regex: RegExp; className: string }[];
     }
@@ -65,7 +66,8 @@ export function Code(
             height="100%"
             width="100%"
             theme="github-light"
-            options={{ readOnly: true, fontSize: 12 }}
+            onChange={(value) => props.onChange?.(value ?? "")}
+            options={{ readOnly: props.onChange === undefined, fontSize: 12 }}
             beforeMount={setEditorTheme}
             onMount={handleEditorDidMount}
         />

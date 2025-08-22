@@ -9,6 +9,7 @@ import { Panel, PanelGroup, PanelResizeHandle } from "react-resizable-panels";
 import { ToolboxPanel } from "./components/tabs/ToolboxPanel";
 import { WorkspaceSavePanel } from "./components/tabs/WorspaceSavePanel";
 import { showNotification } from "@/context/notifications/notification_emitter";
+import { NFAPanel } from "./components/tabs/NFAPanel";
 
 function App() {
     const [language] = useState(localStorage.getItem("language") ?? "en");
@@ -130,6 +131,9 @@ function App() {
                         </Tab>
                         <Tab label="XML" description="The workspace as XML">
                             <Code language="xml" code={xml} />
+                        </Tab>
+                        <Tab label="NFA" description="The NFA visualization of the pattern matcher">
+                            <NFAPanel />
                         </Tab>
                     </Tabs>
                 </Panel>

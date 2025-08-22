@@ -1,21 +1,13 @@
 import { describe } from "vitest";
-import { buildPattern } from "../dsl/pattern_builder";
 import { DateTimeGranularity } from "@/utils/datetime";
 import { testPatternMatcher } from "./utils";
+import { P } from "../dsl/pattern_builder";
 
 describe("NFA Simulation Tests for Sequences with intervals between events", () => {
-    const daysPattern = buildPattern()
-        .sequence(
-            buildPattern()
-                .event((b) => b.matches((e) => e.type === "a"))
-                .build(),
-            buildPattern()
-                .event((b) =>
-                    b.matches((e) => e.type === "b").interval({ max: 10, min: 5, unit: DateTimeGranularity.DAY })
-                )
-                .build()
-        )
-        .build();
+    const daysPattern = P.seq(
+        P.event((e) => e.type === "a"),
+        P.event((e) => e.type === "b").intervalRange(5, 10, DateTimeGranularity.DAY)
+    );
 
     testPatternMatcher("Basic day interval sequence", {
         pattern: daysPattern,
@@ -50,18 +42,10 @@ describe("NFA Simulation Tests for Sequences with intervals between events", () 
     });
 
     testPatternMatcher("Hour interval sequence", {
-        pattern: buildPattern()
-            .sequence(
-                buildPattern()
-                    .event((b) => b.matches((e) => e.type === "a"))
-                    .build(),
-                buildPattern()
-                    .event((b) =>
-                        b.matches((e) => e.type === "b").interval({ max: 3, min: 1, unit: DateTimeGranularity.HOUR })
-                    )
-                    .build()
-            )
-            .build(),
+        pattern: P.seq(
+            P.event((e) => e.type === "a"),
+            P.event((e) => e.type === "b").intervalRange(1, 3, DateTimeGranularity.HOUR)
+        ),
         input: [
             { type: "a", timestamp: "2023-01-01T00:00:00Z" },
             { type: "b", timestamp: "2023-01-01T03:00:00Z" },
@@ -71,16 +55,10 @@ describe("NFA Simulation Tests for Sequences with intervals between events", () 
     });
 
     testPatternMatcher("No maximum", {
-        pattern: buildPattern()
-            .sequence(
-                buildPattern()
-                    .event((b) => b.matches((e) => e.type === "a"))
-                    .build(),
-                buildPattern()
-                    .event((b) => b.matches((e) => e.type === "b").interval({ max: 1, unit: DateTimeGranularity.HOUR }))
-                    .build()
-            )
-            .build(),
+        pattern: P.seq(
+            P.event((e) => e.type === "a"),
+            P.event((e) => e.type === "b").intervalMax(1, DateTimeGranularity.HOUR)
+        ), 
         input: [
             { type: "a", timestamp: "2023-01-01T00:00:00Z" },
             { type: "b", timestamp: "2023-01-01T01:00:00Z" },

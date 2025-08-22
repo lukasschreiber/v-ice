@@ -13,7 +13,7 @@ import {
     SequencePattern,
 } from "./dsl/patterns";
 import { compareDates } from "../ambient/datetime";
-import { matchTimeline, TimelineEntryWithIndex } from "./nfa_simulation";
+import { matchTimeline, Path, TimelineEntryWithIndex } from "./nfa_simulation";
 
 export interface NFAState<T extends StructFields = StructFields> {
     id: number;
@@ -28,6 +28,7 @@ export interface NFATransition<T extends StructFields = StructFields> {
     next: NFAState<T>;
     interval?: RelativeInterval;
     occurrence?: EventOccurence;
+    onTransition?: (path: Path<StructFields>, event: TimelineEntry<T>) => void; // callback when this transition is taken
 }
 
 export class PatternMatcher<T extends StructFields = StructFields> {
@@ -178,8 +179,8 @@ function choicePatternToNFA<T extends StructFields>(
 
     for (const sub of pattern.patterns) {
         const [subStart, subEnd] = patternToNFA<T>(sub, stateIdCounter);
-        start.transitions.push({ next: subStart }); // fork
-        subEnd.transitions.push({ next: end }); // join
+        start.transitions.push({ next: subStart, labels: ["ε"] }); // fork
+        subEnd.transitions.push({ next: end, labels: ["ε"] }); // join
     }
 
     return [start, end];
@@ -190,16 +191,48 @@ function repeatPatternToNFA<T extends StructFields>(
     stateIdCounter: { value: number }
 ): [NFAState<T>, NFAState<T>] {
     const start: NFAState<T> = { id: stateIdCounter.value++, transitions: [], isAccepting: false };
-    const end: NFAState<T> = { id: stateIdCounter.value++, transitions: [], isAccepting: false };
+    const end: NFAState<T>   = { id: stateIdCounter.value++, transitions: [], isAccepting: false };
 
-    const [subStart, subEnd] = patternToNFA<T>(pattern.pattern, stateIdCounter);
+    let currentStart = start;
+    if (pattern.min === undefined) {
+        pattern.min = 0; // default to 0 if not specified
+    }
 
-    start.transitions.push({ next: subStart }); // start pattern
+    // 1. Mandatory repetitions (min)
+    for (let i = 0; i < pattern.min; i++) {
+        const [subStart, subEnd] = patternToNFA<T>(pattern.pattern, stateIdCounter);
+        currentStart.transitions.push({ next: subStart });
+        currentStart = subEnd;
+    }
 
-    // loop back
-    subEnd.transitions.push({ next: subStart });
-    // exit after minimum repetitions
-    subEnd.transitions.push({ next: end });
+    // 2. Optional repetitions (min → max)
+    if (pattern.max !== undefined && pattern.max !== Infinity) {
+        let remaining = pattern.max - pattern.min;
+
+        for (let i = 0; i < remaining; i++) {
+            const [subStart, subEnd] = patternToNFA<T>(pattern.pattern, stateIdCounter);
+            // Option to continue with another copy
+            currentStart.transitions.push({ next: subStart, labels: ["ε"] });
+            // Option to stop early
+            currentStart.transitions.push({ next: end, labels: ["ε"] });
+            currentStart = subEnd;
+        }
+    } else {
+        // unbounded (Kleene star–like)
+        const [subStart, subEnd] = patternToNFA<T>(pattern.pattern, stateIdCounter);
+        currentStart.transitions.push({ next: subStart, labels: ["ε"] });
+        // allow exit anytime
+        currentStart.transitions.push({ next: end, labels: ["ε"] });
+        // loop
+        subEnd.transitions.push({ next: subStart, labels: ["ε"] });
+        subEnd.transitions.push({ next: end, labels: ["ε"] });
+        currentStart = subEnd;
+    }
+
+    if (!currentStart.transitions.find(t => t.next.id === end.id)) {
+        // 3. Connect final piece to end
+        currentStart.transitions.push({ next: end, labels: ["ε"] });
+    }
 
     return [start, end];
 }
@@ -217,6 +250,10 @@ function dateAnchorPatternToNFA<T extends StructFields>(
         match: undefined,
         labels: [`timestamp >= ${pattern.date.timestamp}`],
         skipIf: (event) => compareDates("after_or_equals", pattern.date, { timestamp: event.timestamp }),
+        onTransition: (path) => {
+            // Update anchors
+            path.anchors.lastDateAnchor = pattern.date.timestamp;
+        },
         next: end,
     });
 

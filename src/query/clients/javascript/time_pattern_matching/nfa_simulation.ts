@@ -2,9 +2,21 @@ import { StructFields } from "@/data/types";
 import { TimelineEntry } from "@/query/generation/timeline_templates";
 import { NFAState } from "./nfa";
 import { dateDiff } from "../ambient/datetime";
+import { DateTime } from "luxon";
 
 export type TimelineEntryWithIndex<T extends StructFields> = TimelineEntry<T> & {
     index: number; // position in timeline
+};
+
+export type Path<T extends StructFields> = {
+    state: NFAState<T>;
+    index: number;
+    matched: TimelineEntryWithIndex<T>[];
+    anchors: {
+        timelineStart?: string;
+        lastEventAnchor?: string;
+        lastDateAnchor?: string;
+    };
 };
 
 export function matchTimeline<T extends StructFields>(
@@ -17,14 +29,15 @@ export function matchTimeline<T extends StructFields>(
 ): TimelineEntryWithIndex<T>[][] {
     const results: TimelineEntryWithIndex<T>[][] = [];
 
-    type Path = { state: NFAState<T>; index: number; matched: TimelineEntryWithIndex<T>[] };
-    let paths: Path[] = [{ state: nfaStart, index: 0, matched: [] }];
+    let paths: Path<T>[] = [
+        { state: nfaStart, index: 0, matched: [], anchors: { timelineStart: timeline[0]?.timestamp } },
+    ];
 
     while (paths.length > 0) {
-        const newPaths: Path[] = [];
+        const newPaths: Path<T>[] = [];
 
         for (const path of paths) {
-            const { state, index, matched } = path;
+            const { state, index, matched, anchors } = path;
 
             // Record match if accepting
             if (state.isAccepting) {
@@ -33,10 +46,19 @@ export function matchTimeline<T extends StructFields>(
             }
 
             for (const trans of state.transitions) {
+                if (trans.onTransition) {
+                    trans.onTransition(path as Path<StructFields>, timeline[index] ?? (null as any));
+                }
+
                 if (trans.skipIf) {
                     for (let i = index; i < timeline.length; i++) {
                         if (trans.skipIf(timeline[i])) {
-                            const nextPath = { state: trans.next, index: i + 1, matched: [...matched] };
+                            const nextPath = {
+                                state: trans.next,
+                                index: i + 1,
+                                matched: [...matched],
+                                anchors: { ...anchors },
+                            };
                             newPaths.push(nextPath);
                             debugEvents?.onChangeState?.(trans.next, timeline[i]);
                         }
@@ -46,7 +68,7 @@ export function matchTimeline<T extends StructFields>(
 
                 if (!trans.match) {
                     // Epsilon transition: explore without consuming an event
-                    const nextPath = { state: trans.next, index, matched: [...matched] };
+                    const nextPath = { state: trans.next, index, matched: [...matched], anchors: { ...anchors } };
                     newPaths.push(nextPath);
                     debugEvents?.onChangeState?.(trans.next, timeline[index] ?? (null as any));
                     continue;
@@ -56,30 +78,55 @@ export function matchTimeline<T extends StructFields>(
                     const event = timeline[index];
 
                     // occurrence filter
+                    // TODO: Just anything for now, needs to be implemented properly
                     if (trans.occurrence === "none") continue;
                     if (trans.occurrence === "first" && index !== 0) continue;
                     if (trans.occurrence === "last" && index !== timeline.length - 1) continue;
 
                     // interval check (if there is a previous match)
-                    if (matched.length > 0 && trans.interval) {
-                        const prev = matched[matched.length - 1];
-                        const diff = dateDiff(
-                            { timestamp: prev.timestamp },
-                            { timestamp: event.timestamp },
-                            trans.interval.unit
-                        );
+                    if (trans.interval) {
+                        let anchorTime: string | undefined;
+
+                        switch (trans.interval.relativeTo) {
+                            case "lastEventAnchor":
+                                anchorTime = anchors.lastEventAnchor ?? anchors.timelineStart;
+                                break;
+                            case "lastDateAnchor":
+                                anchorTime = anchors.lastDateAnchor ?? anchors.timelineStart;
+                                break;
+                            case "timelineStart":
+                                anchorTime = anchors.timelineStart;
+                                break;
+                            default: // undefined or "lastAnchor"
+                                const candidates = [
+                                    anchors.lastEventAnchor,
+                                    anchors.lastDateAnchor,
+                                    anchors.timelineStart,
+                                ].filter(Boolean) as string[];
+                                anchorTime = candidates.length
+                                    ? candidates.reduce((a, b) => (DateTime.fromISO(a) > DateTime.fromISO(b) ? a : b))
+                                    : timeline[index]?.timestamp;
+                        }
+
+                        if (!anchorTime) continue; // skip if no valid anchor
+
+                        const diff = dateDiff(anchorTime, event.timestamp, trans.interval.unit);
 
                         if (trans.interval.min !== undefined && diff < trans.interval.min) continue;
                         if (trans.interval.max !== undefined && diff > trans.interval.max) continue;
                     }
 
                     if (trans.match(event)) {
-                        const nextPath = {
+                        const nextAnchors = { ...anchors };
+                        // update event anchor
+                        nextAnchors.lastEventAnchor = event.timestamp;
+
+                        newPaths.push({
                             state: trans.next,
                             index: index + 1,
                             matched: [...matched, event],
-                        };
-                        newPaths.push(nextPath);
+                            anchors: nextAnchors,
+                        });
                         debugEvents?.onChangeState?.(trans.next, event);
                     }
                 }

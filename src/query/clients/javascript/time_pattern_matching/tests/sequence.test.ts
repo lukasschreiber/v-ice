@@ -1,19 +1,13 @@
 import { describe, expect, test } from "vitest";
-import { buildPattern } from "../dsl/pattern_builder";
 import { testPatternMatcher } from "./utils";
 import { createPatternMatcher } from "../nfa";
+import { P } from "../dsl/pattern_builder";
 
 describe("NFA Simulation Tests for Sequences", () => {
-    const pattern = buildPattern()
-        .sequence(
-            buildPattern()
-                .event((b) => b.matches((e) => e.type === "a"))
-                .build(),
-            buildPattern()
-                .event((b) => b.matches((e) => e.type === "b"))
-                .build()
-        )
-        .build();
+    const pattern = P.seq(
+        P.event((e) => e.type === "a"),
+        P.event((e) => e.type === "b"),
+    );
 
     testPatternMatcher("Sequantial events", {
         pattern,
@@ -81,7 +75,7 @@ describe("NFA Simulation Tests for Sequences", () => {
     });
 
     test("Empty pattern", () => {
-        const emptyPattern = buildPattern().build();
+        const emptyPattern = P.empty();
 
         expect(() => {
             const matcher = createPatternMatcher(emptyPattern);
